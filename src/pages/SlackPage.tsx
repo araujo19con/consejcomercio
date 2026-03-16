@@ -12,7 +12,6 @@ import {
 } from '@/lib/slack'
 import { detectSuggestions, type Suggestion, type ReuniaoSuggestion, type LeadSuggestion, type OportunidadeSuggestion } from '@/lib/slack-suggestions'
 import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
-import { useCreateReuniao } from '@/hooks/useReunioes'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 
@@ -50,17 +49,26 @@ function SuggestionCard({
   suggestion,
   onConfirm,
   onDismiss,
+  confirmed,
 }: {
   suggestion: Suggestion
   onConfirm: (s: Suggestion) => void
   onDismiss: (id: string) => void
+  confirmed: boolean
 }) {
   const date = tsToDate(suggestion.message.ts)
   return (
-    <div className="bg-white border-2 border-amber-200 rounded-xl p-4 space-y-2">
+    <div className={`bg-white rounded-xl p-4 space-y-2 border-2 ${confirmed ? 'border-green-200 opacity-75' : 'border-amber-200'}`}>
       <div className="flex items-start justify-between gap-2">
         <TypeBadge type={suggestion.type} />
-        <span className="text-xs text-slate-400">#{suggestion.channelName}</span>
+        <div className="flex items-center gap-1.5">
+          {confirmed && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+              <Check className="w-3 h-3" />Confirmado
+            </span>
+          )}
+          <span className="text-xs text-slate-400">#{suggestion.channelName}</span>
+        </div>
       </div>
 
       {suggestion.type === 'reuniao' && (
@@ -100,21 +108,23 @@ function SuggestionCard({
         "{formatSlackText(suggestion.rawText).slice(0, 120)}"
       </p>
 
-      <div className="flex gap-2 pt-1">
-        <button
-          onClick={() => onConfirm(suggestion)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white font-medium"
-          style={{ backgroundColor: '#0089ac' }}
-        >
-          <Check className="w-3 h-3" />Confirmar
-        </button>
-        <button
-          onClick={() => onDismiss(suggestion.id)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-slate-500 border border-slate-200 hover:bg-slate-50"
-        >
-          <X className="w-3 h-3" />Ignorar
-        </button>
-      </div>
+      {!confirmed && (
+        <div className="flex gap-2 pt-1">
+          <button
+            onClick={() => onConfirm(suggestion)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white font-medium"
+            style={{ backgroundColor: '#0089ac' }}
+          >
+            <Check className="w-3 h-3" />Confirmar
+          </button>
+          <button
+            onClick={() => onDismiss(suggestion.id)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-slate-500 border border-slate-200 hover:bg-slate-50"
+          >
+            <X className="w-3 h-3" />Ignorar
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -255,9 +265,7 @@ export function SlackPage() {
   const [channelMessages, setChannelMessages] = useState<Record<string, { name: string; msgs: SlackMessage[] }>>({})
   const [showSelector, setShowSelector] = useState(false)
   const [search, setSearch] = useState('')
-  const [reuniaoModal, setReuniaoModal] = useState<{ open: boolean; prefill?: Parameters<typeof NovaReuniaoModal>[0]['prefill'] }>({ open: false })
-
-  const createReuniao = useCreateReuniao()
+  const [reuniaoModal, setReuniaoModal] = useState<{ open: boolean; suggestionId?: string; prefill?: Parameters<typeof NovaReuniaoModal>[0]['prefill'] }>({ open: false })
 
   const { data: allChannels, isLoading, error } = useQuery<SlackChannel[]>({
     queryKey: ['slack-channels'],
@@ -288,6 +296,7 @@ export function SlackPage() {
       const r = suggestion as ReuniaoSuggestion
       setReuniaoModal({
         open: true,
+        suggestionId: suggestion.id,
         prefill: {
           titulo: r.titulo,
           dataHora: r.dataHora,
@@ -374,11 +383,26 @@ export function SlackPage() {
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-600" />
-            <h2 className="font-semibold text-amber-900">{allSuggestions.length} sugestão{allSuggestions.length > 1 ? 'ões' : ''} detectada{allSuggestions.length > 1 ? 's' : ''}</h2>
+            <h2 className="font-semibold text-amber-900">
+              {allSuggestions.filter(s => !confirmedIds.has(s.id)).length} sugestão
+              {allSuggestions.filter(s => !confirmedIds.has(s.id)).length !== 1 ? 'ões' : ''} pendente
+              {allSuggestions.filter(s => !confirmedIds.has(s.id)).length !== 1 ? 's' : ''}
+              {allSuggestions.some(s => confirmedIds.has(s.id)) && (
+                <span className="ml-2 text-green-700 font-normal text-sm">
+                  · {allSuggestions.filter(s => confirmedIds.has(s.id)).length} confirmada{allSuggestions.filter(s => confirmedIds.has(s.id)).length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {allSuggestions.map(s => (
-              <SuggestionCard key={s.id} suggestion={s} onConfirm={handleConfirm} onDismiss={handleDismiss} />
+              <SuggestionCard
+                key={s.id}
+                suggestion={s}
+                onConfirm={handleConfirm}
+                onDismiss={handleDismiss}
+                confirmed={confirmedIds.has(s.id)}
+              />
             ))}
           </div>
         </div>
@@ -433,6 +457,7 @@ export function SlackPage() {
       <NovaReuniaoModal
         open={reuniaoModal.open}
         onClose={() => {
+          if (reuniaoModal.suggestionId) markConfirmed(reuniaoModal.suggestionId)
           setReuniaoModal({ open: false })
         }}
         prefill={reuniaoModal.prefill}

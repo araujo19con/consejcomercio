@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { Plus, ChevronLeft, ChevronRight, Video, MapPin, Clock, CheckCircle, XCircle, Calendar } from 'lucide-react'
+import { Plus, ChevronLeft, ChevronRight, Video, MapPin, Clock, CheckCircle, XCircle, Calendar, Pencil, Trash2 } from 'lucide-react'
 import { useReunioes, useUpdateReuniao, useDeleteReuniao, type Reuniao } from '@/hooks/useReunioes'
 import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
 import { toast } from 'sonner'
 
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-const DIAS_FULL = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 function getWeekDays(reference: Date): Date[] {
@@ -34,10 +33,11 @@ function StatusBadge({ status }: { status: Reuniao['status'] }) {
   return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${map[status]}`}>{label[status]}</span>
 }
 
-function ReuniaoCard({ reuniao, onStatusChange, onDelete }: {
+function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit }: {
   reuniao: Reuniao
   onStatusChange: (id: string, status: Reuniao['status']) => void
   onDelete: (id: string) => void
+  onEdit: (r: Reuniao) => void
 }) {
   const dt = new Date(reuniao.data_hora)
   return (
@@ -61,22 +61,22 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete }: {
           <div className="text-slate-400">{reuniao.participantes.join(', ')}</div>
         )}
       </div>
-      {reuniao.status === 'agendada' && (
-        <div className="flex gap-1.5 mt-2 pt-2 border-t border-slate-100">
-          <button
-            onClick={() => onStatusChange(reuniao.id, 'realizada')}
-            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-green-600 hover:bg-green-50"
-          >
+      <div className="flex gap-1.5 mt-2 pt-2 border-t border-slate-100 flex-wrap">
+        <button onClick={() => onEdit(reuniao)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-slate-500 hover:bg-slate-100">
+          <Pencil className="w-3 h-3" />Editar
+        </button>
+        {reuniao.status === 'agendada' && (<>
+          <button onClick={() => onStatusChange(reuniao.id, 'realizada')} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-green-600 hover:bg-green-50">
             <CheckCircle className="w-3 h-3" />Realizada
           </button>
-          <button
-            onClick={() => onStatusChange(reuniao.id, 'cancelada')}
-            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-red-500 hover:bg-red-50"
-          >
+          <button onClick={() => onStatusChange(reuniao.id, 'cancelada')} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-red-500 hover:bg-red-50">
             <XCircle className="w-3 h-3" />Cancelar
           </button>
-        </div>
-      )}
+        </>)}
+        <button onClick={() => onDelete(reuniao.id)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-red-400 hover:bg-red-50 ml-auto">
+          <Trash2 className="w-3 h-3" />
+        </button>
+      </div>
     </div>
   )
 }
@@ -84,6 +84,7 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete }: {
 export function ReunioesPage() {
   const [weekRef, setWeekRef] = useState(new Date())
   const [showModal, setShowModal] = useState(false)
+  const [editando, setEditando] = useState<Reuniao | undefined>()
   const { data: reunioes = [], isLoading } = useReunioes()
   const update = useUpdateReuniao()
   const deletar = useDeleteReuniao()
@@ -168,6 +169,7 @@ export function ReunioesPage() {
                       reuniao={r}
                       onStatusChange={handleStatus}
                       onDelete={handleDelete}
+                      onEdit={r => { setEditando(r); setShowModal(true) }}
                     />
                   ))}
                   {dayReunioes.length === 0 && (
@@ -220,7 +222,11 @@ export function ReunioesPage() {
         </div>
       </div>
 
-      <NovaReuniaoModal open={showModal} onClose={() => setShowModal(false)} />
+      <NovaReuniaoModal
+        open={showModal}
+        reuniao={editando}
+        onClose={() => { setShowModal(false); setEditando(undefined) }}
+      />
     </div>
   )
 }

@@ -39,7 +39,7 @@ export type Suggestion = ReuniaoSuggestion | LeadSuggestion | OportunidadeSugges
 
 const REUNIAO_KEYWORDS = /\b(reunião|reuniao|meeting|call|ligação|ligacao|videoconferência|zoom|meet\.google|teams|hangout|calendly|às \d{1,2}h|às \d{1,2}:\d{2})\b/i
 const DATE_PATTERNS = [
-  /(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/,           // 20/03, 20-03-2026
+  /(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/,
   /\b(amanhã|hoje|segunda|terça|quarta|quinta|sexta|sábado|domingo)\b/i,
   /\b(próxima?\s+(?:segunda|terça|quarta|quinta|sexta|semana))\b/i,
 ]
@@ -104,6 +104,12 @@ function extractTitle(text: string): string {
   return relevant.trim().slice(0, 80) || 'Reunião detectada'
 }
 
+/** Normaliza data para chave de deduplicação (dia + hora arredondada) */
+function dateKey(dt: Date | undefined): string {
+  if (!dt) return ''
+  return `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}-${dt.getHours()}`
+}
+
 // ─── Main detector ────────────────────────────────────────────────────────────
 
 export function detectSuggestions(
@@ -115,45 +121,76 @@ export function detectSuggestions(
 ): Suggestion[] {
   const suggestions: Suggestion[] = []
 
+  // Chaves de deduplicação por tipo
+  const seenReuniaoKeys = new Set<string>() // data-hora
+  const seenEmails = new Set<string>()
+  const seenPhones = new Set<string>()
+  const seenOportunidades = new Set<string>() // primeiras palavras da descrição
+
   for (const msg of messages) {
     if (msg.subtype) continue
     const text = msg.text ?? ''
     if (!text.trim()) continue
 
     const id = `${channelId}-${msg.ts}`
-    if (confirmedIds.has(id) || dismissedIds.has(id)) continue
+
+    // Sugestões descartadas ficam ocultas; confirmadas ficam visíveis (gerenciado no SlackPage)
+    if (dismissedIds.has(id)) continue
 
     const base: BaseSuggestion = { id, type: 'reuniao', message: msg, channelId, channelName, rawText: text }
 
-    // Detecção de reunião
+    // ── Reunião ──
     if (REUNIAO_KEYWORDS.test(text) && DATE_PATTERNS.some((p) => p.test(text))) {
+      const dataHora = parseDateTime(text)
+      const key = dateKey(dataHora) || text.slice(0, 40)
+      if (seenReuniaoKeys.has(key)) continue
+      seenReuniaoKeys.add(key)
+
       const linkMatch = text.match(LINK_PATTERN)
       suggestions.push({
         ...base,
         type: 'reuniao',
         titulo: extractTitle(text),
-        dataHora: parseDateTime(text),
+        dataHora,
         local: linkMatch ? undefined : text.match(/\b(sala|escritório|escritorio|online|presencial)\b/i)?.[0],
         link: linkMatch?.[0],
       } as ReuniaoSuggestion)
       continue
     }
 
-    // Detecção de lead
+    // ── Lead ──
     if (LEAD_KEYWORDS.test(text)) {
       const phoneMatch = text.match(PHONE_PATTERN)
       const emailMatch = text.match(EMAIL_PATTERN)
+      const phone = phoneMatch?.[0]
+      const email = emailMatch?.[0]
+
+      // Deduplica por email ou telefone
+      if (email && seenEmails.has(email)) continue
+      if (phone && seenPhones.has(phone)) continue
+      // Se não tem email nem telefone, deduplica por trecho do texto
+      const textKey = text.slice(0, 60)
+      if (!email && !phone && seenEmails.has(textKey)) continue
+
+      if (email) seenEmails.add(email)
+      if (phone) seenPhones.add(phone)
+      if (!email && !phone) seenEmails.add(textKey)
+
       suggestions.push({
         ...base,
         type: 'lead',
-        email: emailMatch?.[0],
-        telefone: phoneMatch?.[0],
+        email,
+        telefone: phone,
       } as LeadSuggestion)
       continue
     }
 
-    // Detecção de oportunidade
+    // ── Oportunidade ──
     if (OPORTUNIDADE_KEYWORDS.test(text)) {
+      const descKey = text.slice(0, 50)
+      if (seenOportunidades.has(descKey)) continue
+      seenOportunidades.add(descKey)
+
       const valorMatch = text.match(VALOR_PATTERN)
       let valorEstimado: number | undefined
       if (valorMatch) {
