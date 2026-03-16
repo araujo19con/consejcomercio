@@ -1,0 +1,34 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabase'
+import { QUERY_KEYS } from '@/lib/query-keys'
+import type { Oportunidade } from '@/types'
+import { toast } from 'sonner'
+
+export function useOportunidades() {
+  return useQuery({
+    queryKey: QUERY_KEYS.oportunidades.all,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('oportunidades')
+        .select('*, cliente:clientes(id, nome, empresa)')
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data as Oportunidade[]
+    },
+  })
+}
+
+export function useUpdateOportunidade() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Oportunidade> & { id: string }) => {
+      const { data, error } = await supabase.from('oportunidades').update(updates).eq('id', id).select().single()
+      if (error) throw error
+      return data as Oportunidade
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.oportunidades.all })
+      toast.success('Oportunidade atualizada!')
+    },
+  })
+}
