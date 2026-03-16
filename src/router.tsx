@@ -16,6 +16,7 @@ import { AuditoriaPage } from '@/pages/AuditoriaPage'
 import { ConfiguracoesPage } from '@/pages/ConfiguracoesPage'
 import { SlackPage } from '@/pages/SlackPage'
 import { ReunioesPage } from '@/pages/ReunioesPage'
+import { PerfilPage } from '@/pages/PerfilPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -39,6 +40,7 @@ export const router = createBrowserRouter([
       { path: 'slack', element: <SlackPage /> },
       { path: 'auditoria', element: <AuditoriaPage /> },
       { path: 'configuracoes', element: <ConfiguracoesPage /> },
+      { path: 'perfil', element: <PerfilPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/dashboard" replace /> },

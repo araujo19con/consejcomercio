@@ -1,0 +1,70 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabase'
+
+export interface Perfil {
+  id: string
+  nome: string
+  cargo?: string
+  bio?: string
+  foto_url?: string
+  email?: string
+  created_at: string
+}
+
+export function usePerfis() {
+  return useQuery<Perfil[]>({
+    queryKey: ['perfis'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('perfis')
+        .select('*')
+        .order('nome')
+      if (error) throw error
+      return data ?? []
+    },
+  })
+}
+
+export function useMeuPerfil() {
+  return useQuery<Perfil | null>({
+    queryKey: ['perfil-meu'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return null
+      const { data } = await supabase.from('perfis').select('*').eq('id', user.id).maybeSingle()
+      return data ?? null
+    },
+  })
+}
+
+export function useSalvarPerfil() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (perfil: Partial<Perfil> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('perfis')
+        .upsert([perfil], { onConflict: 'id' })
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['perfis'] })
+      qc.invalidateQueries({ queryKey: ['perfil-meu'] })
+    },
+  })
+}
+
+export function useUploadAvatar() {
+  return useMutation({
+    mutationFn: async ({ userId, file }: { userId: string; file: File }) => {
+      const ext = file.name.split('.').pop()
+      const path = `${userId}/avatar.${ext}`
+      const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      if (error) throw error
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+      return data.publicUrl
+    },
+  })
+}

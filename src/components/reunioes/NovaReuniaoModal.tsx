@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { X, Calendar, Clock, MapPin, Link, Users, ExternalLink } from 'lucide-react'
+import { X, Calendar, Clock, MapPin, Link, Users, ExternalLink, ChevronDown } from 'lucide-react'
 import { useCreateReuniao, useUpdateReuniao, type Reuniao } from '@/hooks/useReunioes'
+import { usePerfis } from '@/hooks/usePerfis'
 import { toast } from 'sonner'
 
 interface Props {
@@ -54,12 +55,14 @@ function buildGoogleCalendarUrl(params: {
 export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
   const create = useCreateReuniao()
   const update = useUpdateReuniao()
+  const { data: perfis = [] } = usePerfis()
   const isEdit = !!reuniao
 
   const [titulo, setTitulo] = useState('')
   const [dataHora, setDataHora] = useState('')
   const [duracao, setDuracao] = useState('60')
   const [local, setLocal] = useState('')
+  const [showParticipantPicker, setShowParticipantPicker] = useState(false)
   const [linkVideo, setLinkVideo] = useState('')
   const [participantes, setParticipantes] = useState('')
   const [descricao, setDescricao] = useState('')
@@ -203,12 +206,58 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              <Users className="w-3.5 h-3.5 inline mr-1" />E-mails dos participantes (separados por vírgula)
+              <Users className="w-3.5 h-3.5 inline mr-1" />Participantes
             </label>
+
+            {/* Membros da equipe */}
+            {perfis.length > 0 && (
+              <div className="mb-2">
+                <button
+                  type="button"
+                  onClick={() => setShowParticipantPicker(v => !v)}
+                  className="flex items-center gap-2 text-xs text-blue-600 hover:underline mb-1"
+                >
+                  <ChevronDown className={`w-3 h-3 transition-transform ${showParticipantPicker ? 'rotate-180' : ''}`} />
+                  Selecionar membros da equipe ({perfis.length})
+                </button>
+                {showParticipantPicker && (
+                  <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 mb-2 max-h-40 overflow-y-auto">
+                    {perfis.map(p => {
+                      const email = p.email ?? ''
+                      const checked = email ? participantes.split(',').map(s => s.trim()).includes(email) : false
+                      return (
+                        <label key={p.id} className="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              if (!email) return
+                              const list = participantes.split(',').map(s => s.trim()).filter(Boolean)
+                              if (checked) {
+                                setParticipantes(list.filter(e => e !== email).join(', '))
+                              } else {
+                                setParticipantes([...list, email].join(', '))
+                              }
+                            }}
+                            className="rounded"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-700 truncate">{p.nome}</p>
+                            {p.cargo && <p className="text-xs text-slate-400">{p.cargo}</p>}
+                          </div>
+                          <span className="text-xs text-slate-400 truncate max-w-[160px]">{email}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
             <input
               value={participantes}
               onChange={e => setParticipantes(e.target.value)}
-              placeholder="ana@consej.com, cliente@empresa.com"
+              placeholder="email@exemplo.com, outro@empresa.com"
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-xs text-slate-400 mt-1">Os participantes receberão convite ao criar no Google Calendar</p>
