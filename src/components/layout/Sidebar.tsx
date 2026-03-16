@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Scale, LayoutDashboard, KanbanSquare, Stethoscope, Briefcase, FileText, Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, KanbanSquare, Stethoscope, Briefcase, FileText, Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings, LogOut } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -28,16 +28,10 @@ export function Sidebar() {
   }
 
   return (
-    <div className="w-56 shrink-0 h-screen bg-slate-900 flex flex-col">
+    <div className="w-56 shrink-0 h-screen flex flex-col" style={{ backgroundColor: '#00081d' }}>
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-4 py-5 border-b border-slate-700">
-        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-          <Scale className="w-4.5 h-4.5 text-white" />
-        </div>
-        <div>
-          <p className="text-sm font-bold text-white leading-none">CONSEJ</p>
-          <p className="text-xs text-slate-400 mt-0.5">Assessoria Jurídica</p>
-        </div>
+      <div className="flex items-center justify-center px-4 py-5" style={{ borderBottom: '1px solid #000d32' }}>
+        <img src="/logo.png" alt="CONSEJ" className="h-10 w-auto" />
       </div>
 
       {/* Nav */}
@@ -50,10 +44,26 @@ export function Sidebar() {
               cn(
                 'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm mb-0.5 transition-colors',
                 isActive
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'text-white'
+                  : 'hover:text-white'
               )
             }
+            style={({ isActive }) => isActive
+              ? { backgroundColor: '#0089ac', color: '#fff' }
+              : { color: '#6bd0e7' }
+            }
+            onMouseEnter={e => {
+              const el = e.currentTarget
+              if (!el.classList.contains('active') && !el.getAttribute('aria-current')) {
+                el.style.backgroundColor = '#00263a'
+              }
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget
+              if (!el.getAttribute('aria-current')) {
+                el.style.backgroundColor = ''
+              }
+            }}
           >
             <Icon className="w-4 h-4 shrink-0" />
             {label}
@@ -62,10 +72,13 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="p-2 border-t border-slate-700">
+      <div className="p-2" style={{ borderTop: '1px solid #000d32' }}>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 w-full transition-colors"
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm w-full transition-colors"
+          style={{ color: '#6bd0e7' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#00263a'; (e.currentTarget as HTMLElement).style.color = '#fff' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = ''; (e.currentTarget as HTMLElement).style.color = '#6bd0e7' }}
         >
           <LogOut className="w-4 h-4" />
           Sair
