@@ -7,9 +7,10 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { CLIENT_STATUS_OPTIONS, SEGMENTS } from '@/lib/constants'
 import { formatDate, getDaysUntilExpiry } from '@/lib/utils'
-import { Search, Briefcase, AlertCircle } from 'lucide-react'
+import { Search, Briefcase, AlertCircle, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Cliente, Contrato } from '@/types'
+import { NewClienteModal } from '@/components/clientes/NewClienteModal'
 
 function getStatusColor(status: string) {
   return CLIENT_STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-slate-100 text-slate-600'
@@ -31,6 +32,7 @@ export function ClientesPage() {
   const { data: clientes, isLoading } = useClientes()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('todos')
+  const [showNew, setShowNew] = useState(false)
 
   const filtered = clientes?.filter(c => {
     const matchSearch = !search || c.nome.toLowerCase().includes(search.toLowerCase()) || c.empresa.toLowerCase().includes(search.toLowerCase())
@@ -42,7 +44,12 @@ export function ClientesPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-slate-800">Clientes</h1>
-        <Badge variant="secondary">{filtered.length} cliente{filtered.length !== 1 ? 's' : ''}</Badge>
+        <div className="flex items-center gap-2 ml-auto">
+          <Badge variant="secondary">{filtered.length} cliente{filtered.length !== 1 ? 's' : ''}</Badge>
+          <Button size="sm" onClick={() => setShowNew(true)} style={{ backgroundColor: '#0089ac' }} className="text-white">
+            <Plus className="w-3.5 h-3.5 mr-1" /> Novo Cliente
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -114,6 +121,12 @@ export function ClientesPage() {
           )}
         </div>
       )}
+
+      <NewClienteModal
+        open={showNew}
+        onClose={() => setShowNew(false)}
+        onCreated={(id) => navigate(`/clientes/${id}`)}
+      />
     </div>
   )
 }
