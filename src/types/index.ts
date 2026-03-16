@@ -12,6 +12,7 @@ export interface Lead {
   servicos_interesse?: string[]
   investimento_estimado?: string | null
   responsavel?: string | null
+  responsavel_id?: string | null
   referido_por_cliente_id?: string | null
   referido_por_parceiro_id?: string | null
   notas?: string | null
@@ -74,6 +75,7 @@ export interface Contrato {
   status: string
   rm_status: string
   notas?: string | null
+  responsavel_id?: string | null
   created_at: string
   updated_at: string
   cliente?: Cliente

@@ -314,7 +314,7 @@ export function SlackPage() {
           telefone: l.telefone,
           origem: 'slack',
           status: 'novo',
-          observacoes: `Detectado no canal #${l.channelName}\n\n"${l.rawText.slice(0, 300)}"`,
+          notas: `Detectado no canal #${l.channelName}\n\n"${l.rawText.slice(0, 300)}"`,
         }])
         toast.success('Lead criado com sucesso!')
         markConfirmed(suggestion.id)

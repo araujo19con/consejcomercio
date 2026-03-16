@@ -15,6 +15,7 @@ export interface Reuniao {
   status: 'agendada' | 'realizada' | 'cancelada'
   slack_ts?: string
   slack_channel?: string
+  responsavel_id?: string
   created_at: string
 }
 
