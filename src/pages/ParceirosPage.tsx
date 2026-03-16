@@ -7,10 +7,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
 import { PARCEIRO_TIPOS } from '@/lib/constants'
-import { Plus, Handshake, Globe } from 'lucide-react'
+import { Plus, Handshake, Globe, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { Parceiro } from '@/types'
 
 const PARCEIRO_STATUS = [
   { value: 'ativo', label: 'Ativo', color: 'bg-green-100 text-green-700' },
@@ -18,33 +18,92 @@ const PARCEIRO_STATUS = [
   { value: 'inativo', label: 'Inativo', color: 'bg-slate-100 text-slate-500' },
 ]
 
+function useParceiroForm(initial?: Parceiro) {
+  const [nome, setNome] = useState(initial?.nome ?? '')
+  const [tipo, setTipo] = useState(initial?.tipo ?? 'empresa_junior')
+  const [status, setStatus] = useState(initial?.status ?? 'ativo')
+  const [contatoNome, setContatoNome] = useState(initial?.contato_nome ?? '')
+  const [contatoEmail, setContatoEmail] = useState(initial?.contato_email ?? '')
+  const [contatoPhone, setContatoPhone] = useState(initial?.contato_phone ?? '')
+  const [website, setWebsite] = useState(initial?.website ?? '')
+  const [notas, setNotas] = useState(initial?.notas ?? '')
+  function reset() { setNome(''); setTipo('empresa_junior'); setStatus('ativo'); setContatoNome(''); setContatoEmail(''); setContatoPhone(''); setWebsite(''); setNotas('') }
+  function fill(p: Parceiro) { setNome(p.nome); setTipo(p.tipo); setStatus(p.status); setContatoNome(p.contato_nome ?? ''); setContatoEmail(p.contato_email ?? ''); setContatoPhone(p.contato_phone ?? ''); setWebsite(p.website ?? ''); setNotas(p.notas ?? '') }
+  return { nome, setNome, tipo, setTipo, status, setStatus, contatoNome, setContatoNome, contatoEmail, setContatoEmail, contatoPhone, setContatoPhone, website, setWebsite, notas, setNotas, reset, fill }
+}
+
+function ParceiroForm({ f }: { f: ReturnType<typeof useParceiroForm> }) {
+  return (
+    <div className="space-y-4 py-2">
+      <div className="space-y-1.5"><Label>Nome *</Label><Input value={f.nome} onChange={e => f.setNome(e.target.value)} /></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label>Tipo (IPP)</Label>
+          <Select value={f.tipo} onValueChange={f.setTipo}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>{PARCEIRO_TIPOS.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Status</Label>
+          <Select value={f.status} onValueChange={f.setStatus}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>{PARCEIRO_STATUS.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5"><Label>Contato</Label><Input value={f.contatoNome} onChange={e => f.setContatoNome(e.target.value)} /></div>
+        <div className="space-y-1.5"><Label>Telefone</Label><Input value={f.contatoPhone} onChange={e => f.setContatoPhone(e.target.value)} /></div>
+        <div className="space-y-1.5"><Label>Email</Label><Input value={f.contatoEmail} onChange={e => f.setContatoEmail(e.target.value)} type="email" /></div>
+        <div className="space-y-1.5"><Label>Website</Label><Input value={f.website} onChange={e => f.setWebsite(e.target.value)} /></div>
+      </div>
+      <div className="space-y-1.5"><Label>Observações</Label><Textarea value={f.notas} onChange={e => f.setNotas(e.target.value)} /></div>
+    </div>
+  )
+}
+
 export function ParceirosPage() {
   const { data: parceiros, isLoading } = useParceiros()
   const createParceiro = useCreateParceiro()
   const updateParceiro = useUpdateParceiro()
   const [showNew, setShowNew] = useState(false)
-  const [nome, setNome] = useState('')
-  const [tipo, setTipo] = useState('empresa_junior')
-  const [status, setStatus] = useState('ativo')
-  const [contatoNome, setContatoNome] = useState('')
-  const [contatoEmail, setContatoEmail] = useState('')
-  const [contatoPhone, setContatoPhone] = useState('')
-  const [website, setWebsite] = useState('')
-  const [notas, setNotas] = useState('')
+  const [editParceiro, setEditParceiro] = useState<Parceiro | null>(null)
+  const newForm = useParceiroForm()
+  const editForm = useParceiroForm()
 
   function handleCreate() {
+    const f = newForm
     createParceiro.mutate({
-      nome, tipo, status,
-      contato_nome: contatoNome || null,
-      contato_email: contatoEmail || null,
-      contato_phone: contatoPhone || null,
-      website: website || null,
-      notas: notas || null,
+      nome: f.nome, tipo: f.tipo, status: f.status,
+      contato_nome: f.contatoNome || null,
+      contato_email: f.contatoEmail || null,
+      contato_phone: f.contatoPhone || null,
+      website: f.website || null,
+      notas: f.notas || null,
     }, {
-      onSuccess: () => {
-        setShowNew(false)
-        setNome(''); setContatoNome(''); setContatoEmail(''); setContatoPhone(''); setWebsite(''); setNotas('')
-      }
+      onSuccess: () => { setShowNew(false); newForm.reset() }
+    })
+  }
+
+  function handleEdit(p: Parceiro) {
+    editForm.fill(p)
+    setEditParceiro(p)
+  }
+
+  function handleUpdate() {
+    if (!editParceiro) return
+    const f = editForm
+    updateParceiro.mutate({
+      id: editParceiro.id,
+      nome: f.nome, tipo: f.tipo, status: f.status,
+      contato_nome: f.contatoNome || null,
+      contato_email: f.contatoEmail || null,
+      contato_phone: f.contatoPhone || null,
+      website: f.website || null,
+      notas: f.notas || null,
+    }, {
+      onSuccess: () => setEditParceiro(null)
     })
   }
 
@@ -75,11 +134,16 @@ export function ParceirosPage() {
                         <p className="text-xs text-slate-500">{tipoInfo?.label}</p>
                       </div>
                     </div>
-                    {statusInfo && (
-                      <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', statusInfo.color)}>
-                        {statusInfo.label}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {statusInfo && (
+                        <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', statusInfo.color)}>
+                          {statusInfo.label}
+                        </span>
+                      )}
+                      <button onClick={() => handleEdit(parceiro)} className="p-1 rounded hover:bg-slate-100 text-slate-400">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                   {parceiro.contato_nome && <p className="text-xs text-slate-600 mt-2">Contato: {parceiro.contato_nome}</p>}
                   {parceiro.contato_email && <p className="text-xs text-slate-400">{parceiro.contato_email}</p>}
@@ -99,40 +163,24 @@ export function ParceirosPage() {
       <Dialog open={showNew} onOpenChange={o => !o && setShowNew(false)}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Novo Parceiro</DialogTitle></DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5"><Label>Nome *</Label><Input value={nome} onChange={e => setNome(e.target.value)} /></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Tipo (IPP)</Label>
-                <Select value={tipo} onValueChange={setTipo}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {PARCEIRO_TIPOS.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label>Status</Label>
-                <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {PARCEIRO_STATUS.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5"><Label>Contato</Label><Input value={contatoNome} onChange={e => setContatoNome(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Telefone</Label><Input value={contatoPhone} onChange={e => setContatoPhone(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Email</Label><Input value={contatoEmail} onChange={e => setContatoEmail(e.target.value)} type="email" /></div>
-              <div className="space-y-1.5"><Label>Website</Label><Input value={website} onChange={e => setWebsite(e.target.value)} /></div>
-            </div>
-            <div className="space-y-1.5"><Label>Observações</Label><Textarea value={notas} onChange={e => setNotas(e.target.value)} /></div>
-          </div>
+          <ParceiroForm f={newForm} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowNew(false)}>Cancelar</Button>
-            <Button onClick={handleCreate} disabled={!nome || createParceiro.isPending} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button onClick={handleCreate} disabled={!newForm.nome || createParceiro.isPending} className="bg-indigo-600 hover:bg-indigo-700">
               {createParceiro.isPending ? 'Salvando...' : 'Cadastrar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editParceiro} onOpenChange={o => !o && setEditParceiro(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Editar Parceiro</DialogTitle></DialogHeader>
+          <ParceiroForm f={editForm} />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditParceiro(null)}>Cancelar</Button>
+            <Button onClick={handleUpdate} disabled={!editForm.nome || updateParceiro.isPending} className="bg-indigo-600 hover:bg-indigo-700">
+              {updateParceiro.isPending ? 'Salvando...' : 'Salvar'}
             </Button>
           </DialogFooter>
         </DialogContent>

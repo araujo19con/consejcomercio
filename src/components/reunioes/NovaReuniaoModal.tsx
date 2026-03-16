@@ -4,6 +4,15 @@ import { useCreateReuniao, useUpdateReuniao, type Reuniao } from '@/hooks/useReu
 import { usePerfis } from '@/hooks/usePerfis'
 import { toast } from 'sonner'
 
+const TEAM_EMAILS = [
+  { email: 'ana.carolina@consej.com.br', nome: 'Ana Carolina' },
+  { email: 'camila.silveira@consej.com.br', nome: 'Camila Silveira' },
+  { email: 'gabriel.lima@consej.com.br', nome: 'Gabriel Lima' },
+  { email: 'larissa.fonte@consej.com.br', nome: 'Larissa Fonte' },
+  { email: 'luna.melo@consej.com.br', nome: 'Luna Melo' },
+  { email: 'maria.dantas@consej.com.br', nome: 'Maria Dantas' },
+]
+
 interface Props {
   open: boolean
   onClose: () => void
@@ -90,6 +99,20 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
   }, [open, reuniao, prefill])
 
   if (!open) return null
+
+  // Build merged member list: TEAM_EMAILS + any extra perfis
+  const perfilByEmail = new Map(perfis.map(p => [p.email, p]))
+  const teamMembers = TEAM_EMAILS.map(t => ({
+    key: t.email,
+    email: t.email,
+    nome: perfilByEmail.get(t.email)?.nome ?? t.nome,
+    cargo: perfilByEmail.get(t.email)?.cargo,
+  }))
+  perfis.forEach(p => {
+    if (p.email && !TEAM_EMAILS.find(t => t.email === p.email)) {
+      teamMembers.push({ key: p.id, email: p.email, nome: p.nome, cargo: p.cargo })
+    }
+  })
 
   const calendarUrl = buildGoogleCalendarUrl({
     titulo,
@@ -210,49 +233,45 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
             </label>
 
             {/* Membros da equipe */}
-            {perfis.length > 0 && (
-              <div className="mb-2">
-                <button
-                  type="button"
-                  onClick={() => setShowParticipantPicker(v => !v)}
-                  className="flex items-center gap-2 text-xs text-blue-600 hover:underline mb-1"
-                >
-                  <ChevronDown className={`w-3 h-3 transition-transform ${showParticipantPicker ? 'rotate-180' : ''}`} />
-                  Selecionar membros da equipe ({perfis.length})
-                </button>
-                {showParticipantPicker && (
-                  <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 mb-2 max-h-40 overflow-y-auto">
-                    {perfis.map(p => {
-                      const email = p.email ?? ''
-                      const checked = email ? participantes.split(',').map(s => s.trim()).includes(email) : false
-                      return (
-                        <label key={p.id} className="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => {
-                              if (!email) return
-                              const list = participantes.split(',').map(s => s.trim()).filter(Boolean)
-                              if (checked) {
-                                setParticipantes(list.filter(e => e !== email).join(', '))
-                              } else {
-                                setParticipantes([...list, email].join(', '))
-                              }
-                            }}
-                            className="rounded"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-700 truncate">{p.nome}</p>
-                            {p.cargo && <p className="text-xs text-slate-400">{p.cargo}</p>}
-                          </div>
-                          <span className="text-xs text-slate-400 truncate max-w-[160px]">{email}</span>
-                        </label>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="mb-2">
+              <button
+                type="button"
+                onClick={() => setShowParticipantPicker(v => !v)}
+                className="flex items-center gap-2 text-xs text-blue-600 hover:underline mb-1"
+              >
+                <ChevronDown className={`w-3 h-3 transition-transform ${showParticipantPicker ? 'rotate-180' : ''}`} />
+                Selecionar membros da equipe
+              </button>
+              {showParticipantPicker && (
+                <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 mb-2 max-h-48 overflow-y-auto">
+                  {teamMembers.map(m => {
+                    const checked = participantes.split(',').map(s => s.trim()).includes(m.email)
+                    return (
+                      <label key={m.key} className="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => {
+                            const list = participantes.split(',').map(s => s.trim()).filter(Boolean)
+                            if (checked) {
+                              setParticipantes(list.filter(e => e !== m.email).join(', '))
+                            } else {
+                              setParticipantes([...list, m.email].join(', '))
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-700 truncate">{m.nome}</p>
+                          {m.cargo && <p className="text-xs text-slate-400">{m.cargo}</p>}
+                        </div>
+                        <span className="text-xs text-slate-400 truncate max-w-[160px]">{m.email}</span>
+                      </label>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
 
             <input
               value={participantes}

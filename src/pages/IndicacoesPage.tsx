@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { useIndicacoes, useCreateIndicacao, useUpdateIndicacao } from '@/hooks/useIndicacoes'
+import { useCreateLead } from '@/hooks/useLeads'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@/lib/query-keys'
 import { useClientes } from '@/hooks/useClientes'
 import { useParceiros } from '@/hooks/useParceiros'
 import { Button } from '@/components/ui/button'
@@ -8,11 +11,40 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
 import { INDICACAO_STATUS, REWARD_TYPES } from '@/lib/constants'
 import { formatDate } from '@/lib/utils'
 import { Plus, Gift, User, Handshake } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { Indicacao } from '@/types'
+import { supabase } from '@/lib/supabase'
+import { toast } from 'sonner'
+
+async function handleStatusChange(ind: Indicacao, newStatus: string, updateIndicacao: ReturnType<typeof useUpdateIndicacao>, createLead: ReturnType<typeof useCreateLead>, qc: ReturnType<typeof useQueryClient>) {
+  if (newStatus === 'contactado' && !ind.lead_id) {
+    // Auto-create a lead and link it
+    const origem = ind.indicante_cliente_id ? 'indicacao_cliente' : 'indicacao_parceiro'
+    try {
+      // Note: don't pass referido_por_* here to avoid auto-creating a duplicate indicação
+      const lead = await createLead.mutateAsync({
+        nome: ind.indicado_nome,
+        telefone: ind.indicado_telefone ?? '',
+        empresa: ind.indicado_empresa ?? '',
+        email: ind.indicado_email ?? '',
+        origem,
+        status: 'novo_lead',
+        segmento: 'outro',
+        servicos_interesse: [],
+      })
+      await supabase.from('indicacoes').update({ status: newStatus, lead_id: lead.id }).eq('id', ind.id)
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.indicacoes.all })
+      toast.success('Lead criado e indicação atualizada!')
+    } catch {
+      toast.error('Erro ao criar lead')
+    }
+  } else {
+    updateIndicacao.mutate({ id: ind.id, status: newStatus })
+  }
+}
 
 export function IndicacoesPage() {
   const { data: indicacoes, isLoading } = useIndicacoes()
@@ -20,6 +52,8 @@ export function IndicacoesPage() {
   const { data: parceiros } = useParceiros()
   const createIndicacao = useCreateIndicacao()
   const updateIndicacao = useUpdateIndicacao()
+  const createLead = useCreateLead()
+  const qc = useQueryClient()
   const [showNew, setShowNew] = useState(false)
   const [indicanteType, setIndicanteType] = useState<'cliente' | 'parceiro'>('cliente')
   const [indicanteClienteId, setIndicanteClienteId] = useState('')
@@ -114,7 +148,7 @@ export function IndicacoesPage() {
                         </Button>
                       )}
                       {ind.recompensa_entregue && <span className="text-xs text-green-600 flex items-center gap-1"><Gift className="w-3 h-3" /> Entregue</span>}
-                      <Select value={ind.status} onValueChange={v => updateIndicacao.mutate({ id: ind.id, status: v })}>
+                      <Select value={ind.status} onValueChange={v => handleStatusChange(ind, v, updateIndicacao, createLead, qc)}>
                         <SelectTrigger className={cn('w-32 h-7 text-xs', statusInfo?.color)}>
                           <SelectValue />
                         </SelectTrigger>

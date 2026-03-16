@@ -77,12 +77,23 @@ export function useUpdateLeadStatus() {
       if (error) throw error
       return data as Lead
     },
-    onSuccess: (lead) => {
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.leads.all })
+      const previous = queryClient.getQueryData<Lead[]>(QUERY_KEYS.leads.all)
+      queryClient.setQueryData<Lead[]>(QUERY_KEYS.leads.all, old =>
+        old?.map(l => l.id === id ? { ...l, status } : l) ?? []
+      )
+      return { previous }
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(QUERY_KEYS.leads.all, ctx.previous)
+      toast.error('Erro ao mover lead')
+    },
+    onSettled: (lead) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.leads.all })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard })
-      supabase.from('audit_logs').insert({ tabela: 'leads', registro_id: lead.id, acao: 'status_alterado', campo: 'status', valor_depois: { status: lead.status } })
+      if (lead) supabase.from('audit_logs').insert({ tabela: 'leads', registro_id: lead.id, acao: 'status_alterado', campo: 'status', valor_depois: { status: lead.status } })
     },
-    onError: () => toast.error('Erro ao mover lead'),
   })
 }
 
