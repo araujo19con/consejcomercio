@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, KanbanSquare, Stethoscope, Briefcase, FileText, Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings, LogOut, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, KanbanSquare, Stethoscope, Briefcase, FileText, Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings, LogOut, MessageSquare, CalendarDays } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -14,6 +14,7 @@ const navItems = [
   { to: '/indicacoes', label: 'Indicações', icon: Share2 },
   { to: '/parceiros', label: 'Parceiros', icon: Handshake },
   { to: '/oportunidades', label: 'Oportunidades', icon: TrendingUp },
+  { to: '/reunioes', label: 'Reuniões', icon: CalendarDays },
   { to: '/slack', label: 'Slack', icon: MessageSquare },
   { to: '/auditoria', label: 'Auditoria', icon: ClipboardList },
   { to: '/configuracoes', label: 'Configurações', icon: Settings },

@@ -3,21 +3,27 @@ import { useClientes } from '@/hooks/useClientes'
 import { useContratos } from '@/hooks/useContratos'
 import { useIndicacoes } from '@/hooks/useIndicacoes'
 import { useOportunidades } from '@/hooks/useOportunidades'
+import { useReunioesSemanais } from '@/hooks/useReunioes'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PIPELINE_STAGES, LEAD_SOURCE_LABELS, CLIENT_STATUS_OPTIONS } from '@/lib/constants'
-import { formatCurrency, getDaysUntilExpiry, formatDate } from '@/lib/utils'
+import { PIPELINE_STAGES, LEAD_SOURCE_LABELS } from '@/lib/constants'
+import { formatCurrency, getDaysUntilExpiry } from '@/lib/utils'
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { Users, Briefcase, TrendingUp, FileText, AlertCircle, Share2, DollarSign } from 'lucide-react'
+import { Users, Briefcase, TrendingUp, FileText, AlertCircle, Share2, DollarSign, Calendar, Clock, Video, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useNavigate } from 'react-router-dom'
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316']
 
+const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+
 export function DashboardPage() {
+  const navigate = useNavigate()
   const { data: leads } = useLeads()
   const { data: clientes } = useClientes()
   const { data: contratos } = useContratos()
   const { data: indicacoes } = useIndicacoes()
   const { data: oportunidades } = useOportunidades()
+  const { data: reunioesSemana = [] } = useReunioesSemanais()
 
   // KPIs
   const activeLeads = leads?.filter(l => l.status !== 'perdido' && l.status !== 'contrato_assinado').length || 0
@@ -110,6 +116,57 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Reuniões da semana — destaque */}
+      <Card className="border-2" style={{ borderColor: '#0089ac' }}>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Calendar className="w-4 h-4" style={{ color: '#0089ac' }} />
+              Reuniões desta semana
+            </CardTitle>
+            <button
+              onClick={() => navigate('/reunioes')}
+              className="text-xs px-3 py-1 rounded-lg text-white font-medium"
+              style={{ backgroundColor: '#0089ac' }}
+            >
+              Ver todas
+            </button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {reunioesSemana.length === 0 ? (
+            <p className="text-sm text-slate-400 text-center py-4">Nenhuma reunião esta semana.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {reunioesSemana.map(r => {
+                const dt = new Date(r.data_hora)
+                const statusColors = { agendada: '#0089ac', realizada: '#10b981', cancelada: '#ef4444' }
+                return (
+                  <div key={r.id} className="rounded-xl border p-3 space-y-1.5" style={{ borderLeftWidth: 3, borderLeftColor: statusColors[r.status] }}>
+                    <div className="flex items-start justify-between gap-1">
+                      <p className="text-sm font-semibold text-slate-800 leading-tight">{r.titulo}</p>
+                      <span className="text-xs shrink-0 font-medium" style={{ color: statusColors[r.status] }}>
+                        {DIAS_SEMANA[dt.getDay()]}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-slate-500">
+                      <Clock className="w-3 h-3" />
+                      {dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} às {dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                    {r.local && <div className="flex items-center gap-1 text-xs text-slate-400"><MapPin className="w-3 h-3" />{r.local}</div>}
+                    {r.link_video && (
+                      <a href={r.link_video} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-white px-2 py-1 rounded-md w-fit" style={{ backgroundColor: '#0089ac' }}>
+                        <Video className="w-3 h-3" />Entrar
+                      </a>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Charts row */}
       <div className="grid grid-cols-2 gap-4">
