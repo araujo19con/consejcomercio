@@ -1,8 +1,35 @@
 import { useState } from 'react'
 import { Plus, ChevronLeft, ChevronRight, Video, MapPin, Clock, CheckCircle, XCircle, Calendar, Pencil, Trash2 } from 'lucide-react'
 import { useReunioes, useUpdateReuniao, useDeleteReuniao, type Reuniao } from '@/hooks/useReunioes'
+import { usePerfis, type Perfil } from '@/hooks/usePerfis'
 import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
 import { toast } from 'sonner'
+
+const TEAM_COLORS = [
+  'bg-blue-500', 'bg-violet-500', 'bg-teal-500', 'bg-orange-500',
+  'bg-pink-500', 'bg-indigo-500', 'bg-green-500', 'bg-red-500',
+]
+
+function ParticipanteAvatar({ email, perfilByEmail, index }: {
+  email: string
+  perfilByEmail: Map<string, Perfil>
+  index: number
+}) {
+  const perfil = perfilByEmail.get(email)
+  const nome = perfil?.nome ?? email
+  const initials = nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+  const color = TEAM_COLORS[index % TEAM_COLORS.length]
+
+  return (
+    <div
+      title={`${nome} <${email}>`}
+      className={`w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-[9px] font-bold shrink-0 cursor-default ${perfil?.foto_url ? '' : color}`}
+      style={perfil?.foto_url ? { backgroundImage: `url(${perfil.foto_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+    >
+      {!perfil?.foto_url && initials}
+    </div>
+  )
+}
 
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -33,11 +60,12 @@ function StatusBadge({ status }: { status: Reuniao['status'] }) {
   return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${map[status]}`}>{label[status]}</span>
 }
 
-function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit }: {
+function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit, perfilByEmail }: {
   reuniao: Reuniao
   onStatusChange: (id: string, status: Reuniao['status']) => void
   onDelete: (id: string) => void
   onEdit: (r: Reuniao) => void
+  perfilByEmail: Map<string, Perfil>
 }) {
   const dt = new Date(reuniao.data_hora)
   return (
@@ -58,7 +86,11 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit }: {
           </a>
         )}
         {reuniao.participantes?.length > 0 && (
-          <div className="text-slate-400">{reuniao.participantes.join(', ')}</div>
+          <div className="flex items-center flex-wrap gap-0.5 mt-1">
+            {reuniao.participantes.map((email, i) => (
+              <ParticipanteAvatar key={email} email={email} perfilByEmail={perfilByEmail} index={i} />
+            ))}
+          </div>
         )}
       </div>
       <div className="flex gap-1.5 mt-2 pt-2 border-t border-slate-100 flex-wrap">
@@ -86,8 +118,11 @@ export function ReunioesPage() {
   const [showModal, setShowModal] = useState(false)
   const [editando, setEditando] = useState<Reuniao | undefined>()
   const { data: reunioes = [], isLoading } = useReunioes()
+  const { data: perfis = [] } = usePerfis()
   const update = useUpdateReuniao()
   const deletar = useDeleteReuniao()
+
+  const perfilByEmail = new Map(perfis.filter(p => p.email).map(p => [p.email!, p]))
 
   const weekDays = getWeekDays(weekRef)
   const today = new Date()
@@ -170,6 +205,7 @@ export function ReunioesPage() {
                       onStatusChange={handleStatus}
                       onDelete={handleDelete}
                       onEdit={r => { setEditando(r); setShowModal(true) }}
+                      perfilByEmail={perfilByEmail}
                     />
                   ))}
                   {dayReunioes.length === 0 && (
@@ -205,6 +241,13 @@ export function ReunioesPage() {
                       {dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {r.duracao_minutos}min
                       {r.local ? ` · ${r.local}` : ''}
                     </p>
+                    {r.participantes?.length > 0 && (
+                      <div className="flex items-center gap-0.5 mt-1">
+                        {r.participantes.map((email, i) => (
+                          <ParticipanteAvatar key={email} email={email} perfilByEmail={perfilByEmail} index={i} />
+                        ))}
+                      </div>
+                    )}
                   </div>
                   {r.link_video && (
                     <a href={r.link_video} target="_blank" rel="noreferrer"
