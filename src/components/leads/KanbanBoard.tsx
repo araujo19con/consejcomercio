@@ -7,6 +7,7 @@ import { LeadCard } from './LeadCard'
 import { LostReasonModal } from './LostReasonModal'
 import { ConvertToClientModal } from './ConvertToClientModal'
 import { NewLeadModal } from './NewLeadModal'
+import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
 import { useUpdateLeadStatus } from '@/hooks/useLeads'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -19,6 +20,7 @@ export function KanbanBoard({ leads }: Props) {
   const [showNewLead, setShowNewLead] = useState(false)
   const [lostLead, setLostLead] = useState<{ id: string } | null>(null)
   const [convertLead, setConvertLead] = useState<Lead | null>(null)
+  const [agendarLead, setAgendarLead] = useState<Lead | null>(null)
   const updateStatus = useUpdateLeadStatus()
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
@@ -54,6 +56,10 @@ export function KanbanBoard({ leads }: Props) {
     }
 
     updateStatus.mutate({ id: leadId, status: newStage })
+
+    if (newStage === 'diagnostico_agendado') {
+      setAgendarLead(lead)
+    }
   }
 
   return (
@@ -82,6 +88,14 @@ export function KanbanBoard({ leads }: Props) {
       </DndContext>
 
       {showNewLead && <NewLeadModal open={showNewLead} onClose={() => setShowNewLead(false)} />}
+
+      <NovaReuniaoModal
+        open={!!agendarLead}
+        onClose={() => setAgendarLead(null)}
+        prefill={agendarLead ? {
+          titulo: `Diagnóstico — ${agendarLead.nome}${agendarLead.empresa ? ` (${agendarLead.empresa})` : ''}`,
+        } : undefined}
+      />
 
       {lostLead && (
         <LostReasonModal
