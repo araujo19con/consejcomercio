@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useClientes } from '@/hooks/useClientes'
+import { useClientes, useDeleteCliente } from '@/hooks/useClientes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { CLIENT_STATUS_OPTIONS, SEGMENTS } from '@/lib/constants'
-import { formatDate, getDaysUntilExpiry } from '@/lib/utils'
-import { Search, Briefcase, AlertCircle, Plus } from 'lucide-react'
+import { getDaysUntilExpiry } from '@/lib/utils'
+import { Search, Briefcase, AlertCircle, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Cliente, Contrato } from '@/types'
 import { NewClienteModal } from '@/components/clientes/NewClienteModal'
@@ -30,9 +30,16 @@ function getNextExpiry(contratos: Contrato[] | undefined): string | null {
 export function ClientesPage() {
   const navigate = useNavigate()
   const { data: clientes, isLoading } = useClientes()
+  const deleteCliente = useDeleteCliente()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('todos')
   const [showNew, setShowNew] = useState(false)
+
+  function handleDelete(e: React.MouseEvent, id: string, nome: string) {
+    e.stopPropagation()
+    if (!confirm(`Excluir o cliente "${nome}"? Esta ação não pode ser desfeita.`)) return
+    deleteCliente.mutate(id)
+  }
 
   const filtered = clientes?.filter(c => {
     const matchSearch = !search || c.nome.toLowerCase().includes(search.toLowerCase()) || c.empresa.toLowerCase().includes(search.toLowerCase())
@@ -102,14 +109,22 @@ export function ClientesPage() {
                       </div>
                       <p className="text-sm text-slate-500">{cliente.empresa} · {getSegmentLabel(cliente.segmento)}</p>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-xs text-slate-500">{cliente.contratos?.length || 0} contrato(s)</p>
-                      {nextExpiry && (
-                        <div className={cn('flex items-center gap-1 text-xs mt-0.5', isExpiringSoon ? 'text-orange-600 font-medium' : 'text-slate-400')}>
-                          {isExpiringSoon && <AlertCircle className="w-3 h-3" />}
-                          {daysLeft === 0 ? 'Vence hoje' : daysLeft && daysLeft < 0 ? 'Vencido' : `Vence em ${daysLeft}d`}
-                        </div>
-                      )}
+                    <div className="text-right shrink-0 flex items-center gap-3">
+                      <div>
+                        <p className="text-xs text-slate-500">{cliente.contratos?.length || 0} contrato(s)</p>
+                        {nextExpiry && (
+                          <div className={cn('flex items-center gap-1 text-xs mt-0.5', isExpiringSoon ? 'text-orange-600 font-medium' : 'text-slate-400')}>
+                            {isExpiringSoon && <AlertCircle className="w-3 h-3" />}
+                            {daysLeft === 0 ? 'Vence hoje' : daysLeft && daysLeft < 0 ? 'Vencido' : `Vence em ${daysLeft}d`}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={e => handleDelete(e, cliente.id, cliente.nome)}
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 </CardContent>

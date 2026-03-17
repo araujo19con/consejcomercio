@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useOportunidades, useUpdateOportunidade } from '@/hooks/useOportunidades'
+import { useOportunidades, useCreateOportunidade, useUpdateOportunidade } from '@/hooks/useOportunidades'
 import { useCreateContrato } from '@/hooks/useContratos'
+import { useClientes } from '@/hooks/useClientes'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { OPORTUNIDADE_STATUS, OPORTUNIDADE_TIPOS, CONTRACT_TYPES, PRICING_MODELS, SERVICE_AREAS, RM_STATUS_OPTIONS } from '@/lib/constants'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { TrendingUp, RefreshCw, ArrowUpRight, X, Save } from 'lucide-react'
+import { TrendingUp, RefreshCw, ArrowUpRight, X, Save, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Oportunidade } from '@/types'
 import { toast } from 'sonner'
@@ -156,10 +157,96 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
   )
 }
 
+function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
+  const { data: clientes = [] } = useClientes()
+  const create = useCreateOportunidade()
+
+  const [clienteId, setClienteId] = useState('')
+  const [tipo, setTipo] = useState('upsell')
+  const [titulo, setTitulo] = useState('')
+  const [descricao, setDescricao] = useState('')
+  const [valorEstimado, setValorEstimado] = useState('')
+  const [dataAlerta, setDataAlerta] = useState('')
+
+  async function handleSave() {
+    if (!clienteId || !titulo) { toast.error('Cliente e título são obrigatórios'); return }
+    await create.mutateAsync({
+      cliente_id: clienteId,
+      tipo,
+      titulo,
+      descricao: descricao || undefined,
+      servico_alvo: titulo.toLowerCase().replace(/\s+/g, '_').slice(0, 40),
+      status: 'identificada',
+      valor_estimado: valorEstimado ? parseFloat(valorEstimado) : undefined,
+      data_alerta: dataAlerta || undefined,
+    })
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <h2 className="text-lg font-semibold text-slate-800">Nova Oportunidade</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400"><X className="w-5 h-5" /></button>
+        </div>
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">Cliente *</label>
+            <select value={clienteId} onChange={e => setClienteId(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Selecione o cliente</option>
+              {clientes.map(c => <option key={c.id} value={c.id}>{c.nome} — {c.empresa}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">Tipo</label>
+            <select value={tipo} onChange={e => setTipo(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              {OPORTUNIDADE_TIPOS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">Título *</label>
+            <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex: Renovação de contrato anual"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">Descrição</label>
+            <textarea value={descricao} onChange={e => setDescricao(e.target.value)} rows={2}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Valor Estimado (R$)</label>
+              <input type="number" value={valorEstimado} onChange={e => setValorEstimado(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Data de Alerta</label>
+              <input type="date" value={dataAlerta} onChange={e => setDataAlerta(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-3 px-6 py-4 border-t">
+          <button onClick={onClose} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button onClick={handleSave} disabled={create.isPending || !clienteId || !titulo}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm text-white font-medium disabled:opacity-50"
+            style={{ backgroundColor: '#0089ac' }}>
+            <Save className="w-4 h-4" />{create.isPending ? 'Salvando...' : 'Criar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function OportunidadesPage() {
   const { data: oportunidades, isLoading } = useOportunidades()
   const updateOportunidade = useUpdateOportunidade()
   const [convertendo, setConvertendo] = useState<Oportunidade | null>(null)
+  const [showNova, setShowNova] = useState(false)
 
   function handleStatusChange(op: Oportunidade, newStatus: string) {
     if (newStatus === 'convertida') {
@@ -176,7 +263,14 @@ export function OportunidadesPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-slate-800 mb-6">Oportunidades</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl font-bold text-slate-800">Oportunidades</h1>
+        <button onClick={() => setShowNova(true)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-white text-sm font-medium"
+          style={{ backgroundColor: '#0089ac' }}>
+          <Plus className="w-4 h-4" />Nova Oportunidade
+        </button>
+      </div>
 
       {isLoading ? <div className="text-center text-slate-500 py-8">Carregando...</div> : (
         <div className="flex gap-4 overflow-x-auto pb-4">
@@ -232,6 +326,8 @@ export function OportunidadesPage() {
           onClose={() => setConvertendo(null)}
         />
       )}
+
+      {showNova && <NovaOportunidadeModal onClose={() => setShowNova(false)} />}
     </div>
   )
 }

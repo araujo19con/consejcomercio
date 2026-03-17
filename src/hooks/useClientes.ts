@@ -66,3 +66,18 @@ export function useUpdateCliente() {
     },
   })
 }
+
+export function useDeleteCliente() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('clientes').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.clientes.all })
+      toast.success('Cliente excluído!')
+    },
+    onError: () => toast.error('Erro ao excluir cliente'),
+  })
+}

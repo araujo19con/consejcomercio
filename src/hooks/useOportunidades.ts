@@ -18,6 +18,22 @@ export function useOportunidades() {
   })
 }
 
+export function useCreateOportunidade() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: Omit<Oportunidade, 'id' | 'created_at' | 'updated_at' | 'cliente'>) => {
+      const { data, error } = await supabase.from('oportunidades').insert(input).select().single()
+      if (error) throw error
+      return data as Oportunidade
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.oportunidades.all })
+      toast.success('Oportunidade criada!')
+    },
+    onError: () => toast.error('Erro ao criar oportunidade'),
+  })
+}
+
 export function useUpdateOportunidade() {
   const queryClient = useQueryClient()
   return useMutation({
