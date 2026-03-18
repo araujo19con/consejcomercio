@@ -31,7 +31,7 @@ async function handleStatusChange(ind: Indicacao, newStatus: string, updateIndic
         empresa: ind.indicado_empresa ?? '',
         email: ind.indicado_email ?? '',
         origem,
-        status: 'novo_lead',
+        status: 'classificacao',
         segmento: 'outro',
         servicos_interesse: [],
       })

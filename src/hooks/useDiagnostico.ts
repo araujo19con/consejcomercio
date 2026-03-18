@@ -39,8 +39,8 @@ export function useSaveDiagnostico() {
         .select()
         .single()
       if (error) throw error
-      // Advance lead status to diagnostico_realizado
-      await supabase.from('leads').update({ status: 'diagnostico_realizado' }).eq('id', leadId)
+      // Advance lead to educar_lead after diagnostic is completed
+      await supabase.from('leads').update({ status: 'educar_lead' }).eq('id', leadId)
       return data as Diagnostico
     },
     onSuccess: (diag) => {

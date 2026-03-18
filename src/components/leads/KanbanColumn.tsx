@@ -5,13 +5,16 @@ import { LeadCard } from './LeadCard'
 import { cn } from '@/lib/utils'
 
 const COLUMN_COLORS: Record<string, string> = {
-  novo_lead: 'border-t-slate-400',
-  diagnostico_agendado: 'border-t-violet-500',
-  diagnostico_realizado: 'border-t-blue-500',
-  proposta_enviada: 'border-t-amber-500',
-  em_negociacao: 'border-t-orange-500',
-  contrato_assinado: 'border-t-green-500',
-  perdido: 'border-t-red-500',
+  classificacao:             'border-t-sky-400',
+  levantamento_oportunidade: 'border-t-blue-500',
+  educar_lead:               'border-t-violet-500',
+  proposta_comercial:        'border-t-amber-500',
+  negociacao:                'border-t-orange-500',
+  stand_by:                  'border-t-slate-400',
+  ganho_assessoria:          'border-t-green-500',
+  ganho_consultoria:         'border-t-emerald-500',
+  perdido:                   'border-t-red-500',
+  cancelado:                 'border-t-rose-500',
 }
 
 type Props = {

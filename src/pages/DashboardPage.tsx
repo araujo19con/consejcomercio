@@ -27,7 +27,7 @@ export function DashboardPage() {
   const { data: reunioesSemana = [] } = useReunioesSemanais()
 
   // KPIs
-  const activeLeads = leads?.filter(l => l.status !== 'perdido' && l.status !== 'contrato_assinado').length || 0
+  const activeLeads = leads?.filter(l => !['ganho_assessoria', 'ganho_consultoria', 'perdido', 'cancelado'].includes(l.status)).length || 0
   const activeClientes = clientes?.filter(c => c.status === 'ativo').length || 0
   const totalConversions = clientes?.length || 0
   const totalLeads = leads?.length || 0
@@ -45,10 +45,10 @@ export function DashboardPage() {
 
   // Stagnant leads (no status change in 7+ days, still active)
   const STAGNANT_THRESHOLDS: Record<string, number> = {
-    novo_lead: 3, diagnostico_agendado: 5, diagnostico_realizado: 5, proposta_enviada: 7, em_negociacao: 10,
+    classificacao: 3, levantamento_oportunidade: 5, educar_lead: 7, proposta_comercial: 7, negociacao: 10, stand_by: 14,
   }
   const stagnantLeads = leads?.filter(l => {
-    if (l.status === 'perdido' || l.status === 'contrato_assinado') return false
+    if (['ganho_assessoria', 'ganho_consultoria', 'perdido', 'cancelado'].includes(l.status)) return false
     const days = differenceInDays(new Date(), new Date(l.updated_at))
     return days >= (STAGNANT_THRESHOLDS[l.status] ?? 7)
   }).sort((a, b) => differenceInDays(new Date(), new Date(b.updated_at)) - differenceInDays(new Date(), new Date(a.updated_at))) || []

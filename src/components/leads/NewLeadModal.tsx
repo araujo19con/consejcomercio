@@ -49,7 +49,7 @@ export function NewLeadModal({ open, onClose }: Props) {
       email: data.email || null,
       notas: data.notas || null,
       responsavel: data.responsavel || null,
-      status: 'novo_lead',
+      status: 'classificacao',
       referido_por_cliente_id: origem === 'indicacao_cliente' ? referenteClienteId || null : null,
       referido_por_parceiro_id: origem === 'indicacao_parceiro' ? referenteParceiroId || null : null,
       servicos_interesse: [],

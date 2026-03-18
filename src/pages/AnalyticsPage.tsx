@@ -72,8 +72,8 @@ export function AnalyticsPage() {
     }))
 
     // ── Win / Loss ─────────────────────────────────────────────────────────
-    const won  = filteredLeads.filter(l => l.status === 'contrato_assinado')
-    const lost = filteredLeads.filter(l => l.status === 'perdido')
+    const won  = filteredLeads.filter(l => l.status === 'ganho_assessoria' || l.status === 'ganho_consultoria')
+    const lost = filteredLeads.filter(l => l.status === 'perdido' || l.status === 'cancelado')
     const closed = won.length + lost.length
     const winRate = pct(won.length, closed)
     const lossRate = pct(lost.length, closed)
@@ -110,14 +110,14 @@ export function AnalyticsPage() {
     for (const l of filteredLeads) {
       if (!sourceMap[l.origem]) sourceMap[l.origem] = { total: 0, won: 0 }
       sourceMap[l.origem].total++
-      if (l.status === 'contrato_assinado') sourceMap[l.origem].won++
+      if (l.status === 'ganho_assessoria' || l.status === 'ganho_consultoria') sourceMap[l.origem].won++
     }
     const bySource = Object.entries(sourceMap)
       .map(([key, v]) => ({
         name: LEAD_SOURCE_LABELS[key] ?? key,
         total: v.total,
         won: v.won,
-        taxa: pct(v.won, v.total + (filteredLeads.filter(l => l.origem === key && l.status === 'perdido').length)),
+        taxa: pct(v.won, v.total + (filteredLeads.filter(l => l.origem === key && (l.status === 'perdido' || l.status === 'cancelado')).length)),
       }))
       .sort((a, b) => b.taxa - a.taxa)
 
@@ -126,14 +126,14 @@ export function AnalyticsPage() {
     for (const l of filteredLeads) {
       if (!segMap[l.segmento]) segMap[l.segmento] = { total: 0, won: 0 }
       segMap[l.segmento].total++
-      if (l.status === 'contrato_assinado') segMap[l.segmento].won++
+      if (l.status === 'ganho_assessoria' || l.status === 'ganho_consultoria') segMap[l.segmento].won++
     }
     const bySegment = Object.entries(segMap)
       .map(([key, v]) => ({
         name: SEGMENTS.find(s => s.value === key)?.label ?? key,
         total: v.total,
         won: v.won,
-        taxa: pct(v.won, v.total + (filteredLeads.filter(l => l.segmento === key && l.status === 'perdido').length)),
+        taxa: pct(v.won, v.total + (filteredLeads.filter(l => l.segmento === key && (l.status === 'perdido' || l.status === 'cancelado')).length)),
       }))
       .sort((a, b) => b.won - a.won)
 
@@ -143,7 +143,7 @@ export function AnalyticsPage() {
       const resp = l.responsavel ?? 'Sem responsável'
       if (!respMap[resp]) respMap[resp] = { total: 0, won: 0 }
       respMap[resp].total++
-      if (l.status === 'contrato_assinado') respMap[resp].won++
+      if (l.status === 'ganho_assessoria' || l.status === 'ganho_consultoria') respMap[resp].won++
     }
     const byResponsavel = Object.entries(respMap)
       .map(([name, v]) => ({ name, ...v, taxa: pct(v.won, v.total) }))
@@ -151,10 +151,10 @@ export function AnalyticsPage() {
 
     // ── Stagnant leads ────────────────────────────────────────────────────
     const STAGNANT: Record<string, number> = {
-      novo_lead: 3, diagnostico_agendado: 5, diagnostico_realizado: 5, proposta_enviada: 7, em_negociacao: 10,
+      classificacao: 3, levantamento_oportunidade: 5, educar_lead: 7, proposta_comercial: 7, negociacao: 10, stand_by: 14,
     }
     const stagnant = filteredLeads.filter(l => {
-      if (l.status === 'perdido' || l.status === 'contrato_assinado') return false
+      if (['ganho_assessoria', 'ganho_consultoria', 'perdido', 'cancelado'].includes(l.status)) return false
       return differenceInDays(new Date(), new Date(l.updated_at)) >= (STAGNANT[l.status] ?? 7)
     })
 
@@ -167,7 +167,7 @@ export function AnalyticsPage() {
     // ── Piedata Win/Loss ──────────────────────────────────────────────────
     const winLossPie = [
       { name: 'Ganhos', value: won.length },
-      { name: 'Perdidos', value: lost.length },
+      { name: 'Perdidos/Cancelados', value: lost.length },
       { name: 'Em andamento', value: filteredLeads.length - won.length - lost.length },
     ].filter(d => d.value > 0)
 

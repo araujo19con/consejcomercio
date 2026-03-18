@@ -11,7 +11,7 @@ export function DiagnosticosPage() {
   const navigate = useNavigate()
 
   const withDiagnostico = leads?.filter(l => l.diagnostico?.completed_at) || []
-  const pendentes = leads?.filter(l => l.status === 'diagnostico_agendado' && !l.diagnostico?.completed_at) || []
+  const pendentes = leads?.filter(l => l.status === 'levantamento_oportunidade' && !l.diagnostico?.completed_at) || []
 
   return (
     <div>

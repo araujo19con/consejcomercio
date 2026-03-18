@@ -3,18 +3,131 @@ import { useContratos, useUpdateContrato } from '@/hooks/useContratos'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Progress } from '@/components/ui/progress'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { CONTRACT_TYPES, PRICING_MODELS, RM_STATUS_OPTIONS } from '@/lib/constants'
 import { formatDate, formatCurrency, getContractProgress, getDaysUntilExpiry } from '@/lib/utils'
-import { Search, AlertCircle, X, Pencil, Save, FileText } from 'lucide-react'
+import { Search, AlertCircle, X, Pencil, Save, FileText, Mail, Plus, Trash2, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Contrato } from '@/types'
 import { toast } from 'sonner'
 
+function RelatorioContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () => void }) {
+  const [emails, setEmails] = useState<string[]>(contrato.cliente?.email ? [contrato.cliente.email] : [''])
+
+  function addEmail() { setEmails(prev => [...prev, '']) }
+  function removeEmail(i: number) { setEmails(prev => prev.filter((_, idx) => idx !== i)) }
+  function updateEmail(i: number, v: string) { setEmails(prev => prev.map((e, idx) => idx === i ? v : e)) }
+
+  const validEmails = emails.filter(e => e.includes('@'))
+
+  const tipoLabel    = CONTRACT_TYPES.find(t => t.value === contrato.tipo)?.label ?? contrato.tipo
+  const modeloLabel  = PRICING_MODELS.find(m => m.value === contrato.modelo_precificacao)?.label ?? contrato.modelo_precificacao
+  const areasLabel   = contrato.areas_direito?.map(a => a.replace(/_/g, ' ')).join(', ') || '—'
+  const valorTotal   = contrato.valor_total ? formatCurrency(contrato.valor_total) : '—'
+  const valorMensal  = contrato.valor_mensal ? formatCurrency(contrato.valor_mensal) : '—'
+
+  const subject = encodeURIComponent(`Relatório de Contrato — ${contrato.cliente?.nome ?? 'Cliente'}`)
+  const body = encodeURIComponent([
+    `=== RELATÓRIO DE CONTRATO FECHADO ===`,
+    ``,
+    `CLIENTE`,
+    `Nome: ${contrato.cliente?.nome ?? '—'}`,
+    `Empresa: ${contrato.cliente?.empresa ?? '—'}`,
+    ``,
+    `CONTRATO`,
+    `Tipo: ${tipoLabel}`,
+    `Modelo de Precificação: ${modeloLabel}`,
+    `Áreas do Direito: ${areasLabel}`,
+    `Valor Total: ${valorTotal}`,
+    `Valor Mensal: ${valorMensal}`,
+    `Início: ${formatDate(contrato.data_inicio)}`,
+    `Término: ${formatDate(contrato.data_fim)}`,
+    contrato.notas ? `\nObservações: ${contrato.notas}` : '',
+    ``,
+    `Relatório gerado pelo CONSEJ CRM.`,
+  ].filter(l => l !== undefined).join('\n'))
+
+  const mailto = `mailto:${validEmails.join(',')}?subject=${subject}&body=${body}`
+
+  function handleSend() {
+    window.location.href = mailto
+    toast.success('Relatório aberto no cliente de e-mail')
+  }
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-slate-500" />
+            Enviar Relatório por E-mail
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          {/* Preview */}
+          <div className="bg-slate-50 rounded-lg p-4 text-xs text-slate-700 space-y-1 font-mono border border-slate-200 max-h-52 overflow-y-auto">
+            <p className="font-bold text-slate-500 mb-2 not-italic font-sans text-[10px] uppercase tracking-wider">Prévia do relatório</p>
+            <p className="font-semibold">Cliente: {contrato.cliente?.nome}</p>
+            <p>Empresa: {contrato.cliente?.empresa}</p>
+            <p className="mt-2 font-semibold">Contrato: {tipoLabel}</p>
+            <p>Modelo: {modeloLabel}</p>
+            <p>Áreas: {areasLabel}</p>
+            <p>Valor Total: {valorTotal}</p>
+            {contrato.valor_mensal ? <p>Valor Mensal: {valorMensal}</p> : null}
+            <p>Vigência: {formatDate(contrato.data_inicio)} → {formatDate(contrato.data_fim)}</p>
+            {contrato.notas && <p className="mt-1 text-slate-500">Obs: {contrato.notas}</p>}
+          </div>
+
+          {/* Email inputs */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-slate-700">Destinatários</p>
+            {emails.map((email, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <Input
+                  type="email"
+                  placeholder="email@empresa.com"
+                  value={email}
+                  onChange={e => updateEmail(i, e.target.value)}
+                  className="flex-1"
+                />
+                {emails.length > 1 && (
+                  <button onClick={() => removeEmail(i)} className="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            ))}
+            <button onClick={addEmail} className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 transition-colors">
+              <Plus className="w-3 h-3" /> Adicionar destinatário
+            </button>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button
+            onClick={handleSend}
+            disabled={validEmails.length === 0}
+            className="gap-1.5"
+            style={{ backgroundColor: '#0089ac' }}
+          >
+            <Send className="w-3.5 h-3.5" />
+            Abrir no E-mail
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () => void }) {
   const update = useUpdateContrato()
   const [editing, setEditing] = useState(false)
+  const [showRelatorio, setShowRelatorio] = useState(false)
   const [tipo, setTipo] = useState(contrato.tipo)
   const [modelo, setModelo] = useState(contrato.modelo_precificacao)
   const [valorTotal, setValorTotal] = useState(String(contrato.valor_total ?? ''))
@@ -54,6 +167,7 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
   )
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 overflow-hidden max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b">
@@ -63,9 +177,14 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
           </div>
           <div className="flex items-center gap-2">
             {!editing ? (
-              <button onClick={() => setEditing(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm text-slate-600 hover:bg-slate-50">
-                <Pencil className="w-3.5 h-3.5" />Editar
-              </button>
+              <>
+                <button onClick={() => setShowRelatorio(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm text-slate-600 hover:bg-slate-50">
+                  <Mail className="w-3.5 h-3.5" />Relatório
+                </button>
+                <button onClick={() => setEditing(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm text-slate-600 hover:bg-slate-50">
+                  <Pencil className="w-3.5 h-3.5" />Editar
+                </button>
+              </>
             ) : (
               <button onClick={handleSave} disabled={update.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-white font-medium" style={{ backgroundColor: '#0089ac' }}>
                 <Save className="w-3.5 h-3.5" />{update.isPending ? 'Salvando...' : 'Salvar'}
@@ -147,6 +266,10 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
         </div>
       </div>
     </div>
+    {showRelatorio && (
+      <RelatorioContratoModal contrato={contrato} onClose={() => setShowRelatorio(false)} />
+    )}
+    </>
   )
 }
 

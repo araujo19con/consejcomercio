@@ -20,20 +20,22 @@ const SEGMENT_COLORS: Record<string, string> = {
 
 // Map pipeline stage → mensagens page stage
 const STAGE_TO_MSG: Record<string, string> = {
-  novo_lead: 'primeiro_contato',
-  diagnostico_agendado: 'diagnostico',
-  diagnostico_realizado: 'followup',
-  proposta_enviada: 'proposta',
-  em_negociacao: 'negociacao',
+  classificacao:             'primeiro_contato',
+  levantamento_oportunidade: 'diagnostico',
+  educar_lead:               'followup',
+  proposta_comercial:        'proposta',
+  negociacao:                'negociacao',
+  stand_by:                  'followup',
 }
 
 // Stagnant thresholds in days per stage
 const STAGNANT_DAYS: Record<string, number> = {
-  novo_lead: 3,
-  diagnostico_agendado: 5,
-  diagnostico_realizado: 5,
-  proposta_enviada: 7,
-  em_negociacao: 10,
+  classificacao:             3,
+  levantamento_oportunidade: 5,
+  educar_lead:               7,
+  proposta_comercial:        7,
+  negociacao:                10,
+  stand_by:                  14,
 }
 
 type Props = { lead: Lead; isDragging?: boolean }
@@ -50,7 +52,7 @@ export function LeadCard({ lead, isDragging = false }: Props) {
   // Stagnant check
   const daysInStage = differenceInDays(new Date(), new Date(lead.updated_at))
   const threshold = STAGNANT_DAYS[lead.status] ?? 7
-  const isStagnant = daysInStage >= threshold && lead.status !== 'perdido' && lead.status !== 'contrato_assinado'
+  const isStagnant = daysInStage >= threshold && !(lead.status in { ganho_assessoria: 1, ganho_consultoria: 1, perdido: 1, cancelado: 1 })
 
   // Message shortcut URL
   const msgStage = STAGE_TO_MSG[lead.status] ?? 'primeiro_contato'

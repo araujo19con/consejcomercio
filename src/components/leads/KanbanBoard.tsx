@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
-import { PIPELINE_STAGES } from '@/lib/constants'
+import { PIPELINE_STAGES, TERMINAL_STAGES, TERMINAL_WON_STAGES, TERMINAL_LOST_STAGES } from '@/lib/constants'
 import { KanbanColumn } from './KanbanColumn'
 import { LeadCard } from './LeadCard'
 import { LostReasonModal } from './LostReasonModal'
 import { ConvertToClientModal } from './ConvertToClientModal'
 import { NewLeadModal } from './NewLeadModal'
-import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
 import { useUpdateLeadStatus } from '@/hooks/useLeads'
 import { Button } from '@/components/ui/button'
 import { Plus, Eye, EyeOff, X } from 'lucide-react'
@@ -18,16 +17,15 @@ type Props = { leads: Lead[] }
 export function KanbanBoard({ leads }: Props) {
   const [activeCard, setActiveCard] = useState<Lead | null>(null)
   const [showNewLead, setShowNewLead] = useState(false)
-  const [lostLead, setLostLead] = useState<{ id: string } | null>(null)
-  const [convertLead, setConvertLead] = useState<Lead | null>(null)
-  const [agendarLead, setAgendarLead] = useState<Lead | null>(null)
+  const [lostLead, setLostLead] = useState<{ id: string; status: string } | null>(null)
+  const [convertLead, setConvertLead] = useState<{ lead: Lead; stage: string } | null>(null)
   const [showClosed, setShowClosed] = useState(false)
   const [showDragHint, setShowDragHint] = useState(() => !localStorage.getItem('consej_kanban_hint'))
   const updateStatus = useUpdateLeadStatus()
 
   const visibleStages = showClosed
     ? PIPELINE_STAGES
-    : PIPELINE_STAGES.filter(s => s.id !== 'perdido' && s.id !== 'contrato_assinado')
+    : PIPELINE_STAGES.filter(s => !(TERMINAL_STAGES as readonly string[]).includes(s.id))
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
@@ -52,20 +50,16 @@ export function KanbanBoard({ leads }: Props) {
     const lead = leads.find(l => l.id === leadId)
     if (!lead || lead.status === newStage) return
 
-    if (newStage === 'perdido') {
-      setLostLead({ id: leadId })
+    if ((TERMINAL_LOST_STAGES as readonly string[]).includes(newStage)) {
+      setLostLead({ id: leadId, status: newStage })
       return
     }
-    if (newStage === 'contrato_assinado') {
-      setConvertLead(lead)
+    if ((TERMINAL_WON_STAGES as readonly string[]).includes(newStage)) {
+      setConvertLead({ lead, stage: newStage })
       return
     }
 
     updateStatus.mutate({ id: leadId, status: newStage })
-
-    if (newStage === 'diagnostico_agendado') {
-      setAgendarLead(lead)
-    }
   }
 
   return (
@@ -116,19 +110,11 @@ export function KanbanBoard({ leads }: Props) {
 
       {showNewLead && <NewLeadModal open={showNewLead} onClose={() => setShowNewLead(false)} />}
 
-      <NovaReuniaoModal
-        open={!!agendarLead}
-        onClose={() => setAgendarLead(null)}
-        prefill={agendarLead ? {
-          titulo: `Diagnóstico — ${agendarLead.nome}${agendarLead.empresa ? ` (${agendarLead.empresa})` : ''}`,
-        } : undefined}
-      />
-
       {lostLead && (
         <LostReasonModal
           open={!!lostLead}
           onConfirm={(motivo) => {
-            updateStatus.mutate({ id: lostLead.id, status: 'perdido', motivo_perda: motivo })
+            updateStatus.mutate({ id: lostLead.id, status: lostLead.status, motivo_perda: motivo })
             setLostLead(null)
           }}
           onCancel={() => setLostLead(null)}
@@ -137,7 +123,8 @@ export function KanbanBoard({ leads }: Props) {
 
       {convertLead && (
         <ConvertToClientModal
-          lead={convertLead}
+          lead={convertLead.lead}
+          targetStage={convertLead.stage}
           open={!!convertLead}
           onClose={() => setConvertLead(null)}
         />

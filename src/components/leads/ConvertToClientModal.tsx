@@ -14,9 +14,10 @@ type Props = {
   lead: Lead
   open: boolean
   onClose: () => void
+  targetStage?: string
 }
 
-export function ConvertToClientModal({ lead, open, onClose }: Props) {
+export function ConvertToClientModal({ lead, open, onClose, targetStage = 'ganho_assessoria' }: Props) {
   const createCliente = useCreateCliente()
   const createContrato = useCreateContrato()
   const updateStatus = useUpdateLeadStatus()
@@ -60,7 +61,7 @@ export function ConvertToClientModal({ lead, open, onClose }: Props) {
         rm_status: 'verificar',
         notas: null,
       })
-      await updateStatus.mutateAsync({ id: lead.id, status: 'contrato_assinado' })
+      await updateStatus.mutateAsync({ id: lead.id, status: targetStage })
       onClose()
     } finally {
       setLoading(false)

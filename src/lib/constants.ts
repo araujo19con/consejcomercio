@@ -1,34 +1,50 @@
 // Pipeline stages — passive intake only (no active prospecting)
 export const PIPELINE_STAGES = [
-  { id: 'novo_lead', label: 'Novo Lead', color: 'slate' },
-  { id: 'diagnostico_agendado', label: 'Diagnóstico Agendado', color: 'violet' },
-  { id: 'diagnostico_realizado', label: 'Diagnóstico Realizado', color: 'blue' },
-  { id: 'proposta_enviada', label: 'Proposta Enviada', color: 'amber' },
-  { id: 'em_negociacao', label: 'Em Negociação', color: 'orange' },
-  { id: 'contrato_assinado', label: 'Contrato Assinado', color: 'green' },
-  { id: 'perdido', label: 'Perdido', color: 'red' },
+  { id: 'classificacao',             label: 'Classificação',              color: 'sky'     },
+  { id: 'levantamento_oportunidade', label: 'Levantamento de Oportunidade', color: 'blue'   },
+  { id: 'educar_lead',               label: 'Educar o Lead',              color: 'violet'  },
+  { id: 'proposta_comercial',        label: 'Proposta Comercial',         color: 'amber'   },
+  { id: 'negociacao',                label: 'Negociação',                 color: 'orange'  },
+  { id: 'stand_by',                  label: 'Stand By',                   color: 'slate'   },
+  { id: 'ganho_assessoria',          label: 'Ganho – Assessoria',         color: 'green'   },
+  { id: 'ganho_consultoria',         label: 'Ganho – Consultoria',        color: 'emerald' },
+  { id: 'perdido',                   label: 'Perdido',                    color: 'red'     },
+  { id: 'cancelado',                 label: 'Cancelado',                  color: 'rose'    },
 ] as const
 
 export type PipelineStageId = typeof PIPELINE_STAGES[number]['id']
 
+// Stages that represent a closed deal (won)
+export const TERMINAL_WON_STAGES = ['ganho_assessoria', 'ganho_consultoria'] as const
+// Stages that represent a closed deal (lost)
+export const TERMINAL_LOST_STAGES = ['perdido', 'cancelado'] as const
+// All terminal stages (hidden in kanban by default)
+export const TERMINAL_STAGES = [...TERMINAL_WON_STAGES, ...TERMINAL_LOST_STAGES] as const
+
 export const STAGE_COLORS: Record<string, string> = {
-  novo_lead: 'bg-slate-100 text-slate-700 border-slate-200',
-  diagnostico_agendado: 'bg-violet-100 text-violet-700 border-violet-200',
-  diagnostico_realizado: 'bg-blue-100 text-blue-700 border-blue-200',
-  proposta_enviada: 'bg-amber-100 text-amber-700 border-amber-200',
-  em_negociacao: 'bg-orange-100 text-orange-700 border-orange-200',
-  contrato_assinado: 'bg-green-100 text-green-700 border-green-200',
-  perdido: 'bg-red-100 text-red-700 border-red-200',
+  classificacao:             'bg-sky-100 text-sky-700 border-sky-200',
+  levantamento_oportunidade: 'bg-blue-100 text-blue-700 border-blue-200',
+  educar_lead:               'bg-violet-100 text-violet-700 border-violet-200',
+  proposta_comercial:        'bg-amber-100 text-amber-700 border-amber-200',
+  negociacao:                'bg-orange-100 text-orange-700 border-orange-200',
+  stand_by:                  'bg-slate-100 text-slate-700 border-slate-200',
+  ganho_assessoria:          'bg-green-100 text-green-700 border-green-200',
+  ganho_consultoria:         'bg-emerald-100 text-emerald-700 border-emerald-200',
+  perdido:                   'bg-red-100 text-red-700 border-red-200',
+  cancelado:                 'bg-rose-100 text-rose-700 border-rose-200',
 }
 
 export const STAGE_BORDER_COLORS: Record<string, string> = {
-  novo_lead: 'border-l-slate-400',
-  diagnostico_agendado: 'border-l-violet-500',
-  diagnostico_realizado: 'border-l-blue-500',
-  proposta_enviada: 'border-l-amber-500',
-  em_negociacao: 'border-l-orange-500',
-  contrato_assinado: 'border-l-green-500',
-  perdido: 'border-l-red-500',
+  classificacao:             'border-l-sky-400',
+  levantamento_oportunidade: 'border-l-blue-500',
+  educar_lead:               'border-l-violet-500',
+  proposta_comercial:        'border-l-amber-500',
+  negociacao:                'border-l-orange-500',
+  stand_by:                  'border-l-slate-400',
+  ganho_assessoria:          'border-l-green-500',
+  ganho_consultoria:         'border-l-emerald-500',
+  perdido:                   'border-l-red-500',
+  cancelado:                 'border-l-rose-500',
 }
 
 // Lead origins — passive only
