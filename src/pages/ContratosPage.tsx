@@ -3,10 +3,11 @@ import { useContratos, useUpdateContrato } from '@/hooks/useContratos'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { EmptyState } from '@/components/ui/empty-state'
 import { Progress } from '@/components/ui/progress'
 import { CONTRACT_TYPES, PRICING_MODELS, RM_STATUS_OPTIONS } from '@/lib/constants'
 import { formatDate, formatCurrency, getContractProgress, getDaysUntilExpiry } from '@/lib/utils'
-import { Search, AlertCircle, X, Pencil, Save } from 'lucide-react'
+import { Search, AlertCircle, X, Pencil, Save, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Contrato } from '@/types'
 import { toast } from 'sonner'
@@ -167,9 +168,12 @@ export function ContratosPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-slate-800">Contratos</h1>
-        <Badge variant="secondary">{filtered.length} contrato(s)</Badge>
+      <div className="flex items-start justify-between mb-5">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800">Contratos</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Acompanhe contratos, prazos e status de Registro de Marca</p>
+        </div>
+        <Badge variant="secondary" className="shrink-0 mt-1">{filtered.length} contrato{filtered.length !== 1 ? 's' : ''}</Badge>
       </div>
 
       {expiringSoon.length > 0 && (
@@ -186,8 +190,37 @@ export function ContratosPage() {
         <Input placeholder="Buscar por cliente..." className="pl-8" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      {isLoading ? <div className="text-slate-500 text-sm py-8 text-center">Carregando...</div> : (
+      {isLoading ? (
         <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-white border border-slate-200 rounded-xl p-4 animate-pulse">
+              <div className="flex items-start gap-4">
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-slate-200 rounded w-48" />
+                  <div className="h-3 bg-slate-100 rounded w-64" />
+                  <div className="h-2 bg-slate-100 rounded w-full mt-3" />
+                </div>
+                <div className="space-y-1.5">
+                  <div className="h-4 bg-slate-200 rounded w-20" />
+                  <div className="h-3 bg-slate-100 rounded w-16" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.length === 0 && (
+            <EmptyState
+              icon={FileText}
+              title={search ? 'Nenhum contrato encontrado' : 'Nenhum contrato cadastrado'}
+              description={
+                search
+                  ? `Não encontramos contratos para "${search}".`
+                  : 'Os contratos criados a partir de oportunidades convertidas aparecerão aqui.'
+              }
+            />
+          )}
           {filtered.map(contrato => {
             const daysLeft = getDaysUntilExpiry(contrato.data_fim)
             const progress = getContractProgress(contrato.data_inicio, contrato.data_fim)
@@ -234,7 +267,6 @@ export function ContratosPage() {
               </Card>
             )
           })}
-          {filtered.length === 0 && <div className="text-center text-slate-400 py-12">Nenhum contrato encontrado.</div>}
         </div>
       )}
 

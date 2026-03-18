@@ -5,10 +5,11 @@ import { useIndicacoes } from '@/hooks/useIndicacoes'
 import { useOportunidades } from '@/hooks/useOportunidades'
 import { useReunioesSemanais } from '@/hooks/useReunioes'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PIPELINE_STAGES, LEAD_SOURCE_LABELS } from '@/lib/constants'
+import { PIPELINE_STAGES, LEAD_SOURCE_LABELS, STAGE_COLORS } from '@/lib/constants'
 import { formatCurrency, getDaysUntilExpiry, formatDate } from '@/lib/utils'
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { Users, Briefcase, TrendingUp, FileText, AlertCircle, Share2, DollarSign, Calendar, Clock, Video, MapPin } from 'lucide-react'
+import { differenceInDays } from 'date-fns'
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { Users, Briefcase, TrendingUp, FileText, AlertCircle, Share2, DollarSign, Calendar, Clock, Video, MapPin, Flame, Bell, ArrowRight, Gift } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router-dom'
 
@@ -42,6 +43,23 @@ export function DashboardPage() {
 
   const recompensasPendentes = indicacoes?.filter(i => i.status === 'convertido' && !i.recompensa_entregue).length || 0
 
+  // Stagnant leads (no status change in 7+ days, still active)
+  const STAGNANT_THRESHOLDS: Record<string, number> = {
+    novo_lead: 3, diagnostico_agendado: 5, diagnostico_realizado: 5, proposta_enviada: 7, em_negociacao: 10,
+  }
+  const stagnantLeads = leads?.filter(l => {
+    if (l.status === 'perdido' || l.status === 'contrato_assinado') return false
+    const days = differenceInDays(new Date(), new Date(l.updated_at))
+    return days >= (STAGNANT_THRESHOLDS[l.status] ?? 7)
+  }).sort((a, b) => differenceInDays(new Date(), new Date(b.updated_at)) - differenceInDays(new Date(), new Date(a.updated_at))) || []
+
+  const renewalsUrgent = contratos?.filter(c => {
+    const d = getDaysUntilExpiry(c.data_fim)
+    return d !== null && d <= 15 && d >= 0 && c.status === 'ativo'
+  }) || []
+
+  const hasActionItems = stagnantLeads.length > 0 || renewalsUrgent.length > 0 || recompensasPendentes > 0
+
   // Pipeline funnel data
   const funnelData = PIPELINE_STAGES.map(s => ({
     name: s.label.replace('Diagnóstico', 'Diag.'),
@@ -63,6 +81,47 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-bold text-slate-800">Dashboard</h1>
+
+      {/* ── Para hoje ── */}
+      {hasActionItems && (
+        <div className="rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4">
+          <h2 className="text-sm font-semibold text-orange-800 flex items-center gap-2 mb-3">
+            <Bell className="w-4 h-4" /> Para hoje
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {stagnantLeads.length > 0 && (
+              <button
+                onClick={() => navigate('/leads')}
+                className="flex items-center gap-2 bg-white border border-orange-200 rounded-lg px-3 py-2 text-sm hover:bg-orange-50 transition-colors shadow-sm"
+              >
+                <Flame className="w-3.5 h-3.5 text-orange-500" />
+                <span className="font-medium text-slate-700">{stagnantLeads.length} lead{stagnantLeads.length > 1 ? 's' : ''} parado{stagnantLeads.length > 1 ? 's' : ''}</span>
+                <ArrowRight className="w-3 h-3 text-slate-400" />
+              </button>
+            )}
+            {renewalsUrgent.length > 0 && (
+              <button
+                onClick={() => navigate('/contratos')}
+                className="flex items-center gap-2 bg-white border border-red-200 rounded-lg px-3 py-2 text-sm hover:bg-red-50 transition-colors shadow-sm"
+              >
+                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                <span className="font-medium text-slate-700">{renewalsUrgent.length} contrato{renewalsUrgent.length > 1 ? 's' : ''} vence{renewalsUrgent.length > 1 ? 'm' : ''} em 15d</span>
+                <ArrowRight className="w-3 h-3 text-slate-400" />
+              </button>
+            )}
+            {recompensasPendentes > 0 && (
+              <button
+                onClick={() => navigate('/indicacoes')}
+                className="flex items-center gap-2 bg-white border border-amber-200 rounded-lg px-3 py-2 text-sm hover:bg-amber-50 transition-colors shadow-sm"
+              >
+                <Gift className="w-3.5 h-3.5 text-amber-500" />
+                <span className="font-medium text-slate-700">{recompensasPendentes} recompensa{recompensasPendentes > 1 ? 's' : ''} pendente{recompensasPendentes > 1 ? 's' : ''}</span>
+                <ArrowRight className="w-3 h-3 text-slate-400" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -200,6 +259,53 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Stagnant leads alert */}
+      {stagnantLeads.length > 0 && (
+        <Card className="border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Flame className="w-4 h-4 text-orange-500" />
+              Leads parados ({stagnantLeads.length})
+              <span className="text-xs font-normal text-slate-400 ml-1">— precisam de atenção</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {stagnantLeads.slice(0, 6).map(l => {
+                const days = differenceInDays(new Date(), new Date(l.updated_at))
+                const stageLabel = PIPELINE_STAGES.find(s => s.id === l.status)?.label ?? l.status
+                const stageCss = STAGE_COLORS[l.status] ?? 'bg-slate-100 text-slate-600 border-slate-200'
+                return (
+                  <div
+                    key={l.id}
+                    className="flex items-center justify-between py-2 border-b last:border-0 cursor-pointer hover:bg-slate-50 rounded px-1 -mx-1 transition-colors"
+                    onClick={() => navigate(`/leads/${l.id}`)}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-slate-800 truncate">{l.nome}</p>
+                      <p className="text-xs text-slate-500 truncate">{l.empresa}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0 ml-2">
+                      <span className={cn('text-[10px] font-medium px-2 py-0.5 rounded-full border', stageCss)}>
+                        {stageLabel}
+                      </span>
+                      <span className="text-xs font-semibold text-orange-600 flex items-center gap-0.5">
+                        <Clock className="w-3 h-3" />{days}d
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            {stagnantLeads.length > 6 && (
+              <button onClick={() => navigate('/leads')} className="mt-3 text-xs text-slate-400 hover:text-slate-600 underline w-full text-center">
+                Ver todos os {stagnantLeads.length} leads parados →
+              </button>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Renewals alert */}
       {renewalsSoon.length > 0 && (

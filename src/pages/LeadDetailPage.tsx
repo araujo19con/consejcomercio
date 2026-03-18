@@ -38,10 +38,16 @@ export function LeadDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-1.5 text-sm mb-5">
+        <button onClick={() => navigate('/leads')} className="text-slate-400 hover:text-slate-700 transition-colors flex items-center gap-1">
+          <ArrowLeft className="w-3.5 h-3.5" /> Leads
+        </button>
+        <span className="text-slate-300">/</span>
+        <span className="text-slate-700 font-medium truncate">{lead.nome}</span>
+      </div>
+
       <div className="flex items-center gap-3 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
         <div>
           <h1 className="text-xl font-bold text-slate-800">{lead.nome}</h1>
           <p className="text-sm text-slate-500">{lead.empresa}</p>

@@ -17,6 +17,8 @@ import { ConfiguracoesPage } from '@/pages/ConfiguracoesPage'
 import { SlackPage } from '@/pages/SlackPage'
 import { ReunioesPage } from '@/pages/ReunioesPage'
 import { PerfilPage } from '@/pages/PerfilPage'
+import { MensagensPage } from '@/pages/MensagensPage'
+import { AnalyticsPage } from '@/pages/AnalyticsPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -26,6 +28,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
+      { path: 'analytics', element: <AnalyticsPage /> },
       { path: 'leads', element: <LeadsPage /> },
       { path: 'leads/:id', element: <LeadDetailPage /> },
       { path: 'diagnosticos', element: <DiagnosticosPage /> },
@@ -37,6 +40,7 @@ export const router = createBrowserRouter([
       { path: 'parceiros', element: <ParceirosPage /> },
       { path: 'oportunidades', element: <OportunidadesPage /> },
       { path: 'reunioes', element: <ReunioesPage /> },
+      { path: 'mensagens', element: <MensagensPage /> },
       { path: 'slack', element: <SlackPage /> },
       { path: 'auditoria', element: <AuditoriaPage /> },
       { path: 'configuracoes', element: <ConfiguracoesPage /> },

@@ -10,7 +10,7 @@ import { NewLeadModal } from './NewLeadModal'
 import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
 import { useUpdateLeadStatus } from '@/hooks/useLeads'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, Eye, EyeOff, X } from 'lucide-react'
 import type { Lead } from '@/types'
 
 type Props = { leads: Lead[] }
@@ -21,7 +21,13 @@ export function KanbanBoard({ leads }: Props) {
   const [lostLead, setLostLead] = useState<{ id: string } | null>(null)
   const [convertLead, setConvertLead] = useState<Lead | null>(null)
   const [agendarLead, setAgendarLead] = useState<Lead | null>(null)
+  const [showClosed, setShowClosed] = useState(false)
+  const [showDragHint, setShowDragHint] = useState(() => !localStorage.getItem('consej_kanban_hint'))
   const updateStatus = useUpdateLeadStatus()
+
+  const visibleStages = showClosed
+    ? PIPELINE_STAGES
+    : PIPELINE_STAGES.filter(s => s.id !== 'perdido' && s.id !== 'contrato_assinado')
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
@@ -64,16 +70,37 @@ export function KanbanBoard({ leads }: Props) {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-slate-800">Pipeline de Leads</h1>
-        <Button size="sm" onClick={() => setShowNewLead(true)} className="bg-indigo-600 hover:bg-indigo-700">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between mb-3 gap-3">
+        <button
+          onClick={() => setShowClosed(v => !v)}
+          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          {showClosed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+          {showClosed ? 'Ocultar encerrados' : 'Ver encerrados'}
+        </button>
+        <Button size="sm" onClick={() => setShowNewLead(true)} className="text-white" style={{ backgroundColor: '#0089ac' }}>
           <Plus className="w-4 h-4 mr-1" /> Novo Lead
         </Button>
       </div>
 
+      {/* Drag hint — shown once, dismissible */}
+      {showDragHint && (
+        <div className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-xl px-4 py-2.5 mb-3">
+          <span className="text-xs text-blue-700">💡 Arraste os cards para mover um lead entre as etapas do pipeline</span>
+          <button
+            onClick={() => { setShowDragHint(false); localStorage.setItem('consej_kanban_hint', '1') }}
+            className="p-0.5 text-blue-400 hover:text-blue-700 ml-3 shrink-0"
+            aria-label="Fechar dica"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="flex gap-3 overflow-x-auto pb-4 h-full">
-          {PIPELINE_STAGES.map(stage => (
+          {visibleStages.map(stage => (
             <KanbanColumn
               key={stage.id}
               stageId={stage.id}

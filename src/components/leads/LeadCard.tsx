@@ -1,11 +1,12 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useNavigate } from 'react-router-dom'
+import { differenceInDays } from 'date-fns'
 import type { Lead } from '@/types'
 import { LEAD_SOURCE_LABELS } from '@/lib/constants'
 import { formatRelative } from '@/lib/utils'
 import { cn } from '@/lib/utils'
-import { Calendar, User } from 'lucide-react'
+import { Calendar, User, MessageCircle, Clock } from 'lucide-react'
 
 const SEGMENT_COLORS: Record<string, string> = {
   empresa_junior: 'bg-violet-100 text-violet-700',
@@ -15,6 +16,24 @@ const SEGMENT_COLORS: Record<string, string> = {
   empresa_design: 'bg-pink-100 text-pink-700',
   empresa_gestao: 'bg-cyan-100 text-cyan-700',
   outro: 'bg-slate-100 text-slate-600',
+}
+
+// Map pipeline stage → mensagens page stage
+const STAGE_TO_MSG: Record<string, string> = {
+  novo_lead: 'primeiro_contato',
+  diagnostico_agendado: 'diagnostico',
+  diagnostico_realizado: 'followup',
+  proposta_enviada: 'proposta',
+  em_negociacao: 'negociacao',
+}
+
+// Stagnant thresholds in days per stage
+const STAGNANT_DAYS: Record<string, number> = {
+  novo_lead: 3,
+  diagnostico_agendado: 5,
+  diagnostico_realizado: 5,
+  proposta_enviada: 7,
+  em_negociacao: 10,
 }
 
 type Props = { lead: Lead; isDragging?: boolean }
@@ -28,6 +47,15 @@ export function LeadCard({ lead, isDragging = false }: Props) {
     transition,
   }
 
+  // Stagnant check
+  const daysInStage = differenceInDays(new Date(), new Date(lead.updated_at))
+  const threshold = STAGNANT_DAYS[lead.status] ?? 7
+  const isStagnant = daysInStage >= threshold && lead.status !== 'perdido' && lead.status !== 'contrato_assinado'
+
+  // Message shortcut URL
+  const msgStage = STAGE_TO_MSG[lead.status] ?? 'primeiro_contato'
+  const msgUrl = `/mensagens?nome=${encodeURIComponent(lead.nome)}&empresa=${encodeURIComponent(lead.empresa ?? '')}&stage=${msgStage}`
+
   return (
     <div
       ref={setNodeRef}
@@ -36,18 +64,32 @@ export function LeadCard({ lead, isDragging = false }: Props) {
       {...listeners}
       className={cn(
         'bg-white rounded-lg border border-slate-200 p-3 mb-2 cursor-grab active:cursor-grabbing select-none shadow-sm hover:shadow-md transition-shadow',
-        (isSortDragging || isDragging) && 'opacity-50 shadow-xl rotate-1'
+        (isSortDragging || isDragging) && 'opacity-50 shadow-xl rotate-1',
+        isStagnant && 'border-l-2 border-l-orange-400'
       )}
       onClick={(e) => {
-        // Only navigate if not dragging
         if (!isSortDragging) {
           e.stopPropagation()
           navigate(`/leads/${lead.id}`)
         }
       }}
     >
-      <p className="text-sm font-semibold text-slate-800 leading-tight">{lead.nome}</p>
-      <p className="text-xs text-slate-500 mt-0.5">{lead.empresa}</p>
+      {/* Header row */}
+      <div className="flex items-start justify-between gap-1">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-slate-800 leading-tight truncate">{lead.nome}</p>
+          <p className="text-xs text-slate-500 mt-0.5 truncate">{lead.empresa}</p>
+        </div>
+        {isStagnant && (
+          <div
+            title={`Parado há ${daysInStage} dias`}
+            className="shrink-0 flex items-center gap-0.5 bg-orange-50 text-orange-500 rounded px-1 py-0.5 text-[10px] font-medium"
+          >
+            <Clock className="w-2.5 h-2.5" />
+            {daysInStage}d
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center gap-1.5 mt-2 flex-wrap">
         <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', SEGMENT_COLORS[lead.segmento] || 'bg-slate-100 text-slate-600')}>
@@ -73,7 +115,21 @@ export function LeadCard({ lead, isDragging = false }: Props) {
         )}
       </div>
 
-      <p className="text-xs text-slate-300 mt-1.5">{formatRelative(lead.created_at)}</p>
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-1.5">
+        <p className="text-xs text-slate-300">{formatRelative(lead.created_at)}</p>
+
+        {/* Quick message button */}
+        <button
+          title="Gerar mensagem de abordagem"
+          onPointerDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); navigate(msgUrl) }}
+          className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 px-1.5 py-0.5 rounded transition-colors"
+        >
+          <MessageCircle className="w-3 h-3" />
+          mensagem
+        </button>
+      </div>
     </div>
   )
 }

@@ -3,13 +3,37 @@ import { useOportunidades, useCreateOportunidade, useUpdateOportunidade } from '
 import { useCreateContrato } from '@/hooks/useContratos'
 import { useClientes } from '@/hooks/useClientes'
 import { Card, CardContent } from '@/components/ui/card'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { OPORTUNIDADE_STATUS, OPORTUNIDADE_TIPOS, CONTRACT_TYPES, PRICING_MODELS, SERVICE_AREAS, RM_STATUS_OPTIONS } from '@/lib/constants'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { TrendingUp, RefreshCw, ArrowUpRight, X, Save, Plus } from 'lucide-react'
+import { TrendingUp, RefreshCw, ArrowUpRight, Save, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Oportunidade } from '@/types'
 import { toast } from 'sonner'
+
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+
+function OportunidadesSkeleton() {
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="w-72 shrink-0">
+          <div className="h-5 bg-slate-200 rounded w-28 mb-3 animate-pulse" />
+          <div className="space-y-2">
+            {Array.from({ length: i % 2 === 0 ? 2 : 1 }).map((_, j) => (
+              <div key={j} className="bg-white border border-slate-200 rounded-xl p-3 animate-pulse space-y-2">
+                <div className="h-4 bg-slate-100 rounded w-20" />
+                <div className="h-4 bg-slate-200 rounded w-full" />
+                <div className="h-3 bg-slate-100 rounded w-24" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 const TIPO_ICONS = { upsell: ArrowUpRight, cross_sell: TrendingUp, renovacao: RefreshCw }
 const TIPO_COLORS: Record<string, string> = {
@@ -63,19 +87,14 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
   const isPending = createContrato.isPending || updateOportunidade.isPending
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-800">Novo Contrato — Oportunidade Convertida</h2>
-            <p className="text-sm text-slate-500">{op.titulo} · {op.cliente?.nome}</p>
-          </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
-            <X className="w-5 h-5" />
-          </button>
+    <Dialog open onOpenChange={open => !open && onClose()}>
+      <DialogContent className="max-w-2xl p-0 flex flex-col max-h-[90vh] overflow-hidden gap-0">
+        <div className="px-6 py-4 border-b shrink-0">
+          <h2 className="text-lg font-semibold text-slate-800">Novo Contrato — Oportunidade Convertida</h2>
+          <p className="text-sm text-slate-500">{op.titulo} · {op.cliente?.nome}</p>
         </div>
 
-        <div className="overflow-y-auto p-6 space-y-5">
+        <div className="overflow-y-auto p-6 space-y-5 flex-1">
           <div className="grid grid-cols-2 gap-4">
             {[
               { label: 'Tipo de Contrato', value: tipo, setter: setTipo, options: CONTRACT_TYPES },
@@ -152,8 +171,8 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
             {isPending ? 'Salvando...' : 'Criar Contrato'}
           </button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -184,11 +203,10 @@ function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+    <Dialog open onOpenChange={open => !open && onClose()}>
+      <DialogContent className="max-w-md p-0 gap-0">
+        <div className="px-6 py-4 border-b">
           <h2 className="text-lg font-semibold text-slate-800">Nova Oportunidade</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400"><X className="w-5 h-5" /></button>
         </div>
         <div className="p-6 space-y-4">
           <div>
@@ -237,8 +255,8 @@ function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
             <Save className="w-4 h-4" />{create.isPending ? 'Salvando...' : 'Criar'}
           </button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -272,15 +290,21 @@ export function OportunidadesPage() {
         </button>
       </div>
 
-      {isLoading ? <div className="text-center text-slate-500 py-8">Carregando...</div> : (
+      {isLoading ? <OportunidadesSkeleton /> : (
         <div className="flex gap-4 overflow-x-auto pb-4">
           {OPORTUNIDADE_STATUS.filter(s => s.value !== 'descartada').map(statusInfo => {
             const items = byStatus[statusInfo.value] || []
+            const totalValor = items.reduce((sum, op) => sum + (op.valor_estimado ?? 0), 0)
             return (
               <div key={statusInfo.value} className="w-72 shrink-0">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-slate-700">{statusInfo.label}</h3>
-                  <span className="text-xs font-bold text-slate-400 bg-white rounded-full px-1.5 py-0.5 border">{items.length}</span>
+                  <div className="flex items-center gap-1.5">
+                    {totalValor > 0 && (
+                      <span className="text-[10px] text-slate-400 font-medium">{formatCurrency(totalValor)}</span>
+                    )}
+                    <span className="text-xs font-bold text-slate-400 bg-white rounded-full px-1.5 py-0.5 border">{items.length}</span>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   {items.map(op => {
@@ -312,7 +336,13 @@ export function OportunidadesPage() {
                       </Card>
                     )
                   })}
-                  {items.length === 0 && <div className="text-xs text-slate-300 text-center py-4">Vazio</div>}
+                  {items.length === 0 && (
+                    <div className="text-center py-6 px-3 border-2 border-dashed border-slate-100 rounded-xl">
+                      <p className="text-xs text-slate-400">
+                        {statusInfo.value === 'identificada' ? 'Nenhuma oportunidade ainda' : 'Nenhum item aqui'}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )

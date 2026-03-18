@@ -9,8 +9,14 @@ export function LeadsPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-7rem)]">
-      <KanbanBoard leads={leads || []} />
+    <div className="flex flex-col h-[calc(100vh-5rem)] gap-3">
+      <div>
+        <h1 className="text-xl font-bold text-slate-800">Pipeline de Leads</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Arraste os cards entre as colunas para avançar leads no funil</p>
+      </div>
+      <div className="flex-1 min-h-0">
+        <KanbanBoard leads={leads || []} />
+      </div>
     </div>
   )
 }

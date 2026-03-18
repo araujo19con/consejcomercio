@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Sidebar } from './Sidebar'
+import { GlobalSearch } from './GlobalSearch'
 import { Toaster } from 'sonner'
 
 export function AppLayout() {
-  const navigate = useNavigate()
+  const navigate  = useNavigate()
+  const location  = useLocation()
   const [checking, setChecking] = useState(true)
 
   useEffect(() => {
@@ -23,8 +25,12 @@ export function AppLayout() {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-slate-500 text-sm">Carregando...</div>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-5" style={{ backgroundColor: '#00081d' }}>
+        <img src="/logo.png" alt="CONSEJ" className="h-12 w-auto opacity-90" />
+        <div
+          className="w-6 h-6 rounded-full border-2 animate-spin"
+          style={{ borderColor: 'rgba(107,208,231,0.2)', borderTopColor: 'rgba(107,208,231,0.85)' }}
+        />
       </div>
     )
   }
@@ -33,10 +39,11 @@ export function AppLayout() {
     <div className="flex h-screen bg-slate-50">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
-        <div className="p-6">
+        <div key={location.pathname} className="p-6 animate-in fade-in duration-150">
           <Outlet />
         </div>
       </main>
+      <GlobalSearch />
       <Toaster richColors position="top-right" />
     </div>
   )
