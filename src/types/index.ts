@@ -7,6 +7,7 @@ export interface Lead {
   email?: string | null
   origem: string
   status: string
+  estado?: string | null
   data_diagnostico?: string | null
   motivo_perda?: string | null
   servicos_interesse?: string[]
@@ -56,6 +57,7 @@ export interface Cliente {
   telefone?: string | null
   email?: string | null
   status: string
+  estado?: string | null
   notas?: string | null
   created_at: string
   updated_at: string

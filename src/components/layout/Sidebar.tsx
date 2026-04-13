@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, KanbanSquare, Stethoscope, Users, FileText,
   Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings,
-  LogOut, MessageSquare, CalendarDays, Sparkles, Search, BarChart2,
+  LogOut, MessageSquare, CalendarDays, Sparkles, Search, BarChart2, Map,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useMeuPerfil } from '@/hooks/usePerfis'
@@ -16,6 +16,7 @@ const NAV_GROUPS: { label?: string; items: { to: string; label: string; icon: Re
     items: [
       { to: '/dashboard',  label: 'Dashboard', icon: LayoutDashboard },
       { to: '/analytics',  label: 'Analytics',  icon: BarChart2       },
+      { to: '/mapa',       label: 'Mapa',        icon: Map             },
     ],
   },
   {

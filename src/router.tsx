@@ -19,6 +19,7 @@ import { ReunioesPage } from '@/pages/ReunioesPage'
 import { PerfilPage } from '@/pages/PerfilPage'
 import { MensagensPage } from '@/pages/MensagensPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
+import { MapaPage } from '@/pages/MapaPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'analytics', element: <AnalyticsPage /> },
+      { path: 'mapa', element: <MapaPage /> },
       { path: 'leads', element: <LeadsPage /> },
       { path: 'leads/:id', element: <LeadDetailPage /> },
       { path: 'diagnosticos', element: <DiagnosticosPage /> },

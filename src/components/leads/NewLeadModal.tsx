@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCreateLead } from '@/hooks/useLeads'
 import { useClientes } from '@/hooks/useClientes'
 import { useParceiros } from '@/hooks/useParceiros'
-import { LEAD_SOURCES, SEGMENTS } from '@/lib/constants'
+import { LEAD_SOURCES, SEGMENTS, ESTADOS_BR } from '@/lib/constants'
 
 const schema = z.object({
   nome: z.string().min(2, 'Nome obrigatório'),
@@ -20,6 +20,7 @@ const schema = z.object({
   telefone: z.string().min(8, 'Telefone obrigatório'),
   email: z.string().email().optional().or(z.literal('')),
   origem: z.string().min(1, 'Origem obrigatória'),
+  estado: z.string().optional(),
   responsavel: z.string().optional(),
   notas: z.string().optional(),
 })
@@ -47,6 +48,7 @@ export function NewLeadModal({ open, onClose }: Props) {
     createLead.mutate({
       ...data,
       email: data.email || null,
+      estado: data.estado || null,
       notas: data.notas || null,
       responsavel: data.responsavel || null,
       status: 'classificacao',
@@ -121,9 +123,19 @@ export function NewLeadModal({ open, onClose }: Props) {
             </div>
           </div>
 
+          <div className="space-y-1.5">
+            <Label>Estado (UF)</Label>
+            <Select onValueChange={(v) => setValue('estado', v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione o estado" /></SelectTrigger>
+              <SelectContent>
+                {ESTADOS_BR.map(s => <SelectItem key={s.uf} value={s.uf}>{s.uf} — {s.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Referral fields — only shown for indicacao origins */}
           {origem === 'indicacao_cliente' && (
-            <div className="space-y-1.5 p-3 bg-indigo-50 rounded-lg">
+            <div className="space-y-1.5 p-3 rounded-lg" style={{ background: 'rgba(0,137,172,0.08)', border: '1px solid rgba(0,137,172,0.20)' }}>
               <Label>Cliente que fez a indicação</Label>
               <Select onValueChange={setReferenteClienteId}>
                 <SelectTrigger><SelectValue placeholder="Selecione o cliente" /></SelectTrigger>
@@ -134,7 +146,7 @@ export function NewLeadModal({ open, onClose }: Props) {
             </div>
           )}
           {origem === 'indicacao_parceiro' && (
-            <div className="space-y-1.5 p-3 bg-indigo-50 rounded-lg">
+            <div className="space-y-1.5 p-3 rounded-lg" style={{ background: 'rgba(0,137,172,0.08)', border: '1px solid rgba(0,137,172,0.20)' }}>
               <Label>Parceiro que fez a indicação</Label>
               <Select onValueChange={setReferenteParceiroId}>
                 <SelectTrigger><SelectValue placeholder="Selecione o parceiro" /></SelectTrigger>

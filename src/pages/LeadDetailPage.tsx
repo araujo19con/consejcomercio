@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { STAGE_COLORS, LEAD_SOURCE_LABELS, SEGMENTS, PIPELINE_STAGES } from '@/lib/constants'
+import { STAGE_COLORS, LEAD_SOURCE_LABELS, SEGMENTS, PIPELINE_STAGES, ESTADOS_BR } from '@/lib/constants'
 import { formatDate } from '@/lib/utils'
 import { ArrowLeft, Stethoscope } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -97,6 +97,15 @@ export function LeadDetailPage() {
                 <div className="space-y-1.5">
                   <Label>Origem</Label>
                   <Input value={LEAD_SOURCE_LABELS[lead.origem] || lead.origem} disabled className="bg-background" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Estado (UF)</Label>
+                  <Select value={editing.estado || ''} onValueChange={v => setEditing(p => ({ ...p, estado: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      {ESTADOS_BR.map(s => <SelectItem key={s.uf} value={s.uf}>{s.uf} — {s.nome}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label>Responsável</Label>
