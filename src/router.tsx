@@ -21,9 +21,11 @@ import { MensagensPage } from '@/pages/MensagensPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { MapaPage } from '@/pages/MapaPage'
 import { ImportarPage } from '@/pages/ImportarPage'
+import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  { path: '/reset-password', element: <ResetPasswordPage /> },
   {
     path: '/',
     element: <AppLayout />,

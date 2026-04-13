@@ -9,7 +9,13 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ArrowLeft, Plus, AlertCircle } from 'lucide-react'
-import { CONTRACT_TYPES, PRICING_MODELS, CLIENT_STATUS_OPTIONS, RM_STATUS_OPTIONS, OPORTUNIDADE_STATUS } from '@/lib/constants'
+import { CONTRACT_TYPES, PRICING_MODELS, CLIENT_STATUS_OPTIONS, RM_STATUS_OPTIONS, OPORTUNIDADE_STATUS, SERVICE_AREAS } from '@/lib/constants'
+
+const CONTRACT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
+  ativo:     { label: 'Ativo',     color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+  encerrado: { label: 'Encerrado', color: 'text-slate-500 bg-slate-50 border-slate-200' },
+  suspenso:  { label: 'Suspenso',  color: 'text-amber-600 bg-amber-50 border-amber-200' },
+}
 import { formatDate, formatCurrency, getContractProgress, getDaysUntilExpiry } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
@@ -99,36 +105,66 @@ export function ClienteDetailPage() {
               const isExpiring = daysLeft !== null && daysLeft <= 30 && daysLeft >= 0
               const rmInfo = RM_STATUS_OPTIONS.find(r => r.value === contrato.rm_status)
 
+              const statusInfo = CONTRACT_STATUS_LABELS[contrato.status] ?? CONTRACT_STATUS_LABELS['ativo']
+
               return (
                 <Card key={contrato.id} style={isExpiring ? { borderColor: 'rgba(249,115,22,0.35)' } : {}}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
+                  <CardContent className="p-4 space-y-3">
+                    {/* Header row */}
+                    <div className="flex items-start justify-between">
                       <div>
                         <p className="font-semibold text-[rgba(230,235,240,0.92)]">
                           {CONTRACT_TYPES.find(t => t.value === contrato.tipo)?.label} — {PRICING_MODELS.find(m => m.value === contrato.modelo_precificacao)?.label}
                         </p>
-                        <div className="flex gap-1.5 mt-1 flex-wrap">
+                        <div className="flex gap-1.5 mt-1.5 flex-wrap">
                           {contrato.areas_direito?.map(a => (
-                            <span key={a} className="text-xs bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] px-2 py-0.5 rounded-full">{a.replace(/_/g, ' ')}</span>
+                            <span key={a} className="text-xs bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] px-2 py-0.5 rounded-full border border-[rgba(255,255,255,0.06)]">
+                              {SERVICE_AREAS.find(s => s.value === a)?.label ?? a.replace(/_/g, ' ')}
+                            </span>
                           ))}
                         </div>
                       </div>
-                      <div className="text-right">
-                        {contrato.valor_total && <p className="font-bold text-[rgba(230,235,240,0.92)]">{formatCurrency(contrato.valor_total)}</p>}
+                      <div className="flex flex-col items-end gap-1.5 shrink-0 ml-3">
+                        <span className={cn('text-xs px-1.5 py-0.5 rounded border', statusInfo.color)}>{statusInfo.label}</span>
                         {rmInfo && <span className={cn('text-xs px-1.5 py-0.5 rounded border', rmInfo.color)}>RM: {rmInfo.label}</span>}
                       </div>
                     </div>
+
+                    {/* Financial row */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Valor Total</p>
+                        <p className="text-sm font-bold text-[rgba(230,235,240,0.92)]">{contrato.valor_total ? formatCurrency(contrato.valor_total) : '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Valor Mensal</p>
+                        <p className="text-sm font-medium text-[rgba(215,225,235,0.85)]">{contrato.valor_mensal ? formatCurrency(contrato.valor_mensal) : '—'}</p>
+                      </div>
+                    </div>
+
+                    {/* Timeline */}
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs text-[rgba(130,150,170,0.65)]">
                         <span>{formatDate(contrato.data_inicio)} → {formatDate(contrato.data_fim)}</span>
                         {isExpiring && (
-                          <span className="text-orange-600 font-medium flex items-center gap-1">
+                          <span className="text-orange-500 font-medium flex items-center gap-1">
                             <AlertCircle className="w-3 h-3" /> {daysLeft}d restantes
                           </span>
+                        )}
+                        {daysLeft !== null && daysLeft < 0 && (
+                          <span className="text-red-500 font-medium text-xs">Expirado</span>
                         )}
                       </div>
                       <Progress value={progress} className={cn('h-1.5', isExpiring && '[&>div]:bg-orange-500')} />
                     </div>
+
+                    {/* Notes */}
+                    {contrato.notas && (
+                      <div className="pt-1 border-t border-[rgba(255,255,255,0.05)]">
+                        <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Observações</p>
+                        <p className="text-sm text-[rgba(190,205,220,0.75)] leading-relaxed">{contrato.notas}</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )

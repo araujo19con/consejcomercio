@@ -6,9 +6,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Toaster } from 'sonner'
+import { ArrowLeft } from 'lucide-react'
+
+type Mode = 'login' | 'forgot' | 'sent'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const [mode, setMode] = useState<Mode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -22,6 +26,20 @@ export function LoginPage() {
       toast.error('Email ou senha inválidos.')
     } else {
       navigate('/dashboard', { replace: true })
+    }
+  }
+
+  async function handleForgot(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    setLoading(false)
+    if (error) {
+      toast.error('Erro ao enviar e-mail. Verifique o endereço.')
+    } else {
+      setMode('sent')
     }
   }
 
@@ -90,78 +108,123 @@ export function LoginPage() {
           </span>
         </div>
 
-        <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 4 }}>Entrar</p>
-        <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', marginBottom: 24 }}>Acesso restrito à equipe CONSEJ</p>
+        {mode === 'login' && (
+          <>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 4 }}>Entrar</p>
+            <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', marginBottom: 24 }}>Acesso restrito à equipe CONSEJ</p>
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div>
-            <Label
-              htmlFor="email"
-              style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}
-            >
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                marginTop: 6,
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.10)',
-                color: 'rgba(255,255,255,0.85)',
-              }}
-              className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
-            />
-          </div>
-          <div>
-            <Label
-              htmlFor="password"
-              style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}
-            >
-              Senha
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                marginTop: 6,
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.10)',
-                color: 'rgba(255,255,255,0.85)',
-              }}
-              className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
-            />
-          </div>
-          <Button
-            type="submit"
-            className="w-full text-white mt-1"
-            style={{
-              background: 'linear-gradient(135deg, #0089ac, #006d88)',
-              boxShadow: '0 4px 16px rgba(0,137,172,0.35)',
-              border: 'none',
-              height: 42,
-              fontSize: 14,
-              fontWeight: 600,
-              letterSpacing: '0.02em',
-            }}
-            disabled={loading}
-          >
-            {loading ? 'Entrando...' : 'Entrar →'}
-          </Button>
-        </form>
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <Label htmlFor="email" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Email
+                </Label>
+                <Input
+                  id="email" type="email" placeholder="seu@email.com"
+                  value={email} onChange={(e) => setEmail(e.target.value)} required
+                  style={{ marginTop: 6, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
+                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <Label htmlFor="password" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Senha
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={() => setMode('forgot')}
+                    style={{ fontSize: 11, color: 'rgba(107,208,231,0.55)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.9)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.55)')}
+                  >
+                    Esqueci minha senha
+                  </button>
+                </div>
+                <Input
+                  id="password" type="password" placeholder="••••••••"
+                  value={password} onChange={(e) => setPassword(e.target.value)} required
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
+                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full text-white mt-1"
+                style={{ background: 'linear-gradient(135deg, #0089ac, #006d88)', boxShadow: '0 4px 16px rgba(0,137,172,0.35)', border: 'none', height: 42, fontSize: 14, fontWeight: 600, letterSpacing: '0.02em' }}
+                disabled={loading}
+              >
+                {loading ? 'Entrando...' : 'Entrar →'}
+              </Button>
+            </form>
 
-        <p className="text-center mt-5" style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', lineHeight: 1.6 }}>
-          Acesso apenas para membros da equipe.<br />
-          Contate o administrador para criar sua conta.
-        </p>
+            <p className="text-center mt-5" style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', lineHeight: 1.6 }}>
+              Acesso apenas para membros da equipe.<br />
+              Contate o administrador para criar sua conta.
+            </p>
+          </>
+        )}
+
+        {mode === 'forgot' && (
+          <>
+            <button
+              type="button"
+              onClick={() => setMode('login')}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(107,208,231,0.55)', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 20 }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.9)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.55)')}
+            >
+              <ArrowLeft style={{ width: 13, height: 13 }} /> Voltar ao login
+            </button>
+
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 4 }}>Recuperar senha</p>
+            <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', marginBottom: 24 }}>Enviaremos um link de redefinição para seu e-mail</p>
+
+            <form onSubmit={handleForgot} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <Label htmlFor="email-forgot" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Email
+                </Label>
+                <Input
+                  id="email-forgot" type="email" placeholder="seu@email.com"
+                  value={email} onChange={(e) => setEmail(e.target.value)} required
+                  style={{ marginTop: 6, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
+                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full text-white mt-1"
+                style={{ background: 'linear-gradient(135deg, #0089ac, #006d88)', boxShadow: '0 4px 16px rgba(0,137,172,0.35)', border: 'none', height: 42, fontSize: 14, fontWeight: 600, letterSpacing: '0.02em' }}
+                disabled={loading}
+              >
+                {loading ? 'Enviando...' : 'Enviar link de recuperação →'}
+              </Button>
+            </form>
+          </>
+        )}
+
+        {mode === 'sent' && (
+          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(0,137,172,0.15)', border: '1px solid rgba(0,137,172,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <span style={{ fontSize: 22 }}>✉</span>
+            </div>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 8 }}>E-mail enviado!</p>
+            <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', lineHeight: 1.7, marginBottom: 24 }}>
+              Verifique sua caixa de entrada em<br />
+              <span style={{ color: 'rgba(107,208,231,0.9)', fontWeight: 500 }}>{email}</span><br />
+              e clique no link para redefinir sua senha.
+            </p>
+            <button
+              type="button"
+              onClick={() => { setMode('login'); setEmail('') }}
+              style={{ fontSize: 12, color: 'rgba(107,208,231,0.55)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.9)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.55)')}
+            >
+              Voltar ao login
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Version badge */}
