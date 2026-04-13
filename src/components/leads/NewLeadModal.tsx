@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -12,6 +12,7 @@ import { useCreateLead } from '@/hooks/useLeads'
 import { useClientes } from '@/hooks/useClientes'
 import { useParceiros } from '@/hooks/useParceiros'
 import { LEAD_SOURCES, SEGMENTS, ESTADOS_BR } from '@/lib/constants'
+import { getUFFromPhone } from '@/lib/utils'
 
 const schema = z.object({
   nome: z.string().min(2, 'Nome obrigatório'),
@@ -37,8 +38,16 @@ export function NewLeadModal({ open, onClose }: Props) {
   const [referenteClienteId, setReferenteClienteId] = useState('')
   const [referenteParceiroId, setReferenteParceiroId] = useState('')
 
-  const origem = watch('origem') ?? ''
+  const origem  = watch('origem')   ?? ''
   const segmento = watch('segmento') ?? ''
+  const telefone = watch('telefone') ?? ''
+  const estado   = watch('estado')   ?? ''
+
+  // Auto-detect UF from DDD whenever telefone changes
+  useEffect(() => {
+    const uf = getUFFromPhone(telefone)
+    if (uf && !estado) setValue('estado', uf)
+  }, [telefone]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const createLead = useCreateLead()
   const { data: clientes } = useClientes()
@@ -124,9 +133,9 @@ export function NewLeadModal({ open, onClose }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Estado (UF)</Label>
-            <Select onValueChange={(v) => setValue('estado', v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione o estado" /></SelectTrigger>
+            <Label>Estado (UF) <span style={{ color: 'rgba(107,208,231,0.60)', fontSize: 10 }}>detectado pelo DDD</span></Label>
+            <Select value={estado || undefined} onValueChange={(v) => setValue('estado', v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione ou detectado pelo DDD" /></SelectTrigger>
               <SelectContent>
                 {ESTADOS_BR.map(s => <SelectItem key={s.uf} value={s.uf}>{s.uf} — {s.nome}</SelectItem>)}
               </SelectContent>

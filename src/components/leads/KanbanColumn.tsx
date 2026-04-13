@@ -49,7 +49,7 @@ export function KanbanColumn({ stageId, label, leads }: Props) {
       <div className="flex-1 overflow-y-auto px-2 pb-2 min-h-[200px]">
         <SortableContext items={leads.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {leads.map(lead => (
-            <LeadCard key={lead.id} lead={lead} />
+            <LeadCard key={lead.id} lead={lead} stageId={stageId} />
           ))}
         </SortableContext>
       </div>

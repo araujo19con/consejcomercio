@@ -28,6 +28,34 @@ const STAGE_TO_MSG: Record<string, string> = {
   stand_by:                  'followup',
 }
 
+// Left border color per pipeline stage
+const STAGE_ACCENT: Record<string, string> = {
+  classificacao:             'rgba(56,189,248,0.85)',
+  levantamento_oportunidade: 'rgba(99,130,246,0.85)',
+  educar_lead:               'rgba(139,92,246,0.85)',
+  proposta_comercial:        'rgba(245,158,11,0.85)',
+  negociacao:                'rgba(249,115,22,0.85)',
+  stand_by:                  'rgba(148,163,184,0.70)',
+  ganho_assessoria:          'rgba(34,197,94,0.85)',
+  ganho_consultoria:         'rgba(16,185,129,0.85)',
+  perdido:                   'rgba(239,68,68,0.85)',
+  cancelado:                 'rgba(244,63,94,0.85)',
+}
+
+// Subtle card background tint per stage
+const STAGE_TINT: Record<string, string> = {
+  classificacao:             'rgba(56,189,248,0.04)',
+  levantamento_oportunidade: 'rgba(99,130,246,0.04)',
+  educar_lead:               'rgba(139,92,246,0.05)',
+  proposta_comercial:        'rgba(245,158,11,0.04)',
+  negociacao:                'rgba(249,115,22,0.04)',
+  stand_by:                  'rgba(255,255,255,0.03)',
+  ganho_assessoria:          'rgba(34,197,94,0.05)',
+  ganho_consultoria:         'rgba(16,185,129,0.05)',
+  perdido:                   'rgba(239,68,68,0.04)',
+  cancelado:                 'rgba(244,63,94,0.04)',
+}
+
 // Stagnant thresholds in days per stage
 const STAGNANT_DAYS: Record<string, number> = {
   classificacao:             3,
@@ -38,9 +66,9 @@ const STAGNANT_DAYS: Record<string, number> = {
   stand_by:                  14,
 }
 
-type Props = { lead: Lead; isDragging?: boolean }
+type Props = { lead: Lead; isDragging?: boolean; stageId?: string }
 
-export function LeadCard({ lead, isDragging = false }: Props) {
+export function LeadCard({ lead, isDragging = false, stageId }: Props) {
   const navigate = useNavigate()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortDragging } = useSortable({ id: lead.id })
 
@@ -58,13 +86,17 @@ export function LeadCard({ lead, isDragging = false }: Props) {
   const msgStage = STAGE_TO_MSG[lead.status] ?? 'primeiro_contato'
   const msgUrl = `/mensagens?nome=${encodeURIComponent(lead.nome)}&empresa=${encodeURIComponent(lead.empresa ?? '')}&stage=${msgStage}`
 
+  const accentColor = isStagnant ? 'rgba(249,115,22,0.90)' : (STAGE_ACCENT[stageId ?? lead.status] ?? 'rgba(255,255,255,0.15)')
+  const tintBg     = isStagnant ? 'rgba(249,115,22,0.06)'  : (STAGE_TINT[stageId ?? lead.status]   ?? 'rgba(255,255,255,0.05)')
+
   return (
     <div
       ref={setNodeRef}
       style={{
         ...style,
-        background: 'rgba(255,255,255,0.05)',
-        border: isStagnant ? undefined : '1px solid rgba(255,255,255,0.08)',
+        background: tintBg,
+        border: '1px solid rgba(255,255,255,0.07)',
+        borderLeft: `3px solid ${accentColor}`,
         borderRadius: 8,
       }}
       {...attributes}
@@ -72,7 +104,6 @@ export function LeadCard({ lead, isDragging = false }: Props) {
       className={cn(
         'rounded-lg p-3 mb-2 cursor-grab active:cursor-grabbing select-none transition-all',
         (isSortDragging || isDragging) && 'opacity-50 rotate-1',
-        isStagnant && 'border-l-[3px] border-l-orange-400'
       )}
       onClick={(e) => {
         if (!isSortDragging) {

@@ -46,7 +46,13 @@ export function KanbanBoard({ leads }: Props) {
     if (!over) return
 
     const leadId = active.id as string
-    const newStage = over.id as string
+    const overId = over.id as string
+
+    // over.id can be a stage column OR another card — resolve to stage
+    const isStage = PIPELINE_STAGES.some(s => s.id === overId)
+    const newStage = isStage ? overId : (leads.find(l => l.id === overId)?.status ?? '')
+    if (!newStage) return
+
     const lead = leads.find(l => l.id === leadId)
     if (!lead || lead.status === newStage) return
 
