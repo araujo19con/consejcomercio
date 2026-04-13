@@ -83,3 +83,21 @@ export function useUpdateContrato() {
     },
   })
 }
+
+export function useDeleteContrato() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, clienteId }: { id: string; clienteId: string }) => {
+      const { error } = await supabase.from('contratos').delete().eq('id', id)
+      if (error) throw error
+      return { id, clienteId }
+    },
+    onSuccess: ({ clienteId }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.contratos.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.contratos.byCliente(clienteId) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.oportunidades.all })
+      toast.success('Contrato excluído.')
+    },
+    onError: () => toast.error('Erro ao excluir contrato'),
+  })
+}

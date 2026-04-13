@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCliente } from '@/hooks/useClientes'
-import { useContratosByCliente } from '@/hooks/useContratos'
+import { useContratosByCliente, useDeleteContrato } from '@/hooks/useContratos'
 import { useIndicacoes } from '@/hooks/useIndicacoes'
 import { useOportunidades } from '@/hooks/useOportunidades'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { ArrowLeft, Plus, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Plus, AlertCircle, Trash2 } from 'lucide-react'
 import { CONTRACT_TYPES, PRICING_MODELS, CLIENT_STATUS_OPTIONS, RM_STATUS_OPTIONS, OPORTUNIDADE_STATUS, SERVICE_AREAS } from '@/lib/constants'
 
 const CONTRACT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -29,6 +29,8 @@ export function ClienteDetailPage() {
   const { data: todasIndicacoes } = useIndicacoes()
   const { data: todasOportunidades } = useOportunidades()
   const [showNewContrato, setShowNewContrato] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const deleteContrato = useDeleteContrato()
 
   const indicacoes = todasIndicacoes?.filter(i => i.indicante_cliente_id === id) || []
   const oportunidades = todasOportunidades?.filter(o => o.cliente_id === id) || []
@@ -112,7 +114,7 @@ export function ClienteDetailPage() {
                   <CardContent className="p-4 space-y-3">
                     {/* Header row */}
                     <div className="flex items-start justify-between">
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <p className="font-semibold text-[rgba(230,235,240,0.92)]">
                           {CONTRACT_TYPES.find(t => t.value === contrato.tipo)?.label} — {PRICING_MODELS.find(m => m.value === contrato.modelo_precificacao)?.label}
                         </p>
@@ -125,7 +127,31 @@ export function ClienteDetailPage() {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1.5 shrink-0 ml-3">
-                        <span className={cn('text-xs px-1.5 py-0.5 rounded border', statusInfo.color)}>{statusInfo.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className={cn('text-xs px-1.5 py-0.5 rounded border', statusInfo.color)}>{statusInfo.label}</span>
+                          {deletingId === contrato.id ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => { deleteContrato.mutate({ id: contrato.id, clienteId: contrato.cliente_id }); setDeletingId(null) }}
+                                className="text-xs text-red-400 hover:text-red-300 px-1.5 py-0.5 rounded border border-red-500/30 hover:border-red-400/50 transition-colors"
+                                disabled={deleteContrato.isPending}
+                              >
+                                Confirmar
+                              </button>
+                              <button onClick={() => setDeletingId(null)} className="text-xs text-[rgba(130,150,170,0.55)] hover:text-[rgba(180,195,210,0.75)] transition-colors px-1">
+                                Cancelar
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setDeletingId(contrato.id)}
+                              className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-0.5 rounded"
+                              title="Excluir contrato"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                         {rmInfo && <span className={cn('text-xs px-1.5 py-0.5 rounded border', rmInfo.color)}>RM: {rmInfo.label}</span>}
                       </div>
                     </div>
