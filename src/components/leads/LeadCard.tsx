@@ -61,7 +61,12 @@ export function LeadCard({ lead, isDragging = false }: Props) {
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{
+        ...style,
+        background: 'rgba(255,255,255,0.05)',
+        border: isStagnant ? undefined : '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 8,
+      }}
       {...attributes}
       {...listeners}
       className={cn(
@@ -69,11 +74,6 @@ export function LeadCard({ lead, isDragging = false }: Props) {
         (isSortDragging || isDragging) && 'opacity-50 rotate-1',
         isStagnant && 'border-l-[3px] border-l-orange-400'
       )}
-      style={{
-        background: 'rgba(255,255,255,0.05)',
-        border: isStagnant ? undefined : '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 8,
-      }}
       onClick={(e) => {
         if (!isSortDragging) {
           e.stopPropagation()

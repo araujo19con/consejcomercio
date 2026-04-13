@@ -297,8 +297,8 @@ export function MapaPage() {
         >
           <ZoomableGroup center={[0, 0]} zoom={1}>
             <Geographies geography={BRAZIL_GEO_URL}>
-              {({ geographies }) =>
-                geographies.map(geo => {
+              {({ geographies }: { geographies: any[] }) =>
+                geographies.map((geo: any) => {
                   const uf: string = geo.properties.sigla ?? geo.properties.SIGLA ?? geo.properties.abbrev ?? ''
                   const count = getCount(uf)
                   const isHovered = hovered === uf
@@ -308,11 +308,11 @@ export function MapaPage() {
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      onMouseEnter={(e) => {
+                      onMouseEnter={(e: React.MouseEvent) => {
                         setHovered(uf)
                         setTooltip({ x: e.clientX, y: e.clientY })
                       }}
-                      onMouseMove={(e) => {
+                      onMouseMove={(e: React.MouseEvent) => {
                         setTooltip({ x: e.clientX, y: e.clientY })
                       }}
                       onMouseLeave={() => {
