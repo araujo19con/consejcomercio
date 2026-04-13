@@ -77,6 +77,8 @@ export interface Contrato {
   status: string
   rm_status: string
   notas?: string | null
+  observacoes_demanda?: string | null
+  observacoes_vp?: string | null
   responsavel_id?: string | null
   created_at: string
   updated_at: string

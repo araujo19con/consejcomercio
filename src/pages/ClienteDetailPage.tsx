@@ -185,10 +185,26 @@ export function ClienteDetailPage() {
                     </div>
 
                     {/* Notes */}
-                    {contrato.notas && (
-                      <div className="pt-1 border-t border-[rgba(255,255,255,0.05)]">
-                        <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Observações</p>
-                        <p className="text-sm text-[rgba(190,205,220,0.75)] leading-relaxed">{contrato.notas}</p>
+                    {(contrato.observacoes_demanda || contrato.observacoes_vp || contrato.notas) && (
+                      <div className="pt-2 border-t border-[rgba(255,255,255,0.05)] space-y-2">
+                        {contrato.observacoes_demanda && (
+                          <div>
+                            <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Obs. Demandas</p>
+                            <p className="text-sm text-[rgba(190,205,220,0.75)] leading-relaxed">{contrato.observacoes_demanda}</p>
+                          </div>
+                        )}
+                        {contrato.observacoes_vp && (
+                          <div>
+                            <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Obs. Vice-Presidência</p>
+                            <p className="text-sm text-[rgba(190,205,220,0.75)] leading-relaxed">{contrato.observacoes_vp}</p>
+                          </div>
+                        )}
+                        {!contrato.observacoes_demanda && !contrato.observacoes_vp && contrato.notas && (
+                          <div>
+                            <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Observações</p>
+                            <p className="text-sm text-[rgba(190,205,220,0.75)] leading-relaxed whitespace-pre-line">{contrato.notas}</p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </CardContent>
