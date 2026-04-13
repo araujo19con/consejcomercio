@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Migration data — never commit client CSVs or secrets
+scripts/data/*.csv
+.env.migration
