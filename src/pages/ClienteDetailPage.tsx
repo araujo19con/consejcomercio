@@ -20,6 +20,7 @@ import { formatDate, formatCurrency, getContractProgress, getDaysUntilExpiry } f
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { NewContratoModal } from '@/components/contratos/NewContratoModal'
+import { ActivityTimeline } from '@/components/shared/ActivityTimeline'
 
 export function ClienteDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -68,6 +69,7 @@ export function ClienteDetailPage() {
           <TabsTrigger value="contratos">Contratos ({contratos?.length || 0})</TabsTrigger>
           <TabsTrigger value="indicacoes">Indicações ({indicacoes.length})</TabsTrigger>
           <TabsTrigger value="oportunidades">Oportunidades ({oportunidades.length})</TabsTrigger>
+          <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
         <TabsContent value="dados">
@@ -263,6 +265,13 @@ export function ClienteDetailPage() {
             })}
             {!oportunidades.length && <div className="text-center text-[rgba(100,120,140,0.55)] py-8">Nenhuma oportunidade identificada.</div>}
           </div>
+        </TabsContent>
+        <TabsContent value="historico">
+          <Card>
+            <CardContent className="p-5">
+              <ActivityTimeline tabela="clientes" registroId={id!} />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

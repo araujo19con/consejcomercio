@@ -15,6 +15,7 @@ import type { Lead } from '@/types'
 import { cn } from '@/lib/utils'
 import { DiagnosticForm } from '@/components/diagnostico/DiagnosticForm'
 import { DiagnosticPreview } from '@/components/diagnostico/DiagnosticPreview'
+import { ActivityTimeline } from '@/components/shared/ActivityTimeline'
 
 export function LeadDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -64,6 +65,7 @@ export function LeadDetailPage() {
           <TabsTrigger value="info">Informações</TabsTrigger>
           <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
           <TabsTrigger value="proposta">Proposta</TabsTrigger>
+          <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
@@ -178,6 +180,14 @@ export function LeadDetailPage() {
                   Salvar
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="historico">
+          <Card>
+            <CardContent className="p-5">
+              <ActivityTimeline tabela="leads" registroId={id!} />
             </CardContent>
           </Card>
         </TabsContent>

@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Sidebar } from './Sidebar'
 import { GlobalSearch } from './GlobalSearch'
+import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard'
 import { Toaster } from 'sonner'
 
 export function AppLayout() {
@@ -44,6 +45,7 @@ export function AppLayout() {
         </div>
       </main>
       <GlobalSearch />
+      <OnboardingWizard />
       <Toaster
         position="top-right"
         toastOptions={{

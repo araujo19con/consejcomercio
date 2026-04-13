@@ -164,6 +164,17 @@ export function AnalyticsPage() {
       return d !== null && d <= 60 && d >= 0 && c.status === 'ativo'
     })
 
+    // ── Motivos de perda ──────────────────────────────────────────────────
+    const lossReasonMap: Record<string, number> = {}
+    for (const l of filteredLeads) {
+      if ((l.status === 'perdido' || l.status === 'cancelado') && l.motivo_perda) {
+        lossReasonMap[l.motivo_perda] = (lossReasonMap[l.motivo_perda] ?? 0) + 1
+      }
+    }
+    const byLossReason = Object.entries(lossReasonMap)
+      .map(([reason, count]) => ({ reason, count }))
+      .sort((a, b) => b.count - a.count)
+
     // ── Piedata Win/Loss ──────────────────────────────────────────────────
     const winLossPie = [
       { name: 'Ganhos', value: won.length },
@@ -176,7 +187,7 @@ export function AnalyticsPage() {
       avgCloseDays, avgTicket, mrr,
       leadsLast30, velocityDelta,
       bySource, bySegment, byResponsavel,
-      stagnant, expiring60, winLossPie,
+      stagnant, expiring60, winLossPie, byLossReason,
     }
   }, [leads, contratos, indicacoes, period])
 
@@ -462,6 +473,52 @@ export function AnalyticsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ── Win/Loss Analysis ── */}
+      {metrics.byLossReason.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-400" />
+              Análise Win/Loss — Principais Motivos de Perda
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6 items-center">
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={metrics.byLossReason} layout="vertical" margin={{ left: 0 }}>
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10, fill: 'rgba(150,165,180,0.60)' }} />
+                  <YAxis type="category" dataKey="reason" tick={{ fontSize: 10, fill: 'rgba(150,165,180,0.60)' }} width={160} />
+                  <Tooltip
+                    formatter={(v) => [`${v} lead${Number(v) !== 1 ? 's' : ''}`, 'Perdidos']}
+                    contentStyle={{ background: '#0d1929', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.90)', borderRadius: 8 }}
+                  />
+                  <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                    {metrics.byLossReason.map((_, i) => (
+                      <Cell key={i} fill={i === 0 ? '#ef4444' : i === 1 ? '#f97316' : '#f59e0b'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="space-y-2">
+                <p className="text-xs text-[rgba(100,120,140,0.55)] uppercase tracking-wide mb-3">Distribuição</p>
+                {metrics.byLossReason.map((r, i) => (
+                  <div key={r.reason} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: i === 0 ? '#ef4444' : i === 1 ? '#f97316' : '#f59e0b' }} />
+                      <span className="text-xs text-[rgba(150,165,180,0.70)] truncate">{r.reason}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-sm font-bold text-[rgba(215,225,235,0.85)]">{r.count}</span>
+                      <span className="text-xs text-[rgba(100,120,140,0.45)]">({pct(r.count, metrics.lost.length)}%)</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── Insight box ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
