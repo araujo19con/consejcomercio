@@ -8,8 +8,33 @@ import { CLIENT_STATUS_OPTIONS, SEGMENTS } from '@/lib/constants'
 import { getDaysUntilExpiry } from '@/lib/utils'
 import { Search, Briefcase, AlertCircle, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Contrato } from '@/types'
+import type { Cliente, Contrato } from '@/types'
 import { NewClienteModal } from '@/components/clientes/NewClienteModal'
+
+// ─── Health Score ──────────────────────────────────────────────────────────────
+
+type HealthLevel = 'green' | 'yellow' | 'red' | 'gray'
+
+const HEALTH_STYLES: Record<HealthLevel, { dot: string; label: string }> = {
+  green:  { dot: 'bg-emerald-500', label: 'text-emerald-400' },
+  yellow: { dot: 'bg-amber-400',   label: 'text-amber-400'   },
+  red:    { dot: 'bg-red-500',     label: 'text-red-400'     },
+  gray:   { dot: 'bg-slate-500',   label: 'text-[rgba(100,120,140,0.55)]' },
+}
+
+function getClientHealth(cliente: Cliente): { level: HealthLevel; text: string } {
+  const active = cliente.contratos?.filter(c => c.status === 'ativo') || []
+  if (active.length === 0) return { level: 'gray', text: 'Sem contrato ativo' }
+
+  const assessoria = active.filter(c => c.tipo === 'assessoria')
+  if (assessoria.length === 0) return { level: 'yellow', text: 'Só consultoria' }
+
+  const minDays = Math.min(...assessoria.map(c => getDaysUntilExpiry(c.data_fim) ?? 999))
+  if (minDays < 0)   return { level: 'red',    text: 'Contrato vencido' }
+  if (minDays <= 30) return { level: 'red',    text: `${minDays}d restantes` }
+  if (minDays <= 90) return { level: 'yellow', text: `${minDays}d restantes` }
+  return { level: 'green', text: 'Assessoria ativa' }
+}
 
 // ─── Avatar helpers ────────────────────────────────────────────────────────────
 
@@ -193,6 +218,8 @@ export function ClientesPage() {
             const daysLeft       = nextExpiry ? getDaysUntilExpiry(nextExpiry) : null
             const isExpiringSoon = daysLeft !== null && daysLeft <= 60 && daysLeft >= 0
             const isConfirming   = deleteConfirm === cliente.id
+            const health         = getClientHealth(cliente)
+            const hs             = HEALTH_STYLES[health.level]
 
             return (
               <div
@@ -229,6 +256,11 @@ export function ClientesPage() {
                   {/* Right side */}
                   {!isConfirming ? (
                     <div className="flex items-center gap-3 shrink-0">
+                      {/* Health Score indicator */}
+                      <div className="flex items-center gap-1.5" title={health.text}>
+                        <span className={cn('w-2 h-2 rounded-full shrink-0 animate-pulse', hs.dot, health.level !== 'green' && 'animate-none')} style={health.level === 'green' ? { animation: 'none' } : {}} />
+                        <span className={cn('text-xs font-medium hidden sm:block', hs.label)}>{health.text}</span>
+                      </div>
                       <div className="text-right">
                         <p className="text-xs text-[rgba(130,150,170,0.65)]">
                           {cliente.contratos?.length || 0} contrato{(cliente.contratos?.length || 0) !== 1 ? 's' : ''}

@@ -9,7 +9,8 @@ import { PIPELINE_STAGES, LEAD_SOURCE_LABELS, STAGE_COLORS } from '@/lib/constan
 import { formatCurrency, getDaysUntilExpiry, formatDate } from '@/lib/utils'
 import { differenceInDays } from 'date-fns'
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { Users, Briefcase, TrendingUp, FileText, AlertCircle, Share2, DollarSign, Calendar, Clock, Video, MapPin, Flame, Bell, ArrowRight, Gift } from 'lucide-react'
+import { Users, Briefcase, TrendingUp, FileText, AlertCircle, Share2, DollarSign, Calendar, Clock, Video, MapPin, Flame, Bell, ArrowRight, Gift, Activity, RefreshCw } from 'lucide-react'
+import { isThisMonth } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router-dom'
 
@@ -41,6 +42,31 @@ export function DashboardPage() {
     return d !== null && d <= 60 && d >= 0 && c.status === 'ativo'
   }) || []
 
+  // ── Contratos por janela de vencimento ────────────────────────────────────
+  const expiring30 = contratos?.filter(c => { const d = getDaysUntilExpiry(c.data_fim); return d !== null && d <= 30 && d >= 0 && c.status === 'ativo' }) || []
+  const expiring60 = contratos?.filter(c => { const d = getDaysUntilExpiry(c.data_fim); return d !== null && d > 30 && d <= 60 && c.status === 'ativo' }) || []
+  const expiring90 = contratos?.filter(c => { const d = getDaysUntilExpiry(c.data_fim); return d !== null && d > 60 && d <= 90 && c.status === 'ativo' }) || []
+
+  // ── North Star: leads ganhos este mês ─────────────────────────────────────
+  const wonThisMonth = leads?.filter(l =>
+    (l.status === 'ganho_assessoria' || l.status === 'ganho_consultoria') &&
+    isThisMonth(new Date(l.updated_at))
+  ).length || 0
+
+  // ── Pós-consultoria: clientes sem assessoria e contrato encerrado há >45d ─
+  const postConsultoriaUpsell = clientes?.filter(c => {
+    const contratos_cliente = (c as any).contratos as typeof contratos
+    if (!contratos_cliente?.length) return false
+    const hasAssessoria = contratos_cliente.some(ct => ct.tipo === 'assessoria' && ct.status === 'ativo')
+    if (hasAssessoria) return false
+    const lastConsultoria = contratos_cliente
+      .filter(ct => ct.tipo === 'consultoria' && ct.status === 'encerrado' && ct.data_fim)
+      .sort((a, b) => new Date(b.data_fim!).getTime() - new Date(a.data_fim!).getTime())[0]
+    if (!lastConsultoria) return false
+    const daysSince = differenceInDays(new Date(), new Date(lastConsultoria.data_fim!))
+    return daysSince >= 45 && daysSince <= 180
+  }) || []
+
   const recompensasPendentes = indicacoes?.filter(i => i.status === 'convertido' && !i.recompensa_entregue).length || 0
 
   // Stagnant leads (no status change in 7+ days, still active)
@@ -58,7 +84,7 @@ export function DashboardPage() {
     return d !== null && d <= 15 && d >= 0 && c.status === 'ativo'
   }) || []
 
-  const hasActionItems = stagnantLeads.length > 0 || renewalsUrgent.length > 0 || recompensasPendentes > 0
+  const hasActionItems = stagnantLeads.length > 0 || renewalsUrgent.length > 0 || recompensasPendentes > 0 || postConsultoriaUpsell.length > 0
 
   // Pipeline funnel data
   const funnelData = PIPELINE_STAGES.map(s => ({
@@ -128,9 +154,43 @@ export function DashboardPage() {
                 <ArrowRight className="w-3 h-3 opacity-50" />
               </button>
             )}
+            {postConsultoriaUpsell.length > 0 && (
+              <button
+                onClick={() => navigate('/clientes')}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.85)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-violet-400" />
+                <span className="font-medium">{postConsultoriaUpsell.length} cliente{postConsultoriaUpsell.length > 1 ? 's' : ''} pós-consultoria para upsell</span>
+                <ArrowRight className="w-3 h-3 opacity-50" />
+              </button>
+            )}
           </div>
         </div>
       )}
+
+      {/* ── North Star ── */}
+      <div className="rounded-2xl px-5 py-4 flex items-center justify-between gap-4 flex-wrap" style={{ background: 'linear-gradient(135deg, rgba(0,137,172,0.12) 0%, rgba(107,208,231,0.06) 100%)', border: '1px solid rgba(0,137,172,0.25)' }}>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(107,208,231,0.60)' }}>North Star · Este Mês</p>
+          <p className="text-3xl font-bold mt-1" style={{ color: 'rgba(107,208,231,0.95)' }}>{wonThisMonth}</p>
+          <p className="text-sm mt-0.5" style={{ color: 'rgba(150,175,195,0.70)' }}>
+            {wonThisMonth === 0 ? 'Nenhum novo cliente fechado ainda' : `novo${wonThisMonth > 1 ? 's' : ''} cliente${wonThisMonth > 1 ? 's' : ''} conquistado${wonThisMonth > 1 ? 's' : ''}`}
+          </p>
+        </div>
+        <div className="flex items-center gap-6">
+          <div className="text-right">
+            <p className="text-xs text-[rgba(107,208,231,0.50)] mb-0.5">MRR ativo</p>
+            <p className="text-lg font-bold" style={{ color: 'rgba(107,208,231,0.85)' }}>{formatCurrency(mrr)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-[rgba(107,208,231,0.50)] mb-0.5">Tx. Conversão</p>
+            <p className="text-lg font-bold" style={{ color: 'rgba(107,208,231,0.85)' }}>{convRate}%</p>
+          </div>
+        </div>
+      </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -156,15 +216,6 @@ export function DashboardPage() {
 
       {/* Secondary KPIs */}
       <div className="grid grid-cols-3 gap-4">
-        <Card style={renewalsSoon.length > 0 ? { borderColor: 'rgba(249,115,22,0.35)' } : {}}>
-          <CardContent className="p-5">
-            <div className="flex items-center gap-2 mb-1">
-              {renewalsSoon.length > 0 && <AlertCircle className="w-4 h-4 text-orange-500" />}
-              <p className="text-sm text-[rgba(130,150,170,0.65)]">Renovações em 60 dias</p>
-            </div>
-            <p className={cn('text-2xl font-bold', renewalsSoon.length > 0 ? 'text-orange-600' : 'text-[rgba(230,235,240,0.92)]')}>{renewalsSoon.length}</p>
-          </CardContent>
-        </Card>
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-1">
@@ -183,7 +234,50 @@ export function DashboardPage() {
             <p className={cn('text-2xl font-bold', recompensasPendentes > 0 ? 'text-amber-600' : 'text-[rgba(230,235,240,0.92)]')}>{recompensasPendentes}</p>
           </CardContent>
         </Card>
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-1">
+              <Activity className="w-4 h-4 text-emerald-500" />
+              <p className="text-sm text-[rgba(130,150,170,0.65)]">Upsell pós-consultoria</p>
+            </div>
+            <p className={cn('text-2xl font-bold', postConsultoriaUpsell.length > 0 ? 'text-violet-400' : 'text-[rgba(230,235,240,0.92)]')}>{postConsultoriaUpsell.length}</p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* ── Fila de Renovação — 3 janelas ── */}
+      {(expiring30.length > 0 || expiring60.length > 0 || expiring90.length > 0) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-orange-500" />
+              Fila de Renovação
+              <span className="text-xs font-normal text-[rgba(100,120,140,0.55)] ml-1">— ação requerida por janela</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { label: '≤ 30 dias', sublabel: 'Conversa de renovação AGORA', list: expiring30, color: 'text-red-500', border: 'border-red-500/30', bg: 'bg-red-500/05' },
+                { label: '31–60 dias', sublabel: 'Enviar Relatório de Valor', list: expiring60, color: 'text-orange-500', border: 'border-orange-500/25', bg: '' },
+                { label: '61–90 dias', sublabel: 'Revisar health score', list: expiring90, color: 'text-amber-400', border: 'border-amber-400/20', bg: '' },
+              ].map(({ label, sublabel, list, color, border }) => (
+                <div key={label} className={cn('rounded-xl p-3 border', border, list.length === 0 && 'opacity-40')}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={cn('text-xs font-bold', color)}>{label}</span>
+                    <span className={cn('text-lg font-bold', color)}>{list.length}</span>
+                  </div>
+                  <p className="text-[10px] text-[rgba(100,120,140,0.55)] mb-2">{sublabel}</p>
+                  {list.slice(0, 3).map(c => (
+                    <p key={c.id} className="text-xs text-[rgba(180,195,210,0.70)] truncate">{c.cliente?.nome ?? '—'}</p>
+                  ))}
+                  {list.length > 3 && <p className="text-[10px] text-[rgba(100,120,140,0.45)] mt-1">+{list.length - 3} mais</p>}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Reuniões da semana — destaque */}
       <Card className="border-2" style={{ borderColor: '#0089ac' }}>
@@ -316,35 +410,6 @@ export function DashboardPage() {
         </Card>
       )}
 
-      {/* Renewals alert */}
-      {renewalsSoon.length > 0 && (
-        <Card style={{ borderColor: 'rgba(249,115,22,0.35)' }}>
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-orange-500" />
-              Contratos vencendo em 60 dias
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {renewalsSoon.slice(0, 5).map(c => {
-                const d = getDaysUntilExpiry(c.data_fim)
-                return (
-                  <div key={c.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                    <div>
-                      <p className="text-sm font-medium text-[rgba(230,235,240,0.92)]">{c.cliente?.nome}</p>
-                      <p className="text-xs text-[rgba(130,150,170,0.65)]">{c.cliente?.empresa} · Vence {formatDate(c.data_fim)}</p>
-                    </div>
-                    <span className={cn('text-xs font-medium', d !== null && d <= 15 ? 'text-red-600' : 'text-orange-600')}>
-                      {d}d restantes
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }
