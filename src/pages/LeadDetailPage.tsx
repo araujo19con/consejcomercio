@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { STAGE_COLORS, LEAD_SOURCE_LABELS, SEGMENTS, PIPELINE_STAGES, ESTADOS_BR } from '@/lib/constants'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getUFFromPhone } from '@/lib/utils'
 import { ArrowLeft, Stethoscope } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import type { Lead } from '@/types'
@@ -33,7 +33,9 @@ export function LeadDetailPage() {
 
   function handleSave() {
     if (!lead) return
-    updateLead.mutate({ id: lead.id, ...editing })
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { diagnostico, ...fields } = editing as Lead
+    updateLead.mutate({ id: lead.id, ...fields })
   }
 
   return (
@@ -75,7 +77,14 @@ export function LeadDetailPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Telefone</Label>
-                  <Input value={editing.telefone || ''} onChange={e => setEditing(p => ({ ...p, telefone: e.target.value }))} />
+                  <Input
+                    value={editing.telefone || ''}
+                    onChange={e => {
+                      const tel = e.target.value
+                      const uf = getUFFromPhone(tel)
+                      setEditing(p => ({ ...p, telefone: tel, ...(uf && !p.estado ? { estado: uf } : {}) }))
+                    }}
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Empresa</Label>
