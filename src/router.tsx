@@ -20,6 +20,7 @@ import { PerfilPage } from '@/pages/PerfilPage'
 import { MensagensPage } from '@/pages/MensagensPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { MapaPage } from '@/pages/MapaPage'
+import { ImportarPage } from '@/pages/ImportarPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
       { path: 'slack', element: <SlackPage /> },
       { path: 'auditoria', element: <AuditoriaPage /> },
       { path: 'configuracoes', element: <ConfiguracoesPage /> },
+      { path: 'importar', element: <ImportarPage /> },
       { path: 'perfil', element: <PerfilPage /> },
     ],
   },

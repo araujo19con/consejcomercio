@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, KanbanSquare, Stethoscope, Users, FileText,
   Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings,
-  LogOut, MessageSquare, CalendarDays, Sparkles, Search, BarChart2, Map,
+  LogOut, MessageSquare, CalendarDays, Sparkles, Search, BarChart2, Map, Upload,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useMeuPerfil } from '@/hooks/usePerfis'
@@ -53,6 +53,7 @@ const NAV_GROUPS: { label?: string; items: { to: string; label: string; icon: Re
 ]
 
 const UTILITY_ITEMS = [
+  { to: '/importar',      label: 'Importar',      icon: Upload        },
   { to: '/auditoria',     label: 'Auditoria',     icon: ClipboardList },
   { to: '/configuracoes', label: 'Configurações', icon: Settings      },
 ]
