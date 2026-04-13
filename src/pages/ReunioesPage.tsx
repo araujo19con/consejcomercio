@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 const TEAM_COLORS = [
   'bg-blue-500', 'bg-violet-500', 'bg-teal-500', 'bg-orange-500',
-  'bg-pink-500', 'bg-indigo-500', 'bg-green-500', 'bg-red-500',
+  'bg-pink-500', 'bg-[rgba(0,137,172,0.10)]0', 'bg-green-500', 'bg-red-500',
 ]
 
 function ParticipanteAvatar({ email, perfilByEmail, index }: {
@@ -52,9 +52,9 @@ function isSameDay(a: Date, b: Date) {
 
 function StatusBadge({ status }: { status: Reuniao['status'] }) {
   const map = {
-    agendada: 'bg-blue-100 text-blue-700',
-    realizada: 'bg-green-100 text-green-700',
-    cancelada: 'bg-red-100 text-red-600',
+    agendada: 'bg-[rgba(0,137,172,0.15)] text-[#6bd0e7]',
+    realizada: 'bg-[rgba(16,185,129,0.15)] text-[#34d399]',
+    cancelada: 'bg-[rgba(239,68,68,0.15)] text-[#f87171]',
   }
   const label = { agendada: 'Agendada', realizada: 'Realizada', cancelada: 'Cancelada' }
   return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${map[status]}`}>{label[status]}</span>
@@ -69,12 +69,12 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit, perfilByEmail 
 }) {
   const dt = new Date(reuniao.data_hora)
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-sm hover:shadow transition-shadow">
+    <div className="bg-card rounded-xl border border-slate-200 p-3 shadow-sm hover:shadow transition-shadow">
       <div className="flex items-start justify-between gap-2 mb-2">
-        <p className="text-sm font-semibold text-slate-800 leading-tight">{reuniao.titulo}</p>
+        <p className="text-sm font-semibold text-[rgba(230,235,240,0.92)] leading-tight">{reuniao.titulo}</p>
         <StatusBadge status={reuniao.status} />
       </div>
-      <div className="space-y-1 text-xs text-slate-500">
+      <div className="space-y-1 text-xs text-[rgba(130,150,170,0.65)]">
         <div className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
           {dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {reuniao.duracao_minutos}min
@@ -93,19 +93,19 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit, perfilByEmail 
           </div>
         )}
       </div>
-      <div className="flex gap-1.5 mt-2 pt-2 border-t border-slate-100 flex-wrap">
-        <button onClick={() => onEdit(reuniao)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-slate-500 hover:bg-slate-100">
+      <div className="flex gap-1.5 mt-2 pt-2 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <button onClick={() => onEdit(reuniao)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[rgba(130,150,170,0.65)] hover:bg-[rgba(255,255,255,0.04)]">
           <Pencil className="w-3 h-3" />Editar
         </button>
         {reuniao.status === 'agendada' && (<>
-          <button onClick={() => onStatusChange(reuniao.id, 'realizada')} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-green-600 hover:bg-green-50">
+          <button onClick={() => onStatusChange(reuniao.id, 'realizada')} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs hover:bg-[rgba(16,185,129,0.10)]" style={{ color: '#34d399' }}>
             <CheckCircle className="w-3 h-3" />Realizada
           </button>
-          <button onClick={() => onStatusChange(reuniao.id, 'cancelada')} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-red-500 hover:bg-red-50">
+          <button onClick={() => onStatusChange(reuniao.id, 'cancelada')} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs hover:bg-[rgba(239,68,68,0.10)]" style={{ color: '#f87171' }}>
             <XCircle className="w-3 h-3" />Cancelar
           </button>
         </>)}
-        <button onClick={() => onDelete(reuniao.id)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-red-400 hover:bg-red-50 ml-auto">
+        <button onClick={() => onDelete(reuniao.id)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs ml-auto hover:bg-[rgba(239,68,68,0.10)]" style={{ color: '#f87171' }}>
           <Trash2 className="w-3 h-3" />
         </button>
       </div>
@@ -149,13 +149,13 @@ export function ReunioesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Reuniões</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Calendário semanal</p>
+          <h1 className="text-2xl font-bold text-[rgba(230,235,240,0.95)]">Reuniões</h1>
+          <p className="text-[rgba(130,150,170,0.65)] text-sm mt-0.5">Calendário semanal</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-medium"
-          style={{ backgroundColor: '#0089ac' }}
+          style={{ backgroundColor: 'rgba(0,137,172,0.25)' }}
         >
           <Plus className="w-4 h-4" />Nova Reunião
         </button>
@@ -163,21 +163,21 @@ export function ReunioesPage() {
 
       {/* Week nav */}
       <div className="flex items-center gap-3">
-        <button onClick={prevWeek} className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">
-          <ChevronLeft className="w-4 h-4 text-slate-500" />
+        <button onClick={prevWeek} className="p-1.5 rounded-lg border border-slate-200 hover:bg-background">
+          <ChevronLeft className="w-4 h-4 text-[rgba(130,150,170,0.65)]" />
         </button>
-        <button onClick={goToday} className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm hover:bg-slate-50 text-slate-600">
+        <button onClick={goToday} className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm hover:bg-background text-[rgba(150,165,180,0.70)]">
           Hoje
         </button>
-        <button onClick={nextWeek} className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">
-          <ChevronRight className="w-4 h-4 text-slate-500" />
+        <button onClick={nextWeek} className="p-1.5 rounded-lg border border-slate-200 hover:bg-background">
+          <ChevronRight className="w-4 h-4 text-[rgba(130,150,170,0.65)]" />
         </button>
-        <span className="text-sm font-medium text-slate-700">{weekRange}</span>
+        <span className="text-sm font-medium text-[rgba(215,225,235,0.85)]">{weekRange}</span>
       </div>
 
       {/* Week grid */}
       {isLoading ? (
-        <div className="text-center py-16 text-slate-400">Carregando...</div>
+        <div className="text-center py-16 text-[rgba(100,120,140,0.55)]">Carregando...</div>
       ) : (
         <div className="grid grid-cols-7 gap-2">
           {weekDays.map((day) => {
@@ -188,10 +188,10 @@ export function ReunioesPage() {
             return (
               <div key={day.toISOString()} className="min-h-32">
                 {/* Day header */}
-                <div className={`text-center mb-2 py-2 rounded-lg ${isToday ? 'text-white' : 'text-slate-600'}`}
-                  style={isToday ? { backgroundColor: '#0089ac' } : {}}>
+                <div className={`text-center mb-2 py-2 rounded-lg ${isToday ? 'text-white' : 'text-[rgba(150,165,180,0.70)]'}`}
+                  style={isToday ? { backgroundColor: 'rgba(0,137,172,0.25)' } : {}}>
                   <div className="text-xs font-medium">{DIAS[day.getDay()]}</div>
-                  <div className={`text-lg font-bold ${isPast && !isToday ? 'text-slate-400' : ''}`}>
+                  <div className={`text-lg font-bold ${isPast && !isToday ? 'text-[rgba(100,120,140,0.55)]' : ''}`}>
                     {day.getDate()}
                   </div>
                 </div>
@@ -220,7 +220,7 @@ export function ReunioesPage() {
 
       {/* Upcoming list */}
       <div className="mt-6">
-        <h2 className="text-base font-semibold text-slate-800 mb-3 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-[rgba(230,235,240,0.92)] mb-3 flex items-center gap-2">
           <Calendar className="w-4 h-4" />Próximas Reuniões
         </h2>
         <div className="space-y-2">
@@ -230,14 +230,14 @@ export function ReunioesPage() {
             .map(r => {
               const dt = new Date(r.data_hora)
               return (
-                <div key={r.id} className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-4 py-3">
+                <div key={r.id} className="flex items-center gap-4 bg-card rounded-xl px-4 py-3" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
                   <div className="text-center w-10 shrink-0">
-                    <div className="text-xs text-slate-400">{DIAS[dt.getDay()]}</div>
-                    <div className="text-lg font-bold text-slate-800">{dt.getDate()}</div>
+                    <div className="text-xs text-[rgba(100,120,140,0.55)]">{DIAS[dt.getDay()]}</div>
+                    <div className="text-lg font-bold text-[rgba(230,235,240,0.92)]">{dt.getDate()}</div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-slate-800 text-sm">{r.titulo}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="font-medium text-[rgba(230,235,240,0.92)] text-sm">{r.titulo}</p>
+                    <p className="text-xs text-[rgba(100,120,140,0.55)]">
                       {dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {r.duracao_minutos}min
                       {r.local ? ` · ${r.local}` : ''}
                     </p>
@@ -252,7 +252,7 @@ export function ReunioesPage() {
                   {r.link_video && (
                     <a href={r.link_video} target="_blank" rel="noreferrer"
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white font-medium"
-                      style={{ backgroundColor: '#0089ac' }}>
+                      style={{ backgroundColor: 'rgba(0,137,172,0.25)' }}>
                       <Video className="w-3 h-3" />Entrar
                     </a>
                   )}
@@ -260,7 +260,7 @@ export function ReunioesPage() {
               )
             })}
           {reunioes.filter(r => new Date(r.data_hora) >= today && r.status === 'agendada').length === 0 && (
-            <div className="text-center py-8 text-slate-400 text-sm">Nenhuma reunião agendada.</div>
+            <div className="text-center py-8 text-[rgba(100,120,140,0.55)] text-sm">Nenhuma reunião agendada.</div>
           )}
         </div>
       </div>

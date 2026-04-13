@@ -4,31 +4,31 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 194 100% 34%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 191 56% 94%;
-    --secondary-foreground: 200 100% 28%;
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 35 38% 51%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 194 100% 34%;
-    --radius: 0.5rem;
-    --chart-1: 194 100% 34%;
-    --chart-2: 191 56% 55%;
-    --chart-3: 35 38% 51%;
-    --chart-4: 200 100% 28%;
-    --chart-5: 222 100% 6%;
+    --background:          214 65% 7%;    /* #0a1628 */
+    --foreground:          210 20% 92%;   /* rgba(230,235,240) */
+    --card:                214 50% 11%;   /* #101e33 */
+    --card-foreground:     210 20% 92%;
+    --popover:             214 50% 9%;    /* #0d1929 */
+    --popover-foreground:  210 20% 92%;
+    --primary:             194 100% 34%;  /* #0089ac */
+    --primary-foreground:  0 0% 100%;
+    --secondary:           214 40% 16%;   /* #162035 */
+    --secondary-foreground: 194 60% 70%;
+    --muted:               214 40% 14%;   /* #111c2e */
+    --muted-foreground:    214 20% 50%;   /* #607080 */
+    --accent:              194 100% 34%;
+    --accent-foreground:   0 0% 100%;
+    --destructive:         0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border:              214 35% 18%;   /* #182236 */
+    --input:               214 40% 13%;   /* #0f1b2d */
+    --ring:                194 100% 34%;
+    --radius:              0.5rem;
+    --chart-1:             194 100% 34%;  /* #0089ac */
+    --chart-2:             191 56% 55%;   /* #4bbdd4 */
+    --chart-3:             160 60% 45%;   /* #29b87a */
+    --chart-4:             35 90% 55%;    /* #f0a030 */
+    --chart-5:             0 72% 55%;     /* #e04040 */
   }
 }
 

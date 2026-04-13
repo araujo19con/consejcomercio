@@ -11,10 +11,10 @@ type Props = {
   onRedo: () => void
 }
 
-const PRIORIDADE_CONFIG = {
-  alta: 'bg-red-100 text-red-700 border-red-200',
-  media: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  baixa: 'bg-blue-100 text-blue-700 border-blue-200',
+const PRIORIDADE_CONFIG: Record<string, { bg: string; color: string; border: string }> = {
+  alta:  { bg: 'rgba(239,68,68,0.15)',   color: '#f87171', border: 'rgba(239,68,68,0.30)' },
+  media: { bg: 'rgba(245,158,11,0.15)',  color: '#fbbf24', border: 'rgba(245,158,11,0.30)' },
+  baixa: { bg: 'rgba(59,130,246,0.15)',  color: '#93c5fd', border: 'rgba(59,130,246,0.30)' },
 }
 
 export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
@@ -25,27 +25,27 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
     return (
       <div className="space-y-4">
         {/* Resumo */}
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-          <p className="text-sm font-semibold text-green-800 mb-1">Perfil Jurídico</p>
-          <p className="text-sm text-green-700">{analise.resumo}</p>
+        <div className="rounded-xl p-4" style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.25)' }}>
+          <p className="text-sm font-semibold mb-1" style={{ color: 'rgba(52,211,153,0.85)' }}>Perfil Jurídico</p>
+          <p className="text-sm" style={{ color: 'rgba(52,211,153,0.75)' }}>{analise.resumo}</p>
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full font-medium border border-indigo-200">
+            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(0,137,172,0.15)', color: '#6bd0e7', border: '1px solid rgba(0,137,172,0.30)' }}>
               {clusterInfo?.label}
             </span>
-            <span className="text-xs text-slate-400">{clusterInfo?.price}</span>
+            <span className="text-xs text-[rgba(100,120,140,0.55)]">{clusterInfo?.price}</span>
           </div>
         </div>
 
         {/* Necessidades */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
+        <div className="bg-card rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="flex items-center gap-2 mb-3">
-            <Target className="w-4 h-4 text-indigo-600" />
-            <h3 className="text-sm font-semibold text-slate-800">Necessidades Identificadas</h3>
+            <Target className="w-4 h-4" style={{ color: '#6bd0e7' }} />
+            <h3 className="text-sm font-semibold text-[rgba(230,235,240,0.92)]">Necessidades Identificadas</h3>
           </div>
           <ul className="space-y-2">
             {analise.necessidades.map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                <span className="mt-0.5 w-5 h-5 flex-shrink-0 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold flex items-center justify-center">
+              <li key={i} className="flex items-start gap-2 text-sm text-[rgba(215,225,235,0.85)]">
+                <span className="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full text-xs font-bold flex items-center justify-center" style={{ background: 'rgba(0,137,172,0.20)', color: '#6bd0e7' }}>
                   {i + 1}
                 </span>
                 {item}
@@ -55,15 +55,15 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
         </div>
 
         {/* Fraquezas */}
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.25)' }}>
           <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4 text-orange-600" />
-            <h3 className="text-sm font-semibold text-orange-800">Vulnerabilidades Jurídicas</h3>
+            <AlertTriangle className="w-4 h-4" style={{ color: 'rgba(251,191,36,0.85)' }} />
+            <h3 className="text-sm font-semibold" style={{ color: 'rgba(251,191,36,0.85)' }}>Vulnerabilidades Jurídicas</h3>
           </div>
           <ul className="space-y-2">
             {analise.fraquezas.map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-orange-700">
-                <span className="mt-1 w-1.5 h-1.5 flex-shrink-0 bg-orange-500 rounded-full" />
+              <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'rgba(251,191,36,0.75)' }}>
+                <span className="mt-1 w-1.5 h-1.5 flex-shrink-0 rounded-full" style={{ background: '#f97316' }} />
                 {item}
               </li>
             ))}
@@ -71,23 +71,26 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
         </div>
 
         {/* Serviços */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
+        <div className="bg-card rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="flex items-center gap-2 mb-3">
-            <Lightbulb className="w-4 h-4 text-yellow-600" />
-            <h3 className="text-sm font-semibold text-slate-800">Serviços CONSEJ Recomendados</h3>
+            <Lightbulb className="w-4 h-4" style={{ color: '#fbbf24' }} />
+            <h3 className="text-sm font-semibold text-[rgba(230,235,240,0.92)]">Serviços CONSEJ Recomendados</h3>
           </div>
           <div className="space-y-2">
-            {analise.servicos_recomendados.map((s, i) => (
-              <div key={i} className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className="text-sm font-semibold text-slate-800">{s.nome}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${PRIORIDADE_CONFIG[s.prioridade]}`}>
-                    {s.prioridade === 'alta' ? 'Alta' : s.prioridade === 'media' ? 'Média' : 'Baixa'}
-                  </span>
+            {analise.servicos_recomendados.map((s, i) => {
+              const p = PRIORIDADE_CONFIG[s.prioridade] ?? PRIORIDADE_CONFIG.baixa
+              return (
+                <div key={i} className="p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-sm font-semibold text-[rgba(230,235,240,0.92)]">{s.nome}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full border font-medium" style={{ background: p.bg, color: p.color, borderColor: p.border }}>
+                      {s.prioridade === 'alta' ? 'Alta' : s.prioridade === 'media' ? 'Média' : 'Baixa'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[rgba(130,150,170,0.65)]">{s.justificativa}</p>
                 </div>
-                <p className="text-xs text-slate-500">{s.justificativa}</p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -101,21 +104,21 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
 
   // Fallback: cluster-based (no AI analysis stored)
   return (
-    <Card className="border-green-200 bg-green-50">
+    <Card style={{ borderColor: 'rgba(16,185,129,0.25)', background: 'rgba(16,185,129,0.06)' }}>
       <CardContent className="py-6">
-        <p className="text-sm font-semibold text-green-800 mb-1">Cluster recomendado: <strong>{clusterInfo?.label}</strong></p>
-        <p className="text-xs text-green-600 mb-4">{clusterInfo?.price}</p>
+        <p className="text-sm font-semibold mb-1" style={{ color: 'rgba(52,211,153,0.85)' }}>Cluster recomendado: <strong>{clusterInfo?.label}</strong></p>
+        <p className="text-xs mb-4" style={{ color: 'rgba(52,211,153,0.70)' }}>{clusterInfo?.price}</p>
         {rec.rationale.length > 0 && (
-          <div className="text-left bg-white rounded-lg p-3 mb-4 border border-green-100">
-            <p className="text-xs font-semibold text-green-800 mb-2">Análise:</p>
+          <div className="text-left rounded-lg p-3 mb-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(16,185,129,0.15)' }}>
+            <p className="text-xs font-semibold mb-2" style={{ color: 'rgba(52,211,153,0.85)' }}>Análise:</p>
             {rec.rationale.map((r, i) => (
-              <p key={i} className="text-xs text-green-700 mb-1">• {r}</p>
+              <p key={i} className="text-xs mb-1" style={{ color: 'rgba(52,211,153,0.75)' }}>• {r}</p>
             ))}
           </div>
         )}
         <div className="flex flex-wrap gap-2 mb-4">
           {rec.urgentServices.map((s, i) => (
-            <span key={i} className="text-xs bg-green-100 text-green-800 px-2.5 py-1 rounded-full border border-green-200">{s}</span>
+            <span key={i} className="text-xs px-2.5 py-1 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', border: '1px solid rgba(16,185,129,0.30)' }}>{s}</span>
           ))}
         </div>
         <Button variant="outline" onClick={onRedo} size="sm">Refazer diagnóstico</Button>

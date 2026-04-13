@@ -15,10 +15,10 @@ import { Plus, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const DEMANDA_STATUS = [
-  { value: 'aberta', label: 'Aberta', color: 'bg-blue-100 text-blue-700' },
-  { value: 'em_andamento', label: 'Em Andamento', color: 'bg-amber-100 text-amber-700' },
-  { value: 'concluida', label: 'Concluída', color: 'bg-green-100 text-green-700' },
-  { value: 'cancelada', label: 'Cancelada', color: 'bg-red-100 text-red-700' },
+  { value: 'aberta', label: 'Aberta', color: 'bg-[rgba(59,130,246,0.15)] text-[#93c5fd]' },
+  { value: 'em_andamento', label: 'Em Andamento', color: 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]' },
+  { value: 'concluida', label: 'Concluída', color: 'bg-[rgba(16,185,129,0.15)] text-[#34d399]' },
+  { value: 'cancelada', label: 'Cancelada', color: 'bg-[rgba(239,68,68,0.15)] text-[#f87171]' },
 ]
 
 export function DemandasPage() {
@@ -70,29 +70,29 @@ export function DemandasPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-slate-800">Demandas</h1>
-        <Button size="sm" onClick={() => setShowNew(true)} className="bg-indigo-600 hover:bg-indigo-700">
+        <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Demandas</h1>
+        <Button size="sm" onClick={() => setShowNew(true)} className="bg-primary hover:bg-primary/90">
           <Plus className="w-4 h-4 mr-1" /> Nova Demanda
         </Button>
       </div>
 
       <div className="flex gap-3 mb-5">
         <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
           <Input placeholder="Buscar demanda..." className="pl-8" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <div className="flex gap-1.5">
           {['todos', ...DEMANDA_STATUS.map(s => s.value)].map(s => (
             <Button key={s} size="sm" variant={statusFilter === s ? 'default' : 'outline'}
               onClick={() => setStatusFilter(s)}
-              className={statusFilter === s ? 'bg-indigo-600 hover:bg-indigo-700' : ''}>
+              className={statusFilter === s ? 'bg-primary hover:bg-primary/90' : ''}>
               {s === 'todos' ? 'Todos' : DEMANDA_STATUS.find(d => d.value === s)?.label}
             </Button>
           ))}
         </div>
       </div>
 
-      {isLoading ? <div className="text-center text-slate-500 py-8">Carregando...</div> : (
+      {isLoading ? <div className="text-center text-[rgba(130,150,170,0.65)] py-8">Carregando...</div> : (
         <div className="space-y-2">
           {filtered.map(demanda => {
             const statusInfo = DEMANDA_STATUS.find(s => s.value === demanda.status)
@@ -102,16 +102,16 @@ export function DemandasPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-slate-800">{demanda.titulo}</p>
-                      <p className="text-sm text-slate-500">{demanda.cliente?.nome} · {demanda.cliente?.empresa}</p>
-                      {demanda.area_direito && <p className="text-xs text-slate-400 mt-0.5">{demanda.area_direito.replace(/_/g, ' ')}</p>}
+                      <p className="font-semibold text-[rgba(230,235,240,0.92)]">{demanda.titulo}</p>
+                      <p className="text-sm text-[rgba(130,150,170,0.65)]">{demanda.cliente?.nome} · {demanda.cliente?.empresa}</p>
+                      {demanda.area_direito && <p className="text-xs text-[rgba(100,120,140,0.55)] mt-0.5">{demanda.area_direito.replace(/_/g, ' ')}</p>}
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="text-right">
-                        <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', tipoInfo?.valor === 500 ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700')}>
+                        <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', tipoInfo?.valor === 500 ? 'bg-[rgba(139,92,246,0.15)] text-[#a78bfa]' : 'bg-[rgba(59,130,246,0.15)] text-[#93c5fd]')}>
                           {tipoInfo?.label} · {formatCurrency(tipoInfo?.valor || 0)}
                         </span>
-                        <p className="text-xs text-slate-400 mt-0.5">{formatDate(demanda.data_abertura)}</p>
+                        <p className="text-xs text-[rgba(100,120,140,0.55)] mt-0.5">{formatDate(demanda.data_abertura)}</p>
                       </div>
                       <Select value={demanda.status} onValueChange={v => updateDemanda.mutate({ id: demanda.id, status: v })}>
                         <SelectTrigger className={cn('w-36 h-7 text-xs', statusInfo?.color)}>
@@ -127,7 +127,7 @@ export function DemandasPage() {
               </Card>
             )
           })}
-          {filtered.length === 0 && <div className="text-center text-slate-400 py-12">Nenhuma demanda encontrada.</div>}
+          {filtered.length === 0 && <div className="text-center text-[rgba(100,120,140,0.55)] py-12">Nenhuma demanda encontrada.</div>}
         </div>
       )}
 
@@ -172,7 +172,7 @@ export function DemandasPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowNew(false)}>Cancelar</Button>
-            <Button onClick={handleCreate} disabled={!contratoId || !titulo || createDemanda.isPending} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button onClick={handleCreate} disabled={!contratoId || !titulo || createDemanda.isPending} className="bg-primary hover:bg-primary/90">
               {createDemanda.isPending ? 'Salvando...' : 'Criar Demanda'}
             </Button>
           </DialogFooter>

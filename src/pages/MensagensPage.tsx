@@ -18,14 +18,14 @@ type Templates = Record<Stage, Record<Channel, TemplateMap>>
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
-const STAGES: { id: Stage; label: string; color: string; bg: string }[] = [
-  { id: 'primeiro_contato', label: 'Primeiro Contato',   color: 'text-blue-700',   bg: 'bg-blue-50 border-blue-200'   },
-  { id: 'followup',         label: 'Follow-up',          color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
-  { id: 'diagnostico',      label: 'Diagnóstico',        color: 'text-cyan-700',   bg: 'bg-cyan-50 border-cyan-200'   },
-  { id: 'proposta',         label: 'Proposta Enviada',   color: 'text-amber-700',  bg: 'bg-amber-50 border-amber-200' },
-  { id: 'negociacao',       label: 'Negociação',         color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
-  { id: 'pos_fechamento',   label: 'Pós-Fechamento',     color: 'text-green-700',  bg: 'bg-green-50 border-green-200' },
-  { id: 'reativacao',       label: 'Reativação',         color: 'text-rose-700',   bg: 'bg-rose-50 border-rose-200'   },
+const STAGES: { id: Stage; label: string; colorVal: string; bgVal: string }[] = [
+  { id: 'primeiro_contato', label: 'Primeiro Contato',   colorVal: '#93c5fd', bgVal: 'rgba(59,130,246,0.12)'   },
+  { id: 'followup',         label: 'Follow-up',          colorVal: '#c4b5fd', bgVal: 'rgba(139,92,246,0.12)'  },
+  { id: 'diagnostico',      label: 'Diagnóstico',        colorVal: '#67e8f9', bgVal: 'rgba(6,182,212,0.12)'   },
+  { id: 'proposta',         label: 'Proposta Enviada',   colorVal: '#fbbf24', bgVal: 'rgba(245,158,11,0.12)'  },
+  { id: 'negociacao',       label: 'Negociação',         colorVal: '#fdba74', bgVal: 'rgba(249,115,22,0.12)'  },
+  { id: 'pos_fechamento',   label: 'Pós-Fechamento',     colorVal: '#6ee7b7', bgVal: 'rgba(16,185,129,0.12)'  },
+  { id: 'reativacao',       label: 'Reativação',         colorVal: '#fda4af', bgVal: 'rgba(244,63,94,0.12)'   },
 ]
 
 const SECTORS: { id: Sector; label: string; emoji: string }[] = [
@@ -427,22 +427,22 @@ export function MensagensPage() {
           <Sparkles className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Mensagens de Abordagem</h1>
-          <p className="text-sm text-slate-500">Gere mensagens personalizadas para cada etapa do funil e tipo de cliente</p>
+          <h1 className="text-2xl font-bold text-[rgba(230,235,240,0.95)]">Mensagens de Abordagem</h1>
+          <p className="text-sm text-[rgba(130,150,170,0.65)]">Gere mensagens personalizadas para cada etapa do funil e tipo de cliente</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">
 
         {/* ── Config Panel ── */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-5 shadow-sm">
+        <div className="bg-card border border-slate-200 rounded-2xl p-5 space-y-5 shadow-sm">
 
           {/* Contact info */}
           <div>
-            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Dados do contato</h2>
+            <h2 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mb-3">Dados do contato</h2>
             <div className="space-y-3">
               <div>
-                <Label className="text-slate-600 text-xs mb-1 block">Nome do contato</Label>
+                <Label className="text-[rgba(150,165,180,0.70)] text-xs mb-1 block">Nome do contato</Label>
                 <Input
                   placeholder="Ex: João Silva"
                   value={nome}
@@ -451,7 +451,7 @@ export function MensagensPage() {
                 />
               </div>
               <div>
-                <Label className="text-slate-600 text-xs mb-1 block">Empresa</Label>
+                <Label className="text-[rgba(150,165,180,0.70)] text-xs mb-1 block">Empresa</Label>
                 <Input
                   placeholder="Ex: Tech Solutions Ltda"
                   value={empresa}
@@ -460,7 +460,7 @@ export function MensagensPage() {
                 />
               </div>
               <div>
-                <Label className="text-slate-600 text-xs mb-1 block">Advogado(a) responsável</Label>
+                <Label className="text-[rgba(150,165,180,0.70)] text-xs mb-1 block">Advogado(a) responsável</Label>
                 <Input
                   placeholder="Ex: Ana Carolina"
                   value={responsavel}
@@ -475,7 +475,7 @@ export function MensagensPage() {
 
           {/* Channel */}
           <div>
-            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Canal</h2>
+            <h2 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mb-3">Canal</h2>
             <div className="grid grid-cols-3 gap-2">
               {CHANNELS.map(ch => (
                 <button
@@ -485,7 +485,7 @@ export function MensagensPage() {
                     'flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border text-xs font-medium transition-all',
                     channel === ch.id
                       ? 'border-cyan-500 bg-cyan-50 text-cyan-700'
-                      : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      : 'border-slate-200 text-[rgba(130,150,170,0.65)] hover:border-slate-300 hover:bg-background'
                   )}
                 >
                   <ch.icon className="w-4 h-4" />
@@ -499,18 +499,16 @@ export function MensagensPage() {
 
           {/* Stage */}
           <div>
-            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Etapa do funil</h2>
+            <h2 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mb-3">Etapa do funil</h2>
             <div className="space-y-1.5">
               {STAGES.map(s => (
                 <button
                   key={s.id}
                   onClick={() => handleStageChange(s.id)}
-                  className={cn(
-                    'w-full text-left px-3 py-2 rounded-lg border text-sm font-medium transition-all',
-                    stage === s.id
-                      ? `${s.bg} ${s.color} border-current`
-                      : 'border-transparent text-slate-600 hover:bg-slate-50'
-                  )}
+                  className="w-full text-left px-3 py-2 rounded-lg border text-sm font-medium transition-all"
+                  style={stage === s.id
+                    ? { background: s.bgVal, color: s.colorVal, borderColor: s.colorVal + '80' }
+                    : { borderColor: 'transparent', color: 'rgba(150,165,180,0.70)' }}
                 >
                   {s.label}
                 </button>
@@ -522,7 +520,7 @@ export function MensagensPage() {
 
           {/* Sector */}
           <div>
-            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Setor / Área jurídica</h2>
+            <h2 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mb-3">Setor / Área jurídica</h2>
             <div className="grid grid-cols-2 gap-1.5">
               {SECTORS.map(sec => (
                 <button
@@ -532,7 +530,7 @@ export function MensagensPage() {
                     'flex items-center gap-1.5 px-2.5 py-2 rounded-lg border text-xs font-medium transition-all text-left',
                     sector === sec.id
                       ? 'border-cyan-500 bg-cyan-50 text-cyan-700'
-                      : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                      : 'border-slate-200 text-[rgba(150,165,180,0.70)] hover:border-slate-300 hover:bg-background'
                   )}
                 >
                   <span>{sec.emoji}</span>
@@ -548,47 +546,47 @@ export function MensagensPage() {
 
           {/* Tags */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={cn('px-3 py-1 rounded-full text-xs font-semibold border', stageInfo.bg, stageInfo.color)}>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ background: stageInfo.bgVal, color: stageInfo.colorVal, borderColor: stageInfo.colorVal + '80' }}>
               {stageInfo.label}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-600">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background text-[rgba(150,165,180,0.70)]" style={{ border: '1px solid rgba(255,255,255,0.10)' }}>
               {sectorInfo.emoji} {sectorInfo.label}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-600 capitalize">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 bg-background text-[rgba(150,165,180,0.70)] capitalize">
               {channel === 'whatsapp' ? '📱 WhatsApp' : channel === 'email' ? '📧 E-mail' : '💼 LinkedIn'}
             </span>
             {messages.length > 1 && (
-              <span className="px-3 py-1 rounded-full text-xs font-medium border border-slate-200 bg-slate-50 text-slate-400">
+              <span className="px-3 py-1 rounded-full text-xs font-medium border border-slate-200 bg-background text-[rgba(100,120,140,0.55)]">
                 Variação {varIdx + 1} de {messages.length}
               </span>
             )}
           </div>
 
           {/* Message card */}
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-card border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
             {/* Email subject */}
             {channel === 'email' && currentMsg?.subject && (
-              <div className="px-5 py-3 border-b border-slate-100 bg-slate-50">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-2">Assunto:</span>
-                <span className="text-sm font-medium text-slate-800">{currentMsg.subject}</span>
+              <div className="px-5 py-3 border-b border-slate-100 bg-background">
+                <span className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mr-2">Assunto:</span>
+                <span className="text-sm font-medium text-[rgba(230,235,240,0.92)]">{currentMsg.subject}</span>
               </div>
             )}
 
             {/* Body */}
             <div className="p-5">
-              <pre className="whitespace-pre-wrap text-sm text-slate-700 font-sans leading-relaxed">
+              <pre className="whitespace-pre-wrap text-sm text-[rgba(215,225,235,0.85)] font-sans leading-relaxed">
                 {currentMsg?.body ?? '—'}
               </pre>
             </div>
 
             {/* Footer */}
-            <div className="px-5 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+            <div className="px-5 py-3 border-t border-slate-100 bg-background flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {channel === 'whatsapp' && (
                   <span className={cn(
                     'text-xs',
-                    charCount > 1000 ? 'text-orange-500' : charCount > 600 ? 'text-amber-500' : 'text-slate-400'
+                    charCount > 1000 ? 'text-orange-500' : charCount > 600 ? 'text-amber-500' : 'text-[rgba(100,120,140,0.55)]'
                   )}>
                     {charCount} caracteres
                     {charCount > 1000 && ' — considere encurtar'}
@@ -632,7 +630,7 @@ export function MensagensPage() {
           {/* All variations preview */}
           {messages.length > 1 && (
             <div className="space-y-3">
-              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Todas as variações</h3>
+              <h3 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider">Todas as variações</h3>
               {messages.map((msg, i) => (
                 <button
                   key={i}
@@ -640,12 +638,12 @@ export function MensagensPage() {
                   className={cn(
                     'w-full text-left p-4 rounded-xl border text-sm transition-all',
                     varIdx === i
-                      ? 'border-cyan-400 bg-cyan-50'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                      ? 'border-[rgba(0,137,172,0.55)] bg-[rgba(0,137,172,0.08)]'
+                      : 'border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.14)] hover:bg-[rgba(255,255,255,0.06)]'
                   )}
                 >
-                  <div className="text-xs font-semibold text-slate-400 mb-1.5">Variação {i + 1}</div>
-                  <p className="text-slate-600 text-xs leading-relaxed line-clamp-3 whitespace-pre-wrap">
+                  <div className="text-xs font-semibold text-[rgba(100,120,140,0.55)] mb-1.5">Variação {i + 1}</div>
+                  <p className="text-[rgba(150,165,180,0.70)] text-xs leading-relaxed line-clamp-3 whitespace-pre-wrap">
                     {msg.body}
                   </p>
                 </button>

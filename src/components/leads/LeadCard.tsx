@@ -8,14 +8,14 @@ import { formatRelative } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { Calendar, User, MessageCircle, Clock } from 'lucide-react'
 
-const SEGMENT_COLORS: Record<string, string> = {
-  empresa_junior: 'bg-violet-100 text-violet-700',
-  empresa_senior: 'bg-blue-100 text-blue-700',
-  startup: 'bg-emerald-100 text-emerald-700',
-  escritorio_arquitetura: 'bg-amber-100 text-amber-700',
-  empresa_design: 'bg-pink-100 text-pink-700',
-  empresa_gestao: 'bg-cyan-100 text-cyan-700',
-  outro: 'bg-slate-100 text-slate-600',
+const SEGMENT_COLORS: Record<string, { bg: string; color: string }> = {
+  empresa_junior:        { bg: 'rgba(139,92,246,0.15)',  color: '#c4b5fd' },
+  empresa_senior:        { bg: 'rgba(59,130,246,0.15)',  color: '#93c5fd' },
+  startup:               { bg: 'rgba(16,185,129,0.15)',  color: '#6ee7b7' },
+  escritorio_arquitetura:{ bg: 'rgba(245,158,11,0.15)',  color: '#fbbf24' },
+  empresa_design:        { bg: 'rgba(236,72,153,0.15)',  color: '#f9a8d4' },
+  empresa_gestao:        { bg: 'rgba(6,182,212,0.15)',   color: '#67e8f9' },
+  outro:                 { bg: 'rgba(255,255,255,0.07)', color: 'rgba(180,195,210,0.80)' },
 }
 
 // Map pipeline stage → mensagens page stage
@@ -65,10 +65,15 @@ export function LeadCard({ lead, isDragging = false }: Props) {
       {...attributes}
       {...listeners}
       className={cn(
-        'bg-white rounded-lg border border-slate-200 p-3 mb-2 cursor-grab active:cursor-grabbing select-none shadow-sm hover:shadow-md transition-shadow',
-        (isSortDragging || isDragging) && 'opacity-50 shadow-xl rotate-1',
-        isStagnant && 'border-l-2 border-l-orange-400'
+        'rounded-lg p-3 mb-2 cursor-grab active:cursor-grabbing select-none transition-all',
+        (isSortDragging || isDragging) && 'opacity-50 rotate-1',
+        isStagnant && 'border-l-[3px] border-l-orange-400'
       )}
+      style={{
+        background: 'rgba(255,255,255,0.05)',
+        border: isStagnant ? undefined : '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 8,
+      }}
       onClick={(e) => {
         if (!isSortDragging) {
           e.stopPropagation()
@@ -79,13 +84,14 @@ export function LeadCard({ lead, isDragging = false }: Props) {
       {/* Header row */}
       <div className="flex items-start justify-between gap-1">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-800 leading-tight truncate">{lead.nome}</p>
-          <p className="text-xs text-slate-500 mt-0.5 truncate">{lead.empresa}</p>
+          <p className="text-sm font-semibold text-[rgba(230,235,240,0.92)] leading-tight truncate">{lead.nome}</p>
+          <p className="text-xs text-[rgba(130,150,170,0.65)] mt-0.5 truncate">{lead.empresa}</p>
         </div>
         {isStagnant && (
           <div
             title={`Parado há ${daysInStage} dias`}
-            className="shrink-0 flex items-center gap-0.5 bg-orange-50 text-orange-500 rounded px-1 py-0.5 text-[10px] font-medium"
+            className="shrink-0 flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-medium"
+            style={{ background: 'rgba(249,115,22,0.15)', color: '#fb923c' }}
           >
             <Clock className="w-2.5 h-2.5" />
             {daysInStage}d
@@ -94,23 +100,26 @@ export function LeadCard({ lead, isDragging = false }: Props) {
       </div>
 
       <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-        <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', SEGMENT_COLORS[lead.segmento] || 'bg-slate-100 text-slate-600')}>
+        <span
+          className="text-xs px-1.5 py-0.5 rounded-full font-medium"
+          style={SEGMENT_COLORS[lead.segmento] ? { background: SEGMENT_COLORS[lead.segmento].bg, color: SEGMENT_COLORS[lead.segmento].color } : { background: 'rgba(255,255,255,0.07)', color: 'rgba(180,195,210,0.80)' }}
+        >
           {lead.segmento.replace(/_/g, ' ')}
         </span>
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-[rgba(100,120,140,0.55)]">
           {LEAD_SOURCE_LABELS[lead.origem] || lead.origem}
         </span>
       </div>
 
       <div className="flex items-center justify-between mt-2">
         {lead.data_diagnostico && (
-          <div className="flex items-center gap-1 text-xs text-violet-600">
+          <div className="flex items-center gap-1 text-xs" style={{ color: '#a78bfa' }}>
             <Calendar className="w-3 h-3" />
             <span>{new Date(lead.data_diagnostico).toLocaleDateString('pt-BR')}</span>
           </div>
         )}
         {lead.responsavel && (
-          <div className="flex items-center gap-1 text-xs text-slate-400 ml-auto">
+          <div className="flex items-center gap-1 text-xs text-[rgba(100,120,140,0.55)] ml-auto">
             <User className="w-3 h-3" />
             <span>{lead.responsavel}</span>
           </div>
@@ -119,14 +128,17 @@ export function LeadCard({ lead, isDragging = false }: Props) {
 
       {/* Footer */}
       <div className="flex items-center justify-between mt-1.5">
-        <p className="text-xs text-slate-300">{formatRelative(lead.created_at)}</p>
+        <p className="text-xs text-[rgba(80,100,120,0.50)]">{formatRelative(lead.created_at)}</p>
 
         {/* Quick message button */}
         <button
           title="Gerar mensagem de abordagem"
           onPointerDown={e => e.stopPropagation()}
           onClick={e => { e.stopPropagation(); navigate(msgUrl) }}
-          className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 px-1.5 py-0.5 rounded transition-colors"
+          className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded transition-colors"
+          style={{ color: 'rgba(100,120,140,0.55)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6bd0e7'; (e.currentTarget as HTMLElement).style.background = 'rgba(0,137,172,0.12)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(100,120,140,0.55)'; (e.currentTarget as HTMLElement).style.background = '' }}
         >
           <MessageCircle className="w-3 h-3" />
           mensagem

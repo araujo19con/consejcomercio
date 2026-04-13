@@ -111,8 +111,8 @@ export function ConvertToClientModal({ lead, open, onClose, targetStage = 'ganho
                   onClick={() => toggleArea(a.value)}
                   className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
                     areas.includes(a.value)
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'
+                      ? 'text-white border-primary bg-primary'
+                      : 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] border-[rgba(255,255,255,0.10)] hover:border-primary/50'
                   }`}
                 >
                   {a.label}

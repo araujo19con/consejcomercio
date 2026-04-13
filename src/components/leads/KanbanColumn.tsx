@@ -30,14 +30,18 @@ export function KanbanColumn({ stageId, label, leads }: Props) {
     <div
       ref={setNodeRef}
       className={cn(
-        'w-64 shrink-0 flex flex-col rounded-xl border-t-2 bg-slate-100 transition-colors',
+        'w-64 shrink-0 flex flex-col rounded-xl border-t-2 transition-colors',
         COLUMN_COLORS[stageId] || 'border-t-slate-400',
-        isOver && 'bg-indigo-50'
       )}
+      style={{
+        background: isOver ? 'rgba(0,137,172,0.07)' : 'rgba(255,255,255,0.03)',
+        border: isOver ? '1px solid rgba(0,137,172,0.25)' : '1px solid rgba(255,255,255,0.06)',
+        borderTopWidth: 2,
+      }}
     >
       <div className="px-3 py-2.5 flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">{label}</span>
-        <span className="text-xs font-bold text-slate-400 bg-white rounded-full px-1.5 py-0.5 border">
+        <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'rgba(150,165,180,0.80)' }}>{label}</span>
+        <span className="text-xs font-bold rounded-full px-1.5 py-0.5" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(200,215,225,0.70)' }}>
           {leads.length}
         </span>
       </div>

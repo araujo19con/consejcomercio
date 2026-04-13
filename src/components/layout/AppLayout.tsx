@@ -36,15 +36,24 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen" style={{ backgroundColor: '#0a1628' }}>
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto" style={{ backgroundColor: '#0a1628' }}>
         <div key={location.pathname} className="p-6 animate-in fade-in duration-150">
           <Outlet />
         </div>
       </main>
       <GlobalSearch />
-      <Toaster richColors position="top-right" />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#101e33',
+            color: 'rgba(220,230,240,0.92)',
+            border: '1px solid rgba(255,255,255,0.10)',
+          },
+        }}
+      />
     </div>
   )
 }

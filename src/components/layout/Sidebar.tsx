@@ -109,9 +109,9 @@ export function Sidebar() {
             window.dispatchEvent(ev)
           }}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-colors"
-          style={{ color: '#6bd0e7', backgroundColor: '#000d32' }}
+          style={{ color: '#6bd0e7', backgroundColor: 'rgba(0,137,172,0.08)', border: '1px solid rgba(0,137,172,0.15)' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = HOVER_BG }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#000d32' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,137,172,0.08)' }}
         >
           <Search className="w-3.5 h-3.5 shrink-0 opacity-70" />
           <span className="flex-1 text-left opacity-70">Buscar…</span>
@@ -125,7 +125,7 @@ export function Sidebar() {
           <div key={i}>
             {group.label && (
               <p className="px-3 pt-3 pb-1 text-[10px] font-semibold tracking-widest uppercase"
-                style={{ color: '#2a4a5a' }}>
+                style={{ color: 'rgba(0,137,172,0.45)' }}>
                 {group.label}
               </p>
             )}

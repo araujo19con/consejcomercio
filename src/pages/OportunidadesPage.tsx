@@ -19,13 +19,13 @@ function OportunidadesSkeleton() {
     <div className="flex gap-4 overflow-x-auto pb-4">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="w-72 shrink-0">
-          <div className="h-5 bg-slate-200 rounded w-28 mb-3 animate-pulse" />
+          <div className="h-5 bg-[rgba(255,255,255,0.07)] rounded w-28 mb-3 animate-pulse" />
           <div className="space-y-2">
             {Array.from({ length: i % 2 === 0 ? 2 : 1 }).map((_, j) => (
-              <div key={j} className="bg-white border border-slate-200 rounded-xl p-3 animate-pulse space-y-2">
-                <div className="h-4 bg-slate-100 rounded w-20" />
-                <div className="h-4 bg-slate-200 rounded w-full" />
-                <div className="h-3 bg-slate-100 rounded w-24" />
+              <div key={j} className="bg-card rounded-xl p-3 animate-pulse space-y-2" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div className="h-4 bg-[rgba(255,255,255,0.04)] rounded w-20" />
+                <div className="h-4 bg-[rgba(255,255,255,0.07)] rounded w-full" />
+                <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-24" />
               </div>
             ))}
           </div>
@@ -37,9 +37,9 @@ function OportunidadesSkeleton() {
 
 const TIPO_ICONS = { upsell: ArrowUpRight, cross_sell: TrendingUp, renovacao: RefreshCw }
 const TIPO_COLORS: Record<string, string> = {
-  upsell: 'bg-purple-100 text-purple-700',
-  cross_sell: 'bg-blue-100 text-blue-700',
-  renovacao: 'bg-amber-100 text-amber-700',
+  upsell: 'bg-[rgba(139,92,246,0.15)] text-[#a78bfa]',
+  cross_sell: 'bg-[rgba(59,130,246,0.15)] text-[#93c5fd]',
+  renovacao: 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]',
 }
 
 function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => void }) {
@@ -90,8 +90,8 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
     <Dialog open onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-2xl p-0 flex flex-col max-h-[90vh] overflow-hidden gap-0">
         <div className="px-6 py-4 border-b shrink-0">
-          <h2 className="text-lg font-semibold text-slate-800">Novo Contrato — Oportunidade Convertida</h2>
-          <p className="text-sm text-slate-500">{op.titulo} · {op.cliente?.nome}</p>
+          <h2 className="text-lg font-semibold text-[rgba(230,235,240,0.92)]">Novo Contrato — Oportunidade Convertida</h2>
+          <p className="text-sm text-[rgba(130,150,170,0.65)]">{op.titulo} · {op.cliente?.nome}</p>
         </div>
 
         <div className="overflow-y-auto p-6 space-y-5 flex-1">
@@ -101,7 +101,7 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
               { label: 'Modelo de Precificação', value: modelo, setter: setModelo, options: PRICING_MODELS },
             ].map(({ label, value, setter, options }) => (
               <div key={label}>
-                <label className="block text-xs font-medium text-slate-500 mb-1">{label}</label>
+                <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">{label}</label>
                 <select value={value} onChange={e => setter(e.target.value)}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                   {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -116,14 +116,14 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
               { label: 'Data Término', value: dataFim, setter: setDataFim, type: 'date' },
             ].map(({ label, value, setter, type }) => (
               <div key={label}>
-                <label className="block text-xs font-medium text-slate-500 mb-1">{label}</label>
+                <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">{label}</label>
                 <input type={type ?? 'text'} value={value} onChange={e => setter(e.target.value)}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
             ))}
 
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Status RM</label>
+              <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Status RM</label>
               <select value={rmStatus} onChange={e => setRmStatus(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 {RM_STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -133,7 +133,7 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
 
           {/* Áreas de direito */}
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-2">Áreas de Direito</label>
+            <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-2">Áreas de Direito</label>
             <div className="flex flex-wrap gap-2">
               {SERVICE_AREAS.map(a => (
                 <button
@@ -143,8 +143,8 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
                   className={cn(
                     'px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors',
                     areas.includes(a.value)
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300'
+                      ? 'text-white border-primary bg-primary'
+                      : 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] border-[rgba(255,255,255,0.10)] hover:border-primary/50'
                   )}
                 >
                   {a.label}
@@ -154,14 +154,14 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Notas</label>
+            <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Notas</label>
             <textarea value={notas} onChange={e => setNotas(e.target.value)} rows={3}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
           </div>
         </div>
 
         <div className="flex gap-3 px-6 py-4 border-t shrink-0">
-          <button onClick={onClose} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50">
+          <button onClick={onClose} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background">
             Cancelar
           </button>
           <button onClick={handleSave} disabled={isPending}
@@ -206,11 +206,11 @@ function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
     <Dialog open onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-md p-0 gap-0">
         <div className="px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold text-slate-800">Nova Oportunidade</h2>
+          <h2 className="text-lg font-semibold text-[rgba(230,235,240,0.92)]">Nova Oportunidade</h2>
         </div>
         <div className="p-6 space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Cliente *</label>
+            <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Cliente *</label>
             <select value={clienteId} onChange={e => setClienteId(e.target.value)}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">Selecione o cliente</option>
@@ -218,37 +218,37 @@ function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Tipo</label>
+            <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Tipo</label>
             <select value={tipo} onChange={e => setTipo(e.target.value)}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               {OPORTUNIDADE_TIPOS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Título *</label>
+            <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Título *</label>
             <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex: Renovação de contrato anual"
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Descrição</label>
+            <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Descrição</label>
             <textarea value={descricao} onChange={e => setDescricao(e.target.value)} rows={2}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Valor Estimado (R$)</label>
+              <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Valor Estimado (R$)</label>
               <input type="number" value={valorEstimado} onChange={e => setValorEstimado(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Data de Alerta</label>
+              <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Data de Alerta</label>
               <input type="date" value={dataAlerta} onChange={e => setDataAlerta(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
           </div>
         </div>
         <div className="flex gap-3 px-6 py-4 border-t">
-          <button onClick={onClose} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Cancelar</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background">Cancelar</button>
           <button onClick={handleSave} disabled={create.isPending || !clienteId || !titulo}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm text-white font-medium disabled:opacity-50"
             style={{ backgroundColor: '#0089ac' }}>
@@ -282,7 +282,7 @@ export function OportunidadesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-slate-800">Oportunidades</h1>
+        <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Oportunidades</h1>
         <button onClick={() => setShowNova(true)}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-white text-sm font-medium"
           style={{ backgroundColor: '#0089ac' }}>
@@ -298,12 +298,12 @@ export function OportunidadesPage() {
             return (
               <div key={statusInfo.value} className="w-72 shrink-0">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-slate-700">{statusInfo.label}</h3>
+                  <h3 className="text-sm font-semibold text-[rgba(215,225,235,0.85)]">{statusInfo.label}</h3>
                   <div className="flex items-center gap-1.5">
                     {totalValor > 0 && (
-                      <span className="text-[10px] text-slate-400 font-medium">{formatCurrency(totalValor)}</span>
+                      <span className="text-[10px] text-[rgba(100,120,140,0.55)] font-medium">{formatCurrency(totalValor)}</span>
                     )}
-                    <span className="text-xs font-bold text-slate-400 bg-white rounded-full px-1.5 py-0.5 border">{items.length}</span>
+                    <span className="text-xs font-bold text-[rgba(200,215,225,0.70)] rounded-full px-1.5 py-0.5" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}>{items.length}</span>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -317,10 +317,10 @@ export function OportunidadesPage() {
                               <Icon className="w-3 h-3" />
                               {OPORTUNIDADE_TIPOS.find(t => t.value === op.tipo)?.label}
                             </span>
-                            {op.valor_estimado && <span className="text-xs font-semibold text-slate-700">{formatCurrency(op.valor_estimado)}</span>}
+                            {op.valor_estimado && <span className="text-xs font-semibold text-[rgba(215,225,235,0.85)]">{formatCurrency(op.valor_estimado)}</span>}
                           </div>
-                          <p className="text-sm font-medium text-slate-800 leading-tight">{op.titulo}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">{op.cliente?.nome}</p>
+                          <p className="text-sm font-medium text-[rgba(230,235,240,0.92)] leading-tight">{op.titulo}</p>
+                          <p className="text-xs text-[rgba(130,150,170,0.65)] mt-0.5">{op.cliente?.nome}</p>
                           {op.data_alerta && <p className="text-xs text-orange-600 mt-1">Alerta: {formatDate(op.data_alerta)}</p>}
                           <div className="mt-2">
                             <Select value={op.status} onValueChange={v => handleStatusChange(op, v)}>
@@ -338,7 +338,7 @@ export function OportunidadesPage() {
                   })}
                   {items.length === 0 && (
                     <div className="text-center py-6 px-3 border-2 border-dashed border-slate-100 rounded-xl">
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-[rgba(100,120,140,0.55)]">
                         {statusInfo.value === 'identificada' ? 'Nenhuma oportunidade ainda' : 'Nenhum item aqui'}
                       </p>
                     </div>

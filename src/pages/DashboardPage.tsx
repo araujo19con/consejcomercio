@@ -13,7 +13,7 @@ import { Users, Briefcase, TrendingUp, FileText, AlertCircle, Share2, DollarSign
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router-dom'
 
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316']
+const COLORS = ['#0089ac', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316']
 
 const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
 
@@ -80,43 +80,52 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-slate-800">Dashboard</h1>
+      <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Dashboard</h1>
 
       {/* ── Para hoje ── */}
       {hasActionItems && (
-        <div className="rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4">
-          <h2 className="text-sm font-semibold text-orange-800 flex items-center gap-2 mb-3">
+        <div className="rounded-2xl px-5 py-4" style={{ background: 'rgba(240,90,30,0.08)', border: '1px solid rgba(240,90,30,0.25)' }}>
+          <h2 className="text-sm font-semibold flex items-center gap-2 mb-3" style={{ color: 'rgba(255,180,100,0.90)' }}>
             <Bell className="w-4 h-4" /> Para hoje
           </h2>
           <div className="flex flex-wrap gap-2">
             {stagnantLeads.length > 0 && (
               <button
                 onClick={() => navigate('/leads')}
-                className="flex items-center gap-2 bg-white border border-orange-200 rounded-lg px-3 py-2 text-sm hover:bg-orange-50 transition-colors shadow-sm"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.85)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
               >
-                <Flame className="w-3.5 h-3.5 text-orange-500" />
-                <span className="font-medium text-slate-700">{stagnantLeads.length} lead{stagnantLeads.length > 1 ? 's' : ''} parado{stagnantLeads.length > 1 ? 's' : ''}</span>
-                <ArrowRight className="w-3 h-3 text-slate-400" />
+                <Flame className="w-3.5 h-3.5 text-orange-400" />
+                <span className="font-medium">{stagnantLeads.length} lead{stagnantLeads.length > 1 ? 's' : ''} parado{stagnantLeads.length > 1 ? 's' : ''}</span>
+                <ArrowRight className="w-3 h-3 opacity-50" />
               </button>
             )}
             {renewalsUrgent.length > 0 && (
               <button
                 onClick={() => navigate('/contratos')}
-                className="flex items-center gap-2 bg-white border border-red-200 rounded-lg px-3 py-2 text-sm hover:bg-red-50 transition-colors shadow-sm"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.85)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
               >
-                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                <span className="font-medium text-slate-700">{renewalsUrgent.length} contrato{renewalsUrgent.length > 1 ? 's' : ''} vence{renewalsUrgent.length > 1 ? 'm' : ''} em 15d</span>
-                <ArrowRight className="w-3 h-3 text-slate-400" />
+                <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+                <span className="font-medium">{renewalsUrgent.length} contrato{renewalsUrgent.length > 1 ? 's' : ''} vence{renewalsUrgent.length > 1 ? 'm' : ''} em 15d</span>
+                <ArrowRight className="w-3 h-3 opacity-50" />
               </button>
             )}
             {recompensasPendentes > 0 && (
               <button
                 onClick={() => navigate('/indicacoes')}
-                className="flex items-center gap-2 bg-white border border-amber-200 rounded-lg px-3 py-2 text-sm hover:bg-amber-50 transition-colors shadow-sm"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.85)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
               >
-                <Gift className="w-3.5 h-3.5 text-amber-500" />
-                <span className="font-medium text-slate-700">{recompensasPendentes} recompensa{recompensasPendentes > 1 ? 's' : ''} pendente{recompensasPendentes > 1 ? 's' : ''}</span>
-                <ArrowRight className="w-3 h-3 text-slate-400" />
+                <Gift className="w-3.5 h-3.5 text-amber-400" />
+                <span className="font-medium">{recompensasPendentes} recompensa{recompensasPendentes > 1 ? 's' : ''} pendente{recompensasPendentes > 1 ? 's' : ''}</span>
+                <ArrowRight className="w-3 h-3 opacity-50" />
               </button>
             )}
           </div>
@@ -126,20 +135,20 @@ export function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Leads Ativos', value: activeLeads, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { label: 'Clientes Ativos', value: activeClientes, icon: Briefcase, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Taxa de Conversão', value: `${convRate}%`, icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'MRR', value: formatCurrency(mrr), icon: DollarSign, color: 'text-purple-600', bg: 'bg-purple-50' },
-        ].map(({ label, value, icon: Icon, color, bg }) => (
+          { label: 'Leads Ativos',     value: activeLeads,        icon: Users,     iconBg: 'rgba(99,102,241,0.15)',   iconColor: '#a5b4fc' },
+          { label: 'Clientes Ativos',  value: activeClientes,     icon: Briefcase, iconBg: 'rgba(16,185,129,0.15)',  iconColor: '#6ee7b7' },
+          { label: 'Taxa de Conversão',value: `${convRate}%`,     icon: TrendingUp,iconBg: 'rgba(245,158,11,0.15)',  iconColor: '#fbbf24' },
+          { label: 'MRR',              value: formatCurrency(mrr),icon: DollarSign,iconBg: 'rgba(139,92,246,0.15)',  iconColor: '#c4b5fd' },
+        ].map(({ label, value, icon: Icon, iconBg, iconColor }) => (
           <Card key={label}>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-slate-500">{label}</p>
-                <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center', bg)}>
-                  <Icon className={cn('w-4.5 h-4.5', color)} />
+                <p className="text-sm" style={{ color: 'rgba(130,150,170,0.65)' }}>{label}</p>
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: iconBg }}>
+                  <Icon className="w-4 h-4" style={{ color: iconColor }} />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-slate-800">{value}</p>
+              <p className="text-2xl font-bold" style={{ color: 'rgba(230,235,240,0.95)' }}>{value}</p>
             </CardContent>
           </Card>
         ))}
@@ -147,31 +156,31 @@ export function DashboardPage() {
 
       {/* Secondary KPIs */}
       <div className="grid grid-cols-3 gap-4">
-        <Card className={renewalsSoon.length > 0 ? 'border-orange-200' : ''}>
+        <Card style={renewalsSoon.length > 0 ? { borderColor: 'rgba(249,115,22,0.35)' } : {}}>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-1">
               {renewalsSoon.length > 0 && <AlertCircle className="w-4 h-4 text-orange-500" />}
-              <p className="text-sm text-slate-500">Renovações em 60 dias</p>
+              <p className="text-sm text-[rgba(130,150,170,0.65)]">Renovações em 60 dias</p>
             </div>
-            <p className={cn('text-2xl font-bold', renewalsSoon.length > 0 ? 'text-orange-600' : 'text-slate-800')}>{renewalsSoon.length}</p>
+            <p className={cn('text-2xl font-bold', renewalsSoon.length > 0 ? 'text-orange-600' : 'text-[rgba(230,235,240,0.92)]')}>{renewalsSoon.length}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-1">
               <Share2 className="w-4 h-4 text-indigo-500" />
-              <p className="text-sm text-slate-500">Indicações totais</p>
+              <p className="text-sm text-[rgba(130,150,170,0.65)]">Indicações totais</p>
             </div>
-            <p className="text-2xl font-bold text-slate-800">{indicacoes?.length || 0}</p>
+            <p className="text-2xl font-bold text-[rgba(230,235,240,0.92)]">{indicacoes?.length || 0}</p>
           </CardContent>
         </Card>
-        <Card className={recompensasPendentes > 0 ? 'border-amber-200' : ''}>
+        <Card style={recompensasPendentes > 0 ? { borderColor: 'rgba(245,158,11,0.35)' } : {}}>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-1">
               {recompensasPendentes > 0 && <AlertCircle className="w-4 h-4 text-amber-500" />}
-              <p className="text-sm text-slate-500">Recompensas pendentes</p>
+              <p className="text-sm text-[rgba(130,150,170,0.65)]">Recompensas pendentes</p>
             </div>
-            <p className={cn('text-2xl font-bold', recompensasPendentes > 0 ? 'text-amber-600' : 'text-slate-800')}>{recompensasPendentes}</p>
+            <p className={cn('text-2xl font-bold', recompensasPendentes > 0 ? 'text-amber-600' : 'text-[rgba(230,235,240,0.92)]')}>{recompensasPendentes}</p>
           </CardContent>
         </Card>
       </div>
@@ -195,7 +204,7 @@ export function DashboardPage() {
         </CardHeader>
         <CardContent>
           {reunioesSemana.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-4">Nenhuma reunião esta semana.</p>
+            <p className="text-sm text-[rgba(100,120,140,0.55)] text-center py-4">Nenhuma reunião esta semana.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {reunioesSemana.map(r => {
@@ -204,16 +213,16 @@ export function DashboardPage() {
                 return (
                   <div key={r.id} className="rounded-xl border p-3 space-y-1.5" style={{ borderLeftWidth: 3, borderLeftColor: statusColors[r.status] }}>
                     <div className="flex items-start justify-between gap-1">
-                      <p className="text-sm font-semibold text-slate-800 leading-tight">{r.titulo}</p>
+                      <p className="text-sm font-semibold text-[rgba(230,235,240,0.92)] leading-tight">{r.titulo}</p>
                       <span className="text-xs shrink-0 font-medium" style={{ color: statusColors[r.status] }}>
                         {DIAS_SEMANA[dt.getDay()]}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
+                    <div className="flex items-center gap-1 text-xs text-[rgba(130,150,170,0.65)]">
                       <Clock className="w-3 h-3" />
                       {dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} às {dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                     </div>
-                    {r.local && <div className="flex items-center gap-1 text-xs text-slate-400"><MapPin className="w-3 h-3" />{r.local}</div>}
+                    {r.local && <div className="flex items-center gap-1 text-xs text-[rgba(100,120,140,0.55)]"><MapPin className="w-3 h-3" />{r.local}</div>}
                     {r.link_video && (
                       <a href={r.link_video} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-white px-2 py-1 rounded-md w-fit" style={{ backgroundColor: '#0089ac' }}>
                         <Video className="w-3 h-3" />Entrar
@@ -234,10 +243,10 @@ export function DashboardPage() {
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={funnelData} layout="vertical">
-                <XAxis type="number" tick={{ fontSize: 10 }} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={90} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} />
+                <XAxis type="number" tick={{ fontSize: 10, fill: 'rgba(150,165,180,0.60)' }} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: 'rgba(150,165,180,0.60)' }} width={90} />
+                <Tooltip contentStyle={{ background: '#0d1929', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.90)', borderRadius: 8 }} />
+                <Bar dataKey="value" fill="#0089ac" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -253,7 +262,7 @@ export function DashboardPage() {
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ background: '#0d1929', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.90)', borderRadius: 8 }} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -262,12 +271,12 @@ export function DashboardPage() {
 
       {/* Stagnant leads alert */}
       {stagnantLeads.length > 0 && (
-        <Card className="border-orange-200">
+        <Card style={{ borderColor: 'rgba(249,115,22,0.35)' }}>
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
               <Flame className="w-4 h-4 text-orange-500" />
               Leads parados ({stagnantLeads.length})
-              <span className="text-xs font-normal text-slate-400 ml-1">— precisam de atenção</span>
+              <span className="text-xs font-normal text-[rgba(100,120,140,0.55)] ml-1">— precisam de atenção</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -275,16 +284,16 @@ export function DashboardPage() {
               {stagnantLeads.slice(0, 6).map(l => {
                 const days = differenceInDays(new Date(), new Date(l.updated_at))
                 const stageLabel = PIPELINE_STAGES.find(s => s.id === l.status)?.label ?? l.status
-                const stageCss = STAGE_COLORS[l.status] ?? 'bg-slate-100 text-slate-600 border-slate-200'
+                const stageCss = STAGE_COLORS[l.status] ?? 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] border-slate-200'
                 return (
                   <div
                     key={l.id}
-                    className="flex items-center justify-between py-2 border-b last:border-0 cursor-pointer hover:bg-slate-50 rounded px-1 -mx-1 transition-colors"
+                    className="flex items-center justify-between py-2 border-b last:border-0 cursor-pointer hover:bg-background rounded px-1 -mx-1 transition-colors"
                     onClick={() => navigate(`/leads/${l.id}`)}
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-800 truncate">{l.nome}</p>
-                      <p className="text-xs text-slate-500 truncate">{l.empresa}</p>
+                      <p className="text-sm font-medium text-[rgba(230,235,240,0.92)] truncate">{l.nome}</p>
+                      <p className="text-xs text-[rgba(130,150,170,0.65)] truncate">{l.empresa}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 ml-2">
                       <span className={cn('text-[10px] font-medium px-2 py-0.5 rounded-full border', stageCss)}>
@@ -299,7 +308,7 @@ export function DashboardPage() {
               })}
             </div>
             {stagnantLeads.length > 6 && (
-              <button onClick={() => navigate('/leads')} className="mt-3 text-xs text-slate-400 hover:text-slate-600 underline w-full text-center">
+              <button onClick={() => navigate('/leads')} className="mt-3 text-xs text-[rgba(100,120,140,0.55)] hover:text-[rgba(150,165,180,0.70)] underline w-full text-center">
                 Ver todos os {stagnantLeads.length} leads parados →
               </button>
             )}
@@ -309,7 +318,7 @@ export function DashboardPage() {
 
       {/* Renewals alert */}
       {renewalsSoon.length > 0 && (
-        <Card className="border-orange-200">
+        <Card style={{ borderColor: 'rgba(249,115,22,0.35)' }}>
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-orange-500" />
@@ -323,8 +332,8 @@ export function DashboardPage() {
                 return (
                   <div key={c.id} className="flex items-center justify-between py-2 border-b last:border-0">
                     <div>
-                      <p className="text-sm font-medium text-slate-800">{c.cliente?.nome}</p>
-                      <p className="text-xs text-slate-500">{c.cliente?.empresa} · Vence {formatDate(c.data_fim)}</p>
+                      <p className="text-sm font-medium text-[rgba(230,235,240,0.92)]">{c.cliente?.nome}</p>
+                      <p className="text-xs text-[rgba(130,150,170,0.65)]">{c.cliente?.empresa} · Vence {formatDate(c.data_fim)}</p>
                     </div>
                     <span className={cn('text-xs font-medium', d !== null && d <= 15 ? 'text-red-600' : 'text-orange-600')}>
                       {d}d restantes

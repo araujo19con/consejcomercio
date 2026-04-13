@@ -157,7 +157,7 @@ export function NewLeadModal({ open, onClose }: Props) {
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={createLead.isPending || !origem || !segmento} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button type="submit" disabled={createLead.isPending || !origem || !segmento} className="bg-primary hover:bg-primary/90">
               {createLead.isPending ? 'Criando...' : 'Criar Lead'}
             </Button>
           </DialogFooter>

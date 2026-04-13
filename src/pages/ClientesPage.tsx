@@ -14,14 +14,14 @@ import { NewClienteModal } from '@/components/clientes/NewClienteModal'
 // ─── Avatar helpers ────────────────────────────────────────────────────────────
 
 const AVATAR_PALETTE = [
-  'bg-indigo-100 text-indigo-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-violet-100 text-violet-700',
-  'bg-amber-100 text-amber-700',
-  'bg-cyan-100 text-cyan-700',
-  'bg-rose-100 text-rose-700',
-  'bg-blue-100 text-blue-700',
-  'bg-orange-100 text-orange-700',
+  'bg-[rgba(99,102,241,0.20)] text-[#a5b4fc]',
+  'bg-[rgba(16,185,129,0.20)] text-[#6ee7b7]',
+  'bg-[rgba(139,92,246,0.20)] text-[#c4b5fd]',
+  'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]',
+  'bg-[rgba(6,182,212,0.20)] text-[#67e8f9]',
+  'bg-[rgba(244,63,94,0.20)] text-[#fda4af]',
+  'bg-[rgba(59,130,246,0.20)] text-[#93c5fd]',
+  'bg-[rgba(249,115,22,0.20)] text-[#fdba74]',
 ]
 
 function getAvatarClass(name: string) {
@@ -42,7 +42,7 @@ function getInitials(name: string) {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getStatusColor(status: string) {
-  return CLIENT_STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-slate-100 text-slate-600'
+  return CLIENT_STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)]'
 }
 
 function getSegmentLabel(value: string) {
@@ -60,16 +60,16 @@ function getNextExpiry(contratos: Contrato[] | undefined): string | null {
 
 function ClienteCardSkeleton() {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 animate-pulse">
+    <div className="bg-card rounded-xl p-4 animate-pulse" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-slate-200 shrink-0" />
+        <div className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.07)] shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-slate-200 rounded w-36" />
-          <div className="h-3 bg-slate-100 rounded w-52" />
+          <div className="h-4 bg-[rgba(255,255,255,0.07)] rounded w-36" />
+          <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-52" />
         </div>
         <div className="space-y-1.5 text-right">
-          <div className="h-3 bg-slate-100 rounded w-20 ml-auto" />
-          <div className="h-3 bg-slate-100 rounded w-16 ml-auto" />
+          <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-20 ml-auto" />
+          <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-16 ml-auto" />
         </div>
       </div>
     </div>
@@ -115,8 +115,8 @@ export function ClientesPage() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-800">Clientes</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Gerencie sua carteira de clientes ativos e histórico de contratos</p>
+          <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Clientes</h1>
+          <p className="text-sm text-[rgba(130,150,170,0.65)] mt-0.5">Gerencie sua carteira de clientes ativos e histórico de contratos</p>
         </div>
         <Button
           size="sm"
@@ -132,7 +132,7 @@ export function ClientesPage() {
       {/* ── Filters ── */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
           <Input
             placeholder="Buscar por nome ou empresa…"
             className="pl-8 h-9 text-sm"
@@ -142,7 +142,7 @@ export function ClientesPage() {
         </div>
 
         {/* Pill tabs — brand-consistent */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+        <div className="flex items-center gap-1 bg-[rgba(255,255,255,0.04)] p-1 rounded-lg">
           {STATUS_TABS.map(tab => {
             const count = tab.value === 'todos'
               ? (clientes?.length ?? 0)
@@ -154,13 +154,13 @@ export function ClientesPage() {
                 onClick={() => setStatusFilter(tab.value)}
                 className={cn(
                   'px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5',
-                  isActive ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  isActive ? 'bg-white text-[rgba(230,235,240,0.92)] shadow-sm' : 'text-[rgba(130,150,170,0.65)] hover:text-[rgba(215,225,235,0.85)]'
                 )}
               >
                 {tab.label}
                 <span className={cn(
                   'text-[10px] px-1.5 py-0.5 rounded-full font-semibold tabular-nums',
-                  isActive ? 'text-white' : 'bg-slate-200 text-slate-500'
+                  isActive ? 'text-white' : 'bg-[rgba(255,255,255,0.07)] text-[rgba(130,150,170,0.65)]'
                 )} style={isActive ? { backgroundColor: '#0089ac' } : {}}>
                   {count}
                 </span>
@@ -197,10 +197,10 @@ export function ClientesPage() {
             return (
               <div
                 key={cliente.id}
-                className={cn(
-                  'bg-white border rounded-xl p-4 cursor-pointer transition-all hover:shadow-md group',
-                  isConfirming ? 'border-red-200 bg-red-50' : 'border-slate-200 hover:border-slate-300'
-                )}
+                className="bg-card rounded-xl p-4 cursor-pointer transition-all group"
+                style={isConfirming
+                  ? { border: '1px solid rgba(239,68,68,0.30)', background: 'rgba(239,68,68,0.05)' }
+                  : { border: '1px solid rgba(255,255,255,0.07)' }}
                 onClick={() => { if (!isConfirming) navigate(`/clientes/${cliente.id}`) }}
               >
                 <div className="flex items-center gap-4">
@@ -216,12 +216,12 @@ export function ClientesPage() {
                   {/* Name + company */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-slate-800">{cliente.nome}</p>
+                      <p className="font-semibold text-[rgba(230,235,240,0.92)]">{cliente.nome}</p>
                       <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', getStatusColor(cliente.status))}>
                         {CLIENT_STATUS_OPTIONS.find(s => s.value === cliente.status)?.label}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500 truncate">
+                    <p className="text-sm text-[rgba(130,150,170,0.65)] truncate">
                       {cliente.empresa} · {getSegmentLabel(cliente.segmento)}
                     </p>
                   </div>
@@ -230,13 +230,13 @@ export function ClientesPage() {
                   {!isConfirming ? (
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="text-right">
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-[rgba(130,150,170,0.65)]">
                           {cliente.contratos?.length || 0} contrato{(cliente.contratos?.length || 0) !== 1 ? 's' : ''}
                         </p>
                         {nextExpiry && (
                           <div className={cn(
                             'flex items-center justify-end gap-1 text-xs mt-0.5',
-                            isExpiringSoon ? 'text-orange-600 font-medium' : 'text-slate-400'
+                            isExpiringSoon ? 'text-orange-600 font-medium' : 'text-[rgba(100,120,140,0.55)]'
                           )}>
                             {isExpiringSoon && <AlertCircle className="w-3 h-3" />}
                             {daysLeft === 0
@@ -249,7 +249,7 @@ export function ClientesPage() {
                       </div>
                       <button
                         onClick={e => { e.stopPropagation(); setDeleteConfirm(cliente.id) }}
-                        className="p-1.5 rounded-lg text-slate-300 hover:bg-red-50 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                        className="p-1.5 rounded-lg text-[rgba(80,100,120,0.50)] hover:bg-[rgba(239,68,68,0.12)] hover:text-[#f87171] transition-colors opacity-0 group-hover:opacity-100"
                         title="Excluir cliente"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -267,7 +267,7 @@ export function ClientesPage() {
                       </button>
                       <button
                         onClick={e => { e.stopPropagation(); setDeleteConfirm(null) }}
-                        className="text-xs px-2.5 py-1 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-md border border-slate-300 text-[rgba(150,165,180,0.70)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                       >
                         Cancelar
                       </button>

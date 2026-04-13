@@ -13,9 +13,9 @@ import { cn } from '@/lib/utils'
 import type { Parceiro } from '@/types'
 
 const PARCEIRO_STATUS = [
-  { value: 'ativo', label: 'Ativo', color: 'bg-green-100 text-green-700' },
-  { value: 'potencial', label: 'Potencial', color: 'bg-amber-100 text-amber-700' },
-  { value: 'inativo', label: 'Inativo', color: 'bg-slate-100 text-slate-500' },
+  { value: 'ativo', label: 'Ativo', color: 'bg-[rgba(16,185,129,0.15)] text-[#34d399]' },
+  { value: 'potencial', label: 'Potencial', color: 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]' },
+  { value: 'inativo', label: 'Inativo', color: 'bg-[rgba(255,255,255,0.04)] text-[rgba(130,150,170,0.65)]' },
 ]
 
 function useParceiroForm(initial?: Parceiro) {
@@ -110,13 +110,13 @@ export function ParceirosPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-slate-800">Parceiros</h1>
-        <Button size="sm" onClick={() => setShowNew(true)} className="bg-indigo-600 hover:bg-indigo-700">
+        <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Parceiros</h1>
+        <Button size="sm" onClick={() => setShowNew(true)} className="bg-primary hover:bg-primary/90">
           <Plus className="w-4 h-4 mr-1" /> Novo Parceiro
         </Button>
       </div>
 
-      {isLoading ? <div className="text-center text-slate-500 py-8">Carregando...</div> : (
+      {isLoading ? <div className="text-center text-[rgba(130,150,170,0.65)] py-8">Carregando...</div> : (
         <div className="grid grid-cols-2 gap-3">
           {parceiros?.map(parceiro => {
             const tipoInfo = PARCEIRO_TIPOS.find(t => t.value === parceiro.tipo)
@@ -126,12 +126,12 @@ export function ParceirosPage() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                        <Handshake className="w-4 h-4 text-indigo-600" />
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,137,172,0.20)' }}>
+                        <Handshake className="w-4 h-4 text-[#6bd0e7]" />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-800">{parceiro.nome}</p>
-                        <p className="text-xs text-slate-500">{tipoInfo?.label}</p>
+                        <p className="font-semibold text-[rgba(230,235,240,0.92)]">{parceiro.nome}</p>
+                        <p className="text-xs text-[rgba(130,150,170,0.65)]">{tipoInfo?.label}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -140,15 +140,15 @@ export function ParceirosPage() {
                           {statusInfo.label}
                         </span>
                       )}
-                      <button onClick={() => handleEdit(parceiro)} className="p-1 rounded hover:bg-slate-100 text-slate-400">
+                      <button onClick={() => handleEdit(parceiro)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-[rgba(100,120,140,0.55)]">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                  {parceiro.contato_nome && <p className="text-xs text-slate-600 mt-2">Contato: {parceiro.contato_nome}</p>}
-                  {parceiro.contato_email && <p className="text-xs text-slate-400">{parceiro.contato_email}</p>}
+                  {parceiro.contato_nome && <p className="text-xs text-[rgba(150,165,180,0.70)] mt-2">Contato: {parceiro.contato_nome}</p>}
+                  {parceiro.contato_email && <p className="text-xs text-[rgba(100,120,140,0.55)]">{parceiro.contato_email}</p>}
                   {parceiro.website && (
-                    <a href={parceiro.website} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-500 flex items-center gap-1 mt-1 hover:underline">
+                    <a href={parceiro.website} target="_blank" rel="noopener noreferrer" className="text-xs text-[#6bd0e7] flex items-center gap-1 mt-1 hover:underline">
                       <Globe className="w-3 h-3" /> {parceiro.website}
                     </a>
                   )}
@@ -156,7 +156,7 @@ export function ParceirosPage() {
               </Card>
             )
           })}
-          {!parceiros?.length && <div className="col-span-2 text-center text-slate-400 py-12">Nenhum parceiro cadastrado.</div>}
+          {!parceiros?.length && <div className="col-span-2 text-center text-[rgba(100,120,140,0.55)] py-12">Nenhum parceiro cadastrado.</div>}
         </div>
       )}
 
@@ -166,7 +166,7 @@ export function ParceirosPage() {
           <ParceiroForm f={newForm} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowNew(false)}>Cancelar</Button>
-            <Button onClick={handleCreate} disabled={!newForm.nome || createParceiro.isPending} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button onClick={handleCreate} disabled={!newForm.nome || createParceiro.isPending} className="bg-primary hover:bg-primary/90">
               {createParceiro.isPending ? 'Salvando...' : 'Cadastrar'}
             </Button>
           </DialogFooter>
@@ -179,7 +179,7 @@ export function ParceirosPage() {
           <ParceiroForm f={editForm} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditParceiro(null)}>Cancelar</Button>
-            <Button onClick={handleUpdate} disabled={!editForm.nome || updateParceiro.isPending} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button onClick={handleUpdate} disabled={!editForm.nome || updateParceiro.isPending} className="bg-primary hover:bg-primary/90">
               {updateParceiro.isPending ? 'Salvando...' : 'Salvar'}
             </Button>
           </DialogFooter>

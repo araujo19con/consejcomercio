@@ -29,7 +29,7 @@ export function LeadDetailPage() {
     if (lead) setEditing(lead)
   }, [lead])
 
-  if (!lead) return <div className="text-slate-500">Lead não encontrado.</div>
+  if (!lead) return <div className="text-[rgba(130,150,170,0.65)]">Lead não encontrado.</div>
 
   function handleSave() {
     if (!lead) return
@@ -40,17 +40,17 @@ export function LeadDetailPage() {
     <div className="max-w-4xl mx-auto">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-sm mb-5">
-        <button onClick={() => navigate('/leads')} className="text-slate-400 hover:text-slate-700 transition-colors flex items-center gap-1">
+        <button onClick={() => navigate('/leads')} className="text-[rgba(100,120,140,0.55)] hover:text-[rgba(215,225,235,0.85)] transition-colors flex items-center gap-1">
           <ArrowLeft className="w-3.5 h-3.5" /> Leads
         </button>
-        <span className="text-slate-300">/</span>
-        <span className="text-slate-700 font-medium truncate">{lead.nome}</span>
+        <span className="text-[rgba(80,100,120,0.50)]">/</span>
+        <span className="text-[rgba(215,225,235,0.85)] font-medium truncate">{lead.nome}</span>
       </div>
 
       <div className="flex items-center gap-3 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-slate-800">{lead.nome}</h1>
-          <p className="text-sm text-slate-500">{lead.empresa}</p>
+          <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">{lead.nome}</h1>
+          <p className="text-sm text-[rgba(130,150,170,0.65)]">{lead.empresa}</p>
         </div>
         <span className={cn('ml-auto text-xs font-medium px-2.5 py-1 rounded-full border', STAGE_COLORS[lead.status])}>
           {PIPELINE_STAGES.find(s => s.id === lead.status)?.label}
@@ -96,7 +96,7 @@ export function LeadDetailPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Origem</Label>
-                  <Input value={LEAD_SOURCE_LABELS[lead.origem] || lead.origem} disabled className="bg-slate-50" />
+                  <Input value={LEAD_SOURCE_LABELS[lead.origem] || lead.origem} disabled className="bg-background" />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Responsável</Label>
@@ -112,13 +112,13 @@ export function LeadDetailPage() {
                 <Textarea value={editing.notas || ''} onChange={e => setEditing(p => ({ ...p, notas: e.target.value }))} rows={3} />
               </div>
               {lead.motivo_perda && (
-                <div className="p-3 bg-red-50 rounded-lg border border-red-100">
-                  <p className="text-xs font-medium text-red-700">Motivo da perda:</p>
-                  <p className="text-sm text-red-800 mt-0.5">{lead.motivo_perda}</p>
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.20)' }}>
+                  <p className="text-xs font-medium" style={{ color: 'rgba(248,113,113,0.85)' }}>Motivo da perda:</p>
+                  <p className="text-sm mt-0.5" style={{ color: 'rgba(248,113,113,0.75)' }}>{lead.motivo_perda}</p>
                 </div>
               )}
               <div className="flex justify-end">
-                <Button onClick={handleSave} disabled={updateLead.isPending} className="bg-indigo-600 hover:bg-indigo-700">
+                <Button onClick={handleSave} disabled={updateLead.isPending} className="bg-primary hover:bg-primary/90">
                   {updateLead.isPending ? 'Salvando...' : 'Salvar'}
                 </Button>
               </div>
@@ -156,7 +156,7 @@ export function LeadDetailPage() {
                 />
               </div>
               <div className="flex justify-end mt-4">
-                <Button onClick={handleSave} disabled={updateLead.isPending} className="bg-indigo-600 hover:bg-indigo-700">
+                <Button onClick={handleSave} disabled={updateLead.isPending} className="bg-primary hover:bg-primary/90">
                   Salvar
                 </Button>
               </div>

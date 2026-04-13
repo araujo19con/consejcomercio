@@ -51,7 +51,7 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
 
   if (phase === 'saving') {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
+      <div className="flex flex-col items-center justify-center py-16 gap-3 text-[rgba(130,150,170,0.65)]">
         <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
         <p className="text-sm">Salvando diagnóstico...</p>
       </div>
@@ -60,10 +60,10 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
 
   if (phase === 'analyzing') {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
+      <div className="flex flex-col items-center justify-center py-16 gap-3 text-[rgba(130,150,170,0.65)]">
         <Sparkles className="w-8 h-8 text-indigo-500 animate-pulse" />
-        <p className="text-sm font-medium text-slate-700">Analisando com IA...</p>
-        <p className="text-xs text-slate-400">Identificando necessidades e serviços adequados</p>
+        <p className="text-sm font-medium text-[rgba(215,225,235,0.85)]">Analisando com IA...</p>
+        <p className="text-xs text-[rgba(100,120,140,0.55)]">Identificando necessidades e serviços adequados</p>
       </div>
     )
   }
@@ -97,7 +97,7 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
                     ? 'bg-indigo-600 text-white'
                     : i < step
                     ? 'bg-indigo-200 text-indigo-700'
-                    : 'bg-slate-100 text-slate-400'
+                    : 'bg-[rgba(255,255,255,0.04)] text-[rgba(100,120,140,0.55)]'
                 )}
                 title={s.title}
               >
@@ -105,7 +105,7 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
               </button>
             ))}
           </div>
-          <span className="text-xs text-slate-500">{step + 1} / {SECTIONS.length}</span>
+          <span className="text-xs text-[rgba(130,150,170,0.65)]">{step + 1} / {SECTIONS.length}</span>
         </div>
         <Progress value={progress} className="h-1.5" />
       </div>
@@ -117,7 +117,7 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
         <CardContent className="space-y-6">
           {section.questions.map((question) => (
             <div key={String(question.key)}>
-              <p className="text-sm font-medium text-slate-800 mb-3">{question.label}</p>
+              <p className="text-sm font-medium text-[rgba(230,235,240,0.92)] mb-3">{question.label}</p>
               <div className="space-y-2">
                 {question.options.map((option) => (
                   <button
@@ -127,8 +127,8 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
                     className={cn(
                       'w-full text-left px-3.5 py-2.5 rounded-lg border text-sm transition-colors',
                       answers[question.key] === option.value
-                        ? 'bg-indigo-50 border-indigo-400 text-indigo-800 font-medium'
-                        : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/50'
+                        ? 'bg-[rgba(0,137,172,0.15)] border-primary text-[#6bd0e7] font-medium'
+                        : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.10)] text-[rgba(215,225,235,0.85)] hover:border-primary/40 hover:bg-primary/10'
                     )}
                   >
                     {option.label}
@@ -152,7 +152,7 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
         {step < SECTIONS.length - 1 ? (
           <Button
             onClick={() => setStep(s => s + 1)}
-            className="gap-1.5 bg-indigo-600 hover:bg-indigo-700"
+            className="gap-1.5 bg-primary hover:bg-primary/90"
           >
             Próximo <ArrowRight className="w-4 h-4" />
           </Button>

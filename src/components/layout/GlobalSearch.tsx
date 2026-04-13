@@ -19,15 +19,15 @@ interface ResultItem {
   category: string
 }
 
-const CATEGORY_META: Record<string, { icon: React.FC<{ className?: string }>; color: string; bg: string }> = {
-  Leads:       { icon: KanbanSquare, color: 'text-indigo-600',  bg: 'bg-indigo-50'   },
-  Clientes:    { icon: Briefcase,    color: 'text-emerald-600', bg: 'bg-emerald-50'  },
-  Contratos:   { icon: FileText,     color: 'text-amber-600',   bg: 'bg-amber-50'    },
-  Demandas:    { icon: Inbox,        color: 'text-violet-600',  bg: 'bg-violet-50'   },
-  Reuniões:    { icon: Calendar,     color: 'text-blue-600',    bg: 'bg-blue-50'     },
-  Indicações:  { icon: Share2,       color: 'text-rose-600',    bg: 'bg-rose-50'     },
-  Oportunidades: { icon: TrendingUp, color: 'text-orange-600',  bg: 'bg-orange-50'   },
-  Parceiros:   { icon: Handshake,    color: 'text-cyan-600',    bg: 'bg-cyan-50'     },
+const CATEGORY_META: Record<string, { icon: React.FC<{ className?: string }>; color: string; bgStyle: string }> = {
+  Leads:         { icon: KanbanSquare, color: 'text-indigo-400',  bgStyle: 'rgba(99,102,241,0.15)'   },
+  Clientes:      { icon: Briefcase,    color: 'text-emerald-400', bgStyle: 'rgba(16,185,129,0.15)'   },
+  Contratos:     { icon: FileText,     color: 'text-amber-400',   bgStyle: 'rgba(245,158,11,0.15)'   },
+  Demandas:      { icon: Inbox,        color: 'text-violet-400',  bgStyle: 'rgba(139,92,246,0.15)'   },
+  'Reuniões':    { icon: Calendar,     color: 'text-blue-400',    bgStyle: 'rgba(59,130,246,0.15)'   },
+  'Indicações':  { icon: Share2,       color: 'text-rose-400',    bgStyle: 'rgba(244,63,94,0.15)'    },
+  Oportunidades: { icon: TrendingUp,   color: 'text-orange-400',  bgStyle: 'rgba(249,115,22,0.15)'   },
+  Parceiros:     { icon: Handshake,    color: 'text-cyan-400',    bgStyle: 'rgba(6,182,212,0.15)'    },
 }
 
 function highlight(text: string, query: string) {
@@ -37,7 +37,7 @@ function highlight(text: string, query: string) {
   return (
     <span>
       {text.slice(0, idx)}
-      <mark className="bg-yellow-100 text-yellow-900 rounded px-0.5 font-semibold not-italic">
+      <mark className="rounded px-0.5 font-semibold not-italic" style={{ background: 'rgba(0,137,172,0.30)', color: '#6bd0e7' }}>
         {text.slice(idx, idx + query.length)}
       </mark>
       {text.slice(idx + query.length)}
@@ -151,21 +151,21 @@ export function GlobalSearch() {
       onClick={() => setOpen(false)}
     >
       <div
-        className="w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+        className="w-full max-w-xl rounded-2xl overflow-hidden" style={{ background: '#0d1929', border: '1px solid rgba(107,208,231,0.15)', boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}
         onClick={e => e.stopPropagation()}
         onKeyDown={onResultKeydown}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-100">
-          <Search className="w-4 h-4 text-slate-400 shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+          <Search className="w-4 h-4 text-[rgba(100,120,140,0.55)] shrink-0" />
           <input
             ref={inputRef}
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Buscar leads, clientes, contratos, demandas…"
-            className="flex-1 text-sm text-slate-800 placeholder-slate-400 outline-none bg-transparent"
+            className="flex-1 text-sm text-[rgba(230,235,240,0.92)] placeholder-slate-400 outline-none bg-transparent"
           />
-          <kbd className="text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded font-mono">Esc</kbd>
+          <kbd className="text-xs text-[rgba(100,120,140,0.55)] bg-[rgba(255,255,255,0.04)] px-1.5 py-0.5 rounded font-mono">Esc</kbd>
         </div>
 
         {/* Results */}
@@ -173,13 +173,13 @@ export function GlobalSearch() {
           {!q && (
             <div className="py-10 text-center">
               <Search className="w-8 h-8 text-slate-200 mx-auto mb-2" />
-              <p className="text-sm text-slate-400">Digite para buscar em todo o CRM</p>
+              <p className="text-sm text-[rgba(100,120,140,0.55)]">Digite para buscar em todo o CRM</p>
             </div>
           )}
 
           {q && results.length === 0 && (
             <div className="py-10 text-center">
-              <p className="text-sm text-slate-400">Nenhum resultado para <strong>"{query}"</strong></p>
+              <p className="text-sm text-[rgba(100,120,140,0.55)]">Nenhum resultado para <strong>"{query}"</strong></p>
             </div>
           )}
 
@@ -188,11 +188,11 @@ export function GlobalSearch() {
             const Icon = meta.icon
             return (
               <div key={category}>
-                <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border-b border-slate-100">
-                  <div className={cn('w-5 h-5 rounded flex items-center justify-center', meta.bg)}>
+                <div className="flex items-center gap-2 px-4 py-2 bg-background border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                  <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: meta.bgStyle }}>
                     <Icon className={cn('w-3 h-3', meta.color)} />
                   </div>
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{category}</span>
+                  <span className="text-xs font-semibold text-[rgba(130,150,170,0.65)] uppercase tracking-wider">{category}</span>
                 </div>
                 {items.map(item => {
                   const globalIdx = flat.indexOf(item)
@@ -203,21 +203,21 @@ export function GlobalSearch() {
                       onClick={() => go(item.path)}
                       onMouseEnter={() => setActiveIdx(globalIdx)}
                       className={cn(
-                        'w-full flex items-center justify-between px-4 py-3 text-left transition-colors border-b border-slate-50 last:border-0',
-                        isActive ? 'bg-slate-50' : 'hover:bg-slate-50'
+                        'w-full flex items-center justify-between px-4 py-3 text-left transition-colors border-b last:border-0',
+                        isActive ? 'bg-background' : 'hover:bg-background'
                       )}
                     >
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-800 truncate">
+                        <p className="text-sm font-medium text-[rgba(230,235,240,0.92)] truncate">
                           {highlight(item.label, query)}
                         </p>
                         {item.sublabel && (
-                          <p className="text-xs text-slate-400 truncate">
+                          <p className="text-xs text-[rgba(100,120,140,0.55)] truncate">
                             {highlight(item.sublabel, query)}
                           </p>
                         )}
                       </div>
-                      {isActive && <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-2" />}
+                      {isActive && <ArrowRight className="w-3.5 h-3.5 text-[rgba(100,120,140,0.55)] shrink-0 ml-2" />}
                     </button>
                   )
                 })}
@@ -227,15 +227,15 @@ export function GlobalSearch() {
         </div>
 
         {/* Footer hints */}
-        <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex items-center gap-4">
-          <span className="text-xs text-slate-400 flex items-center gap-1">
-            <kbd className="bg-white border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">↑↓</kbd> navegar
+        <div className="px-4 py-2.5 border-t border-slate-100 bg-background flex items-center gap-4">
+          <span className="text-xs text-[rgba(100,120,140,0.55)] flex items-center gap-1">
+            <kbd className="bg-card border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">↑↓</kbd> navegar
           </span>
-          <span className="text-xs text-slate-400 flex items-center gap-1">
-            <kbd className="bg-white border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">Enter</kbd> abrir
+          <span className="text-xs text-[rgba(100,120,140,0.55)] flex items-center gap-1">
+            <kbd className="bg-card border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">Enter</kbd> abrir
           </span>
-          <span className="text-xs text-slate-400 flex items-center gap-1">
-            <kbd className="bg-white border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">Esc</kbd> fechar
+          <span className="text-xs text-[rgba(100,120,140,0.55)] flex items-center gap-1">
+            <kbd className="bg-card border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">Esc</kbd> fechar
           </span>
         </div>
       </div>

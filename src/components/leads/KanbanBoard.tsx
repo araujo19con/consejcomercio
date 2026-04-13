@@ -68,7 +68,7 @@ export function KanbanBoard({ leads }: Props) {
       <div className="flex items-center justify-between mb-3 gap-3">
         <button
           onClick={() => setShowClosed(v => !v)}
-          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-[rgba(100,120,140,0.55)] hover:text-[rgba(150,165,180,0.70)] transition-colors"
         >
           {showClosed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
           {showClosed ? 'Ocultar encerrados' : 'Ver encerrados'}
@@ -80,11 +80,11 @@ export function KanbanBoard({ leads }: Props) {
 
       {/* Drag hint — shown once, dismissible */}
       {showDragHint && (
-        <div className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-xl px-4 py-2.5 mb-3">
-          <span className="text-xs text-blue-700">💡 Arraste os cards para mover um lead entre as etapas do pipeline</span>
+        <div className="flex items-center justify-between rounded-xl px-4 py-2.5 mb-3" style={{ background: 'rgba(0,137,172,0.06)', border: '1px solid rgba(0,137,172,0.20)' }}>
+          <span className="text-xs" style={{ color: 'rgba(107,208,231,0.85)' }}>💡 Arraste os cards para mover um lead entre as etapas do pipeline</span>
           <button
             onClick={() => { setShowDragHint(false); localStorage.setItem('consej_kanban_hint', '1') }}
-            className="p-0.5 text-blue-400 hover:text-blue-700 ml-3 shrink-0"
+            className="p-0.5 ml-3 shrink-0" style={{ color: 'rgba(107,208,231,0.50)' }}
             aria-label="Fechar dica"
           >
             <X className="w-3.5 h-3.5" />
