@@ -34,7 +34,7 @@ export function LeadDetailPage() {
   function handleSave() {
     if (!lead) return
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { diagnostico, ...fields } = editing as Lead
+    const { diagnostico, id: _id, ...fields } = editing as Lead
     updateLead.mutate({ id: lead.id, ...fields })
   }
 
