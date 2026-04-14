@@ -8,7 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { ArrowLeft, Plus, AlertCircle, Trash2 } from 'lucide-react'
+import { ArrowLeft, Plus, AlertCircle, Trash2, Star, Shield, UserCheck } from 'lucide-react'
+import { useUpdateClienteNPS } from '@/hooks/useClientes'
+import { useUpdateContrato } from '@/hooks/useContratos'
 import { CONTRACT_TYPES, PRICING_MODELS, CLIENT_STATUS_OPTIONS, RM_STATUS_OPTIONS, OPORTUNIDADE_STATUS, SERVICE_AREAS } from '@/lib/constants'
 
 const CONTRACT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -31,7 +33,11 @@ export function ClienteDetailPage() {
   const { data: todasOportunidades } = useOportunidades()
   const [showNewContrato, setShowNewContrato] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingNps, setEditingNps] = useState(false)
+  const [npsInput, setNpsInput] = useState<number>(cliente?.nps_score ?? 0)
   const deleteContrato = useDeleteContrato()
+  const updateNps = useUpdateClienteNPS()
+  const updateContrato = useUpdateContrato()
 
   const indicacoes = todasIndicacoes?.filter(i => i.indicante_cliente_id === id) || []
   const oportunidades = todasOportunidades?.filter(o => o.cliente_id === id) || []
@@ -73,27 +79,93 @@ export function ClienteDetailPage() {
         </TabsList>
 
         <TabsContent value="dados">
-          <Card>
-            <CardContent className="p-5 grid grid-cols-2 gap-4">
-              {[
-                { label: 'Telefone', value: cliente.telefone },
-                { label: 'Email', value: cliente.email },
-                { label: 'Segmento', value: cliente.segmento?.replace(/_/g, ' ') },
-                { label: 'Cliente desde', value: formatDate(cliente.created_at) },
-              ].map(({ label, value }) => (
-                <div key={label}>
-                  <p className="text-xs text-[rgba(130,150,170,0.65)]">{label}</p>
-                  <p className="text-sm font-medium text-[rgba(230,235,240,0.92)]">{value || '—'}</p>
+          <div className="space-y-3">
+            <Card>
+              <CardContent className="p-5 grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Telefone', value: cliente.telefone },
+                  { label: 'Email', value: cliente.email },
+                  { label: 'Segmento', value: cliente.segmento?.replace(/_/g, ' ') },
+                  { label: 'Cliente desde', value: formatDate(cliente.created_at) },
+                ].map(({ label, value }) => (
+                  <div key={label}>
+                    <p className="text-xs text-[rgba(130,150,170,0.65)]">{label}</p>
+                    <p className="text-sm font-medium text-[rgba(230,235,240,0.92)]">{value || '—'}</p>
+                  </div>
+                ))}
+                {(cliente as any).indicado_por_cliente && (
+                  <div>
+                    <p className="text-xs text-[rgba(130,150,170,0.65)]">Indicado por</p>
+                    <p className="text-sm font-medium text-violet-400 flex items-center gap-1">
+                      <UserCheck className="w-3.5 h-3.5" />
+                      {(cliente as any).indicado_por_cliente.nome}
+                      <span className="text-[rgba(100,120,140,0.55)] font-normal text-xs">· {(cliente as any).indicado_por_cliente.empresa}</span>
+                    </p>
+                  </div>
+                )}
+                {cliente.notas && (
+                  <div className="col-span-2">
+                    <p className="text-xs text-[rgba(130,150,170,0.65)]">Observações</p>
+                    <p className="text-sm text-[rgba(215,225,235,0.85)] mt-0.5">{cliente.notas}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* NPS Widget */}
+            <Card>
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amber-400" />
+                    <p className="text-sm font-semibold text-[rgba(215,225,235,0.85)]">NPS do Cliente</p>
+                  </div>
+                  {!editingNps ? (
+                    <button onClick={() => { setNpsInput(cliente.nps_score ?? 0); setEditingNps(true) }} className="text-xs text-[rgba(100,120,140,0.55)] hover:text-[rgba(150,165,180,0.70)]">
+                      {cliente.nps_score !== null && cliente.nps_score !== undefined ? 'Atualizar' : 'Registrar'}
+                    </button>
+                  ) : (
+                    <div className="flex gap-1.5">
+                      <button onClick={() => { updateNps.mutate({ id: id!, nps_score: npsInput }); setEditingNps(false) }} className="text-xs px-2 py-1 rounded bg-[#0089ac] text-white">Salvar</button>
+                      <button onClick={() => setEditingNps(false)} className="text-xs px-2 py-1 rounded border border-[rgba(255,255,255,0.10)] text-[rgba(130,150,170,0.65)]">Cancelar</button>
+                    </div>
+                  )}
                 </div>
-              ))}
-              {cliente.notas && (
-                <div className="col-span-2">
-                  <p className="text-xs text-[rgba(130,150,170,0.65)]">Observações</p>
-                  <p className="text-sm text-[rgba(215,225,235,0.85)] mt-0.5">{cliente.notas}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                {editingNps ? (
+                  <div className="flex gap-1.5 flex-wrap">
+                    {Array.from({ length: 11 }, (_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setNpsInput(i)}
+                        className={cn(
+                          'w-9 h-9 rounded-lg text-sm font-bold border transition-all',
+                          npsInput === i
+                            ? (i >= 9 ? 'bg-emerald-600 border-emerald-500 text-white' : i >= 7 ? 'bg-amber-500 border-amber-400 text-white' : 'bg-red-600 border-red-500 text-white')
+                            : 'border-[rgba(255,255,255,0.10)] text-[rgba(150,165,180,0.60)] hover:border-[rgba(255,255,255,0.20)]'
+                        )}
+                      >{i}</button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    {cliente.nps_score !== null && cliente.nps_score !== undefined ? (
+                      <>
+                        <span className={cn('text-4xl font-bold', cliente.nps_score >= 9 ? 'text-emerald-400' : cliente.nps_score >= 7 ? 'text-amber-400' : 'text-red-400')}>{cliente.nps_score}</span>
+                        <div>
+                          <p className={cn('text-sm font-semibold', cliente.nps_score >= 9 ? 'text-emerald-400' : cliente.nps_score >= 7 ? 'text-amber-400' : 'text-red-400')}>
+                            {cliente.nps_score >= 9 ? '🟢 Promotor — convidar para indicar' : cliente.nps_score >= 7 ? '🟡 Neutro — aprofundar relacionamento' : '🔴 Detrator — check-in urgente'}
+                          </p>
+                          {cliente.nps_updated_at && <p className="text-xs text-[rgba(100,120,140,0.45)]">Atualizado em {formatDate(cliente.nps_updated_at)}</p>}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-[rgba(100,120,140,0.55)]">Nenhum NPS registrado ainda. Clique em "Registrar" para avaliar.</p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="contratos">
@@ -117,9 +189,16 @@ export function ClienteDetailPage() {
                     {/* Header row */}
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-[rgba(230,235,240,0.92)]">
-                          {CONTRACT_TYPES.find(t => t.value === contrato.tipo)?.label} — {PRICING_MODELS.find(m => m.value === contrato.modelo_precificacao)?.label}
-                        </p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold text-[rgba(230,235,240,0.92)]">
+                            {CONTRACT_TYPES.find(t => t.value === contrato.tipo)?.label} — {PRICING_MODELS.find(m => m.value === contrato.modelo_precificacao)?.label}
+                          </p>
+                          {contrato.caso_manifesto && (
+                            <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25">
+                              <Shield className="w-3 h-3" /> Caso Manifesto
+                            </span>
+                          )}
+                        </div>
                         <div className="flex gap-1.5 mt-1.5 flex-wrap">
                           {contrato.areas_direito?.map(a => (
                             <span key={a} className="text-xs bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] px-2 py-0.5 rounded-full border border-[rgba(255,255,255,0.06)]">
@@ -145,13 +224,22 @@ export function ClienteDetailPage() {
                               </button>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => setDeletingId(contrato.id)}
-                              className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-0.5 rounded"
-                              title="Excluir contrato"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => updateContrato.mutate({ id: contrato.id, caso_manifesto: !contrato.caso_manifesto })}
+                                className={cn('transition-colors p-0.5 rounded', contrato.caso_manifesto ? 'text-amber-400' : 'text-[rgba(100,120,140,0.40)] hover:text-amber-400')}
+                                title={contrato.caso_manifesto ? 'Remover Caso Manifesto' : 'Marcar como Caso Manifesto'}
+                              >
+                                <Shield className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => setDeletingId(contrato.id)}
+                                className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-0.5 rounded"
+                                title="Excluir contrato"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           )}
                         </div>
                         {rmInfo && <span className={cn('text-xs px-1.5 py-0.5 rounded border', rmInfo.color)}>RM: {rmInfo.label}</span>}

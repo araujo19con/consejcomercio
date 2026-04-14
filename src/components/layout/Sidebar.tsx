@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, KanbanSquare, Stethoscope, Users, FileText,
   Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings,
-  LogOut, MessageSquare, CalendarDays, Sparkles, Search, BarChart2, Map, Upload,
+  LogOut, MessageSquare, CalendarDays, Sparkles, Search, BarChart2, Map, Upload, GraduationCap,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useMeuPerfil } from '@/hooks/usePerfis'
@@ -38,8 +38,9 @@ const NAV_GROUPS: { label?: string; items: { to: string; label: string; icon: Re
   {
     label: 'CRESCIMENTO',
     items: [
-      { to: '/indicacoes', label: 'Indicações', icon: Share2    },
-      { to: '/parceiros',  label: 'Parceiros',  icon: Handshake },
+      { to: '/indicacoes',   label: 'Indicações',   icon: Share2         },
+      { to: '/parceiros',    label: 'Parceiros',    icon: Handshake      },
+      { to: '/pos-juniors',  label: 'Pós-Juniors',  icon: GraduationCap  },
     ],
   },
   {

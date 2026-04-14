@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useClientes, useDeleteCliente } from '@/hooks/useClientes'
+import { useIndicacoes } from '@/hooks/useIndicacoes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -20,6 +21,31 @@ const HEALTH_STYLES: Record<HealthLevel, { dot: string; label: string }> = {
   yellow: { dot: 'bg-amber-400',   label: 'text-amber-400'   },
   red:    { dot: 'bg-red-500',     label: 'text-red-400'     },
   gray:   { dot: 'bg-slate-500',   label: 'text-[rgba(100,120,140,0.55)]' },
+}
+
+// ─── Nível de Pertencimento ───────────────────────────────────────────────────
+
+type NivelPertencimento = 1 | 2 | 3 | 4 | 5
+const NIVEL_LABELS: Record<NivelPertencimento, { label: string; color: string }> = {
+  1: { label: 'Curioso',           color: 'text-slate-400'   },
+  2: { label: 'Interessado',       color: 'text-sky-400'     },
+  3: { label: 'Parceiro Ativo',    color: 'text-blue-400'    },
+  4: { label: 'Defensor',          color: 'text-violet-400'  },
+  5: { label: 'Construtor',        color: 'text-amber-400'   },
+}
+
+function getNivelPertencimento(cliente: Cliente, referralsCount: number): NivelPertencimento {
+  const contratos = cliente.contratos || []
+  const hasActive = contratos.some(c => c.status === 'ativo')
+  const hasAny    = contratos.length > 0
+  if (!hasAny) return 1
+  if (!hasActive) return 2
+  if (referralsCount === 0) return 3
+  // level 5: active 12+ months + referrals + NPS ≥ 9
+  const oldest = contratos.filter(c => c.data_inicio).sort((a, b) => new Date(a.data_inicio!).getTime() - new Date(b.data_inicio!).getTime())[0]
+  const monthsActive = oldest ? Math.floor((Date.now() - new Date(oldest.data_inicio!).getTime()) / (1000 * 60 * 60 * 24 * 30)) : 0
+  if (monthsActive >= 12 && referralsCount >= 1 && (cliente.nps_score ?? 0) >= 9) return 5
+  return 4
 }
 
 function getClientHealth(cliente: Cliente): { level: HealthLevel; text: string } {
@@ -115,6 +141,7 @@ const STATUS_TABS = [
 export function ClientesPage() {
   const navigate   = useNavigate()
   const { data: clientes, isLoading } = useClientes()
+  const { data: indicacoes = [] }     = useIndicacoes()
   const deleteCliente = useDeleteCliente()
 
   const [search, setSearch]             = useState('')
@@ -220,6 +247,9 @@ export function ClientesPage() {
             const isConfirming   = deleteConfirm === cliente.id
             const health         = getClientHealth(cliente)
             const hs             = HEALTH_STYLES[health.level]
+            const refCount       = indicacoes.filter(i => i.indicante_cliente_id === cliente.id).length
+            const nivel          = getNivelPertencimento(cliente, refCount)
+            const nivelInfo      = NIVEL_LABELS[nivel]
 
             return (
               <div
@@ -262,6 +292,14 @@ export function ClientesPage() {
                         <span className={cn('text-xs font-medium hidden sm:block', hs.label)}>{health.text}</span>
                       </div>
                       <div className="text-right">
+                        <div className="flex items-center justify-end gap-2 mb-0.5">
+                          <span className={cn('text-[10px] font-medium', nivelInfo.color)}>Nv.{nivel} {nivelInfo.label}</span>
+                          {cliente.nps_score !== null && cliente.nps_score !== undefined && (
+                            <span className={cn('text-[10px] font-bold px-1.5 py-0.5 rounded', cliente.nps_score >= 9 ? 'bg-emerald-500/15 text-emerald-400' : cliente.nps_score >= 7 ? 'bg-amber-500/15 text-amber-400' : 'bg-red-500/15 text-red-400')}>
+                              NPS {cliente.nps_score}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-[rgba(130,150,170,0.65)]">
                           {cliente.contratos?.length || 0} contrato{(cliente.contratos?.length || 0) !== 1 ? 's' : ''}
                         </p>

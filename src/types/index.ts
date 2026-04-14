@@ -59,9 +59,13 @@ export interface Cliente {
   status: string
   estado?: string | null
   notas?: string | null
+  nps_score?: number | null
+  nps_updated_at?: string | null
+  indicado_por_cliente_id?: string | null
   created_at: string
   updated_at: string
   contratos?: Contrato[]
+  indicado_por_cliente?: Pick<Cliente, 'id' | 'nome' | 'empresa'> | null
 }
 
 export interface Contrato {
@@ -80,9 +84,28 @@ export interface Contrato {
   observacoes_demanda?: string | null
   observacoes_vp?: string | null
   responsavel_id?: string | null
+  caso_manifesto?: boolean
+  caso_manifesto_descricao?: string | null
+  valor_protegido?: number | null
   created_at: string
   updated_at: string
   cliente?: Cliente
+}
+
+export interface PosJunior {
+  id: string
+  nome: string
+  email?: string | null
+  telefone?: string | null
+  empresa?: string | null
+  cargo?: string | null
+  area_atuacao?: string | null
+  anos_consej?: number | null
+  semestre_saida?: string | null
+  disponivel_mentoria: boolean
+  linkedin?: string | null
+  notas?: string | null
+  created_at: string
 }
 
 export interface Demanda {

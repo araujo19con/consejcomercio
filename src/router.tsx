@@ -22,6 +22,7 @@ import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { MapaPage } from '@/pages/MapaPage'
 import { ImportarPage } from '@/pages/ImportarPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
+import { PosJuniorsPage } from '@/pages/PosJuniorsPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -50,6 +51,7 @@ export const router = createBrowserRouter([
       { path: 'auditoria', element: <AuditoriaPage /> },
       { path: 'configuracoes', element: <ConfiguracoesPage /> },
       { path: 'importar', element: <ImportarPage /> },
+      { path: 'pos-juniors', element: <PosJuniorsPage /> },
       { path: 'perfil', element: <PerfilPage /> },
     ],
   },

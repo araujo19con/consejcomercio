@@ -37,5 +37,9 @@ export const QUERY_KEYS = {
     all: ['audit_logs'] as const,
     byEntity: (tabela: string, id: string) => ['audit_logs', tabela, id] as const,
   },
+  pos_juniors: {
+    all: ['pos_juniors'] as const,
+    byId: (id: string) => ['pos_juniors', id] as const,
+  },
   dashboard: ['dashboard'] as const,
 }

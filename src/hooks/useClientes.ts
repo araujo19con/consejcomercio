@@ -10,7 +10,7 @@ export function useClientes() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('clientes')
-        .select('*, contratos(*)')
+        .select('*, contratos(*), indicado_por_cliente:indicado_por_cliente_id(id,nome,empresa)')
         .order('created_at', { ascending: false })
       if (error) throw error
       return data as Cliente[]
@@ -24,13 +24,35 @@ export function useCliente(id: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('clientes')
-        .select('*, contratos(*)')
+        .select('*, contratos(*), indicado_por_cliente:indicado_por_cliente_id(id,nome,empresa)')
         .eq('id', id)
         .single()
       if (error) throw error
       return data as Cliente
     },
     enabled: !!id,
+  })
+}
+
+export function useUpdateClienteNPS() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, nps_score }: { id: string; nps_score: number }) => {
+      const { data, error } = await supabase
+        .from('clientes')
+        .update({ nps_score, nps_updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single()
+      if (error) throw error
+      return data as Cliente
+    },
+    onSuccess: (cliente) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.clientes.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.clientes.byId(cliente.id) })
+      toast.success('NPS atualizado!')
+    },
+    onError: () => toast.error('Erro ao salvar NPS'),
   })
 }
 
