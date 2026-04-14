@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useClientes, useDeleteCliente } from '@/hooks/useClientes'
 import { useIndicacoes } from '@/hooks/useIndicacoes'
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { EmptyState } from '@/components/ui/empty-state'
 import { CLIENT_STATUS_OPTIONS, SEGMENTS } from '@/lib/constants'
 import { getDaysUntilExpiry } from '@/lib/utils'
-import { Search, Briefcase, AlertCircle, Plus, Trash2 } from 'lucide-react'
+import { Search, Briefcase, AlertCircle, Plus, Trash2, ArrowUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Cliente, Contrato } from '@/types'
 import { NewClienteModal } from '@/components/clientes/NewClienteModal'
@@ -136,6 +136,30 @@ const STATUS_TABS = [
   { value: 'encerrado',   label: 'Encerrados' },
 ]
 
+// ─── Health filter ────────────────────────────────────────────────────────────
+
+type HealthFilter = 'todos' | 'green' | 'yellow' | 'red' | 'gray'
+
+const HEALTH_FILTER_TABS: { value: HealthFilter; label: string; dot: string; text: string }[] = [
+  { value: 'todos',  label: 'Todos',           dot: '',               text: 'rgba(130,150,170,0.65)' },
+  { value: 'green',  label: 'Saudável',         dot: '#10b981',        text: '#34d399' },
+  { value: 'yellow', label: 'Atenção',          dot: '#f59e0b',        text: '#fbbf24' },
+  { value: 'red',    label: 'Crítico',          dot: '#ef4444',        text: '#f87171' },
+  { value: 'gray',   label: 'Sem contrato',     dot: '#64748b',        text: 'rgba(130,150,170,0.65)' },
+]
+
+// ─── Sort options ─────────────────────────────────────────────────────────────
+
+type ClienteSort = 'padrao' | 'vencimento' | 'nps' | 'nivel' | 'contratos'
+
+const SORT_OPTIONS: { value: ClienteSort; label: string }[] = [
+  { value: 'padrao',     label: 'Padrão (mais recente)' },
+  { value: 'vencimento', label: 'Vencimento (mais urgente)' },
+  { value: 'nps',        label: 'NPS (maior → menor)' },
+  { value: 'nivel',      label: 'Nível de Pertencimento ↓' },
+  { value: 'contratos',  label: 'Qtd. de contratos ↓' },
+]
+
 // ─── Tipo de serviço filter ───────────────────────────────────────────────────
 
 type TipoServico = 'todos' | 'assessoria' | 'consultoria' | 'ambos' | 'sem_contrato'
@@ -167,18 +191,49 @@ export function ClientesPage() {
   const { data: indicacoes = [] }     = useIndicacoes()
   const deleteCliente = useDeleteCliente()
 
-  const [search, setSearch]             = useState('')
-  const [statusFilter, setStatusFilter] = useState('todos')
-  const [tipoFilter, setTipoFilter]     = useState<TipoServico>('todos')
-  const [showNew, setShowNew]           = useState(false)
+  const [search, setSearch]               = useState('')
+  const [statusFilter, setStatusFilter]   = useState('todos')
+  const [tipoFilter, setTipoFilter]       = useState<TipoServico>('todos')
+  const [healthFilter, setHealthFilter]   = useState<HealthFilter>('todos')
+  const [segmentoFilter, setSegmentoFilter] = useState('todos')
+  const [sortBy, setSortBy]               = useState<ClienteSort>('padrao')
+  const [showNew, setShowNew]             = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
-  const filtered = clientes?.filter(c => {
-    const matchSearch = !search || c.nome.toLowerCase().includes(search.toLowerCase()) || c.empresa.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = statusFilter === 'todos' || c.status === statusFilter
-    const matchTipo   = tipoFilter === 'todos' || getTipoServico(c) === tipoFilter
-    return matchSearch && matchStatus && matchTipo
-  }) || []
+  const filtered = useMemo(() => {
+    let list = clientes ?? []
+    if (search)
+      list = list.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()) || c.empresa.toLowerCase().includes(search.toLowerCase()))
+    if (statusFilter !== 'todos')
+      list = list.filter(c => c.status === statusFilter)
+    if (tipoFilter !== 'todos')
+      list = list.filter(c => getTipoServico(c) === tipoFilter)
+    if (healthFilter !== 'todos')
+      list = list.filter(c => getClientHealth(c).level === healthFilter)
+    if (segmentoFilter !== 'todos')
+      list = list.filter(c => c.segmento === segmentoFilter)
+
+    // Sort
+    list = [...list]
+    if (sortBy === 'vencimento') {
+      list.sort((a, b) => {
+        const da = getDaysUntilExpiry(getNextExpiry(a.contratos)) ?? 9999
+        const db = getDaysUntilExpiry(getNextExpiry(b.contratos)) ?? 9999
+        return da - db
+      })
+    } else if (sortBy === 'nps') {
+      list.sort((a, b) => (b.nps_score ?? -1) - (a.nps_score ?? -1))
+    } else if (sortBy === 'nivel') {
+      list.sort((a, b) => {
+        const ra = indicacoes.filter(i => i.indicante_cliente_id === a.id).length
+        const rb = indicacoes.filter(i => i.indicante_cliente_id === b.id).length
+        return getNivelPertencimento(b, rb) - getNivelPertencimento(a, ra)
+      })
+    } else if (sortBy === 'contratos') {
+      list.sort((a, b) => (b.contratos?.length ?? 0) - (a.contratos?.length ?? 0))
+    }
+    return list
+  }, [clientes, search, statusFilter, tipoFilter, healthFilter, segmentoFilter, sortBy, indicacoes])
 
   function handleDelete(e: React.MouseEvent, id: string) {
     e.stopPropagation()
@@ -272,6 +327,64 @@ export function ClientesPage() {
               </button>
             )
           })}
+        </div>
+
+        {/* Health filter + Segmento + Sort */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Health */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.55)]">Saúde:</span>
+            {HEALTH_FILTER_TABS.map(tab => {
+              const count = tab.value === 'todos'
+                ? (clientes?.length ?? 0)
+                : (clientes?.filter(c => getClientHealth(c).level === tab.value).length ?? 0)
+              const isActive = healthFilter === tab.value
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => setHealthFilter(tab.value)}
+                  className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 border"
+                  style={isActive
+                    ? { backgroundColor: `${tab.dot}22`, borderColor: `${tab.dot}55`, color: tab.text }
+                    : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }
+                  }
+                >
+                  {tab.value !== 'todos' && (
+                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: tab.dot }} />
+                  )}
+                  {tab.label}
+                  <span className="tabular-nums text-[10px]">{count}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Segmento select */}
+          <select
+            value={segmentoFilter}
+            onChange={e => setSegmentoFilter(e.target.value)}
+            className="h-7 px-2.5 text-xs rounded-lg border focus:outline-none focus:ring-1 focus:ring-[rgba(0,137,172,0.40)]"
+            style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(150,165,180,0.80)' }}
+          >
+            <option value="todos">Todos os segmentos</option>
+            {SEGMENTS.map(s => {
+              const count = clientes?.filter(c => c.segmento === s.value).length ?? 0
+              return <option key={s.value} value={s.value}>{s.label} ({count})</option>
+            })}
+          </select>
+
+          {/* Sort */}
+          <div className="flex items-center gap-1.5 ml-auto">
+            <ArrowUpDown className="w-3.5 h-3.5 text-[rgba(100,120,140,0.55)]" />
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as ClienteSort)}
+              className="h-7 px-2.5 text-xs rounded-lg border focus:outline-none focus:ring-1 focus:ring-[rgba(0,137,172,0.40)]"
+              style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(150,165,180,0.80)' }}
+            >
+              {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 

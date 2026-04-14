@@ -1,8 +1,34 @@
+import { useState, useMemo } from 'react'
 import { useLeads } from '@/hooks/useLeads'
 import { KanbanBoard } from '@/components/leads/KanbanBoard'
+import { Input } from '@/components/ui/input'
+import { LEAD_SOURCES, SEGMENTS } from '@/lib/constants'
+import { Search, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export function LeadsPage() {
   const { data: leads, isLoading } = useLeads()
+  const [search, setSearch]           = useState('')
+  const [origemFilter, setOrigemFilter]     = useState('todos')
+  const [segmentoFilter, setSegmentoFilter] = useState('todos')
+
+  const filteredLeads = useMemo(() => {
+    if (!leads) return []
+    return leads.filter(l => {
+      const matchSearch    = !search || l.nome.toLowerCase().includes(search.toLowerCase()) || (l.empresa ?? '').toLowerCase().includes(search.toLowerCase())
+      const matchOrigem    = origemFilter === 'todos' || l.origem === origemFilter
+      const matchSegmento  = segmentoFilter === 'todos' || l.segmento === segmentoFilter
+      return matchSearch && matchOrigem && matchSegmento
+    })
+  }, [leads, search, origemFilter, segmentoFilter])
+
+  const hasFilter = search || origemFilter !== 'todos' || segmentoFilter !== 'todos'
+
+  const selectStyle = {
+    background: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(255,255,255,0.10)',
+    color: 'rgba(150,165,180,0.85)',
+  }
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-64 text-[rgba(130,150,170,0.65)]">Carregando leads...</div>
@@ -10,12 +36,80 @@ export function LeadsPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-5rem)] gap-3">
-      <div>
-        <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Pipeline de Leads</h1>
-        <p className="text-sm text-[rgba(130,150,170,0.65)] mt-0.5">Arraste os cards entre as colunas para avançar leads no funil</p>
+
+      {/* Header + filtros */}
+      <div className="space-y-2">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Pipeline de Leads</h1>
+            <p className="text-sm text-[rgba(130,150,170,0.65)] mt-0.5">
+              Arraste os cards entre as colunas para avançar leads no funil
+              {hasFilter && (
+                <span className="ml-2 font-medium" style={{ color: '#0089ac' }}>
+                  — {filteredLeads.length} de {leads?.length ?? 0} leads
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Filter bar */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-2.5 top-[7px] w-3.5 h-3.5 text-[rgba(100,120,140,0.55)]" />
+            <Input
+              placeholder="Buscar lead…"
+              className="pl-8 h-8 text-xs w-48"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Origem */}
+          <select
+            value={origemFilter}
+            onChange={e => setOrigemFilter(e.target.value)}
+            className="h-8 px-2.5 text-xs rounded-lg border focus:outline-none focus:ring-1 focus:ring-[rgba(0,137,172,0.40)]"
+            style={selectStyle}
+          >
+            <option value="todos">Todas as origens</option>
+            {LEAD_SOURCES.map(s => {
+              const count = leads?.filter(l => l.origem === s.value).length ?? 0
+              return <option key={s.value} value={s.value}>{s.label} ({count})</option>
+            })}
+          </select>
+
+          {/* Segmento */}
+          <select
+            value={segmentoFilter}
+            onChange={e => setSegmentoFilter(e.target.value)}
+            className="h-8 px-2.5 text-xs rounded-lg border focus:outline-none focus:ring-1 focus:ring-[rgba(0,137,172,0.40)]"
+            style={selectStyle}
+          >
+            <option value="todos">Todos os segmentos</option>
+            {SEGMENTS.map(s => {
+              const count = leads?.filter(l => l.segmento === s.value).length ?? 0
+              return <option key={s.value} value={s.value}>{s.label} ({count})</option>
+            })}
+          </select>
+
+          {/* Clear */}
+          {hasFilter && (
+            <button
+              onClick={() => { setSearch(''); setOrigemFilter('todos'); setSegmentoFilter('todos') }}
+              className="h-8 px-2.5 flex items-center gap-1 text-xs rounded-lg border transition-colors text-[rgba(130,150,170,0.65)] hover:text-white hover:border-[rgba(255,255,255,0.15)]"
+              style={{ borderColor: 'rgba(255,255,255,0.08)' }}
+            >
+              <X className="w-3 h-3" />Limpar filtros
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Kanban */}
       <div className="flex-1 min-h-0">
-        <KanbanBoard leads={leads || []} />
+        <KanbanBoard leads={filteredLeads} />
       </div>
     </div>
   )

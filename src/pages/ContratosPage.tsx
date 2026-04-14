@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useContratos, useUpdateContrato, useDeleteContrato } from '@/hooks/useContratos'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { CONTRACT_TYPES, PRICING_MODELS, RM_STATUS_OPTIONS } from '@/lib/constants'
 import { formatDate, formatCurrency, getContractProgress, getDaysUntilExpiry } from '@/lib/utils'
-import { Search, AlertCircle, X, Pencil, Save, FileText, Mail, Plus, Trash2, Send } from 'lucide-react'
+import { Search, AlertCircle, X, Pencil, Save, FileText, Mail, Plus, Trash2, Send, ArrowUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Contrato } from '@/types'
 import { toast } from 'sonner'
@@ -293,25 +293,64 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
   )
 }
 
-type TipoFilter = 'todos' | 'assessoria' | 'consultoria'
+type TipoFilter   = 'todos' | 'assessoria' | 'consultoria'
+type StatusFilter = 'todos' | 'ativo' | 'encerrado'
+type RMFilter     = 'todos' | string
+type ContratoSort = 'padrao' | 'vencimento' | 'valor' | 'progresso'
 
-const TIPO_TABS: { value: TipoFilter; label: string; color: string; activeColor: string }[] = [
-  { value: 'todos',       label: 'Todos',       color: 'rgba(255,255,255,0.08)', activeColor: '#0089ac' },
-  { value: 'assessoria',  label: 'Assessoria',  color: 'rgba(6,182,212,0.12)',   activeColor: '#06b6d4' },
-  { value: 'consultoria', label: 'Consultoria', color: 'rgba(139,92,246,0.12)',  activeColor: '#8b5cf6' },
+const TIPO_TABS: { value: TipoFilter; label: string; activeColor: string }[] = [
+  { value: 'todos',       label: 'Todos',       activeColor: '#0089ac' },
+  { value: 'assessoria',  label: 'Assessoria',  activeColor: '#06b6d4' },
+  { value: 'consultoria', label: 'Consultoria', activeColor: '#8b5cf6' },
+]
+
+const STATUS_CONTRACT_TABS: { value: StatusFilter; label: string; activeColor: string }[] = [
+  { value: 'todos',     label: 'Todos',      activeColor: '#0089ac' },
+  { value: 'ativo',     label: 'Ativos',     activeColor: '#10b981' },
+  { value: 'encerrado', label: 'Encerrados', activeColor: '#6b7280' },
+]
+
+const SORT_OPTIONS: { value: ContratoSort; label: string }[] = [
+  { value: 'padrao',     label: 'Padrão (mais recente)' },
+  { value: 'vencimento', label: 'Vencimento (mais urgente)' },
+  { value: 'valor',      label: 'Valor (maior → menor)' },
+  { value: 'progresso',  label: 'Progresso (mais avançado)' },
 ]
 
 export function ContratosPage() {
   const { data: contratos, isLoading } = useContratos()
-  const [search, setSearch] = useState('')
-  const [tipoFilter, setTipoFilter] = useState<TipoFilter>('todos')
-  const [selected, setSelected] = useState<Contrato | null>(null)
+  const [search, setSearch]           = useState('')
+  const [tipoFilter, setTipoFilter]   = useState<TipoFilter>('todos')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('todos')
+  const [rmFilter, setRmFilter]       = useState<RMFilter>('todos')
+  const [sortBy, setSortBy]           = useState<ContratoSort>('padrao')
+  const [selected, setSelected]       = useState<Contrato | null>(null)
 
-  const filtered = contratos?.filter(c => {
-    const matchSearch = !search || c.cliente?.nome?.toLowerCase().includes(search.toLowerCase()) || c.cliente?.empresa?.toLowerCase().includes(search.toLowerCase())
-    const matchTipo   = tipoFilter === 'todos' || c.tipo === tipoFilter
-    return matchSearch && matchTipo
-  }) || []
+  const filtered = useMemo(() => {
+    let list = contratos ?? []
+    if (search)
+      list = list.filter(c => c.cliente?.nome?.toLowerCase().includes(search.toLowerCase()) || c.cliente?.empresa?.toLowerCase().includes(search.toLowerCase()))
+    if (tipoFilter !== 'todos')
+      list = list.filter(c => c.tipo === tipoFilter)
+    if (statusFilter !== 'todos')
+      list = list.filter(c => c.status === statusFilter)
+    if (rmFilter !== 'todos')
+      list = list.filter(c => c.rm_status === rmFilter)
+
+    list = [...list]
+    if (sortBy === 'vencimento') {
+      list.sort((a, b) => {
+        const da = a.data_fim ? new Date(a.data_fim).getTime() : Infinity
+        const db = b.data_fim ? new Date(b.data_fim).getTime() : Infinity
+        return da - db
+      })
+    } else if (sortBy === 'valor') {
+      list.sort((a, b) => (b.valor_total ?? 0) - (a.valor_total ?? 0))
+    } else if (sortBy === 'progresso') {
+      list.sort((a, b) => getContractProgress(b.data_inicio, b.data_fim) - getContractProgress(a.data_inicio, a.data_fim))
+    }
+    return list
+  }, [contratos, search, tipoFilter, statusFilter, rmFilter, sortBy])
 
   const expiringSoon = filtered.filter(c => {
     const d = getDaysUntilExpiry(c.data_fim)
@@ -337,32 +376,79 @@ export function ContratosPage() {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-5 items-start">
-        <div className="relative max-w-xs w-full">
-          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
-          <Input placeholder="Buscar por cliente..." className="pl-8" value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="space-y-2 mb-5">
+        {/* Row 1: search + tipo + status */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
+            <Input placeholder="Buscar por cliente..." className="pl-8 w-56" value={search} onChange={e => setSearch(e.target.value)} />
+          </div>
+
+          {/* Tipo */}
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)] mr-0.5">Tipo:</span>
+            {TIPO_TABS.map(tab => {
+              const count = tab.value === 'todos' ? (contratos?.length ?? 0) : (contratos?.filter(c => c.tipo === tab.value).length ?? 0)
+              const isActive = tipoFilter === tab.value
+              return (
+                <button key={tab.value} onClick={() => setTipoFilter(tab.value)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border"
+                  style={isActive ? { backgroundColor: `${tab.activeColor}22`, borderColor: `${tab.activeColor}55`, color: tab.activeColor } : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }}
+                >
+                  {tab.label} <span className="tabular-nums text-[10px]">{count}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Status */}
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)] mr-0.5">Status:</span>
+            {STATUS_CONTRACT_TABS.map(tab => {
+              const count = tab.value === 'todos' ? (contratos?.length ?? 0) : (contratos?.filter(c => c.status === tab.value).length ?? 0)
+              const isActive = statusFilter === tab.value
+              return (
+                <button key={tab.value} onClick={() => setStatusFilter(tab.value)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border"
+                  style={isActive ? { backgroundColor: `${tab.activeColor}22`, borderColor: `${tab.activeColor}55`, color: tab.activeColor } : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }}
+                >
+                  {tab.label} <span className="tabular-nums text-[10px]">{count}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          {TIPO_TABS.map(tab => {
-            const count = tab.value === 'todos'
-              ? (contratos?.length ?? 0)
-              : (contratos?.filter(c => c.tipo === tab.value).length ?? 0)
-            const isActive = tipoFilter === tab.value
+
+        {/* Row 2: RM filter + sort */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)]">RM:</span>
+          {[{ value: 'todos', label: 'Todos', color: '#0089ac' }, ...RM_STATUS_OPTIONS.map(r => ({ value: r.value, label: r.label, color: '#0089ac' }))].map(tab => {
+            const count = tab.value === 'todos' ? (contratos?.length ?? 0) : (contratos?.filter(c => c.rm_status === tab.value).length ?? 0)
+            const isActive = rmFilter === tab.value
+            const rmOpt = RM_STATUS_OPTIONS.find(r => r.value === tab.value)
+            const accentColor = tab.value === 'possivel' ? '#10b981' : tab.value === 'em_andamento' ? '#f59e0b' : tab.value === 'registrado' ? '#3b82f6' : tab.value === 'verificar' ? '#ef4444' : tab.value === 'nao_aplicavel' ? '#64748b' : '#0089ac'
             return (
-              <button
-                key={tab.value}
-                onClick={() => setTipoFilter(tab.value)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border"
-                style={isActive
-                  ? { backgroundColor: `${tab.activeColor}22`, borderColor: `${tab.activeColor}55`, color: tab.activeColor }
-                  : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }
-                }
+              <button key={tab.value} onClick={() => setRmFilter(tab.value)}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all border"
+                style={isActive ? { backgroundColor: `${accentColor}22`, borderColor: `${accentColor}55`, color: accentColor } : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }}
               >
-                {tab.label}
-                <span className="tabular-nums text-[10px]">{count}</span>
+                {tab.label} <span className="tabular-nums text-[10px]">{count}</span>
               </button>
             )
           })}
+
+          {/* Sort */}
+          <div className="flex items-center gap-1.5 ml-auto">
+            <ArrowUpDown className="w-3.5 h-3.5 text-[rgba(100,120,140,0.55)]" />
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as ContratoSort)}
+              className="h-7 px-2.5 text-xs rounded-lg border focus:outline-none"
+              style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(150,165,180,0.80)' }}
+            >
+              {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 
