@@ -177,8 +177,15 @@ export function DashboardPage() {
           <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(107,208,231,0.60)' }}>North Star · Este Mês</p>
           <p className="text-3xl font-bold mt-1" style={{ color: 'rgba(107,208,231,0.95)' }}>{wonThisMonth}</p>
           <p className="text-sm mt-0.5" style={{ color: 'rgba(150,175,195,0.70)' }}>
-            {wonThisMonth === 0 ? 'Nenhum novo cliente fechado ainda' : `novo${wonThisMonth > 1 ? 's' : ''} cliente${wonThisMonth > 1 ? 's' : ''} conquistado${wonThisMonth > 1 ? 's' : ''}`}
+            {wonThisMonth === 0
+              ? 'Nenhum novo cliente fechado ainda'
+              : `novo${wonThisMonth > 1 ? 's' : ''} cliente${wonThisMonth > 1 ? 's' : ''} conquistado${wonThisMonth > 1 ? 's' : ''}`}
           </p>
+          {wonThisMonth === 0 && totalConversions > 0 && (
+            <p className="text-xs mt-1" style={{ color: 'rgba(107,208,231,0.40)' }}>
+              {totalConversions} cliente{totalConversions > 1 ? 's' : ''} no histórico total
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right">
@@ -370,7 +377,11 @@ export function DashboardPage() {
             <CardTitle className="text-sm flex items-center gap-2">
               <Flame className="w-4 h-4 text-orange-500" />
               Leads parados ({stagnantLeads.length})
-              <span className="text-xs font-normal text-fg4 ml-1">— precisam de atenção</span>
+              <span className="text-xs font-normal text-fg4 ml-1">
+                {stagnantLeads.length > activeLeads * 0.4
+                  ? '— inclui leads importados ainda não trabalhados'
+                  : '— precisam de atenção'}
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent>

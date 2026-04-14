@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useLeads } from '@/hooks/useLeads'
 import { useContratos } from '@/hooks/useContratos'
 import { useIndicacoes } from '@/hooks/useIndicacoes'
+import { useClientes } from '@/hooks/useClientes'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PIPELINE_STAGES, LEAD_SOURCE_LABELS, SEGMENTS } from '@/lib/constants'
 import { formatCurrency, getDaysUntilExpiry } from '@/lib/utils'
@@ -55,6 +56,7 @@ export function AnalyticsPage() {
   const { data: leads = [] }      = useLeads()
   const { data: contratos = [] }  = useContratos()
   const { data: indicacoes = [] } = useIndicacoes()
+  const { data: clientes = [] }   = useClientes()
   const [period, setPeriod] = useState<Period>('all')
 
   const metrics = useMemo(() => {
@@ -79,9 +81,12 @@ export function AnalyticsPage() {
     const lossRate = pct(lost.length, closed)
 
     // ── Tempo médio de fechamento ──────────────────────────────────────────
+    // Filter out 0-day closes: bulk-imported leads have created_at ≈ updated_at,
+    // producing a spurious "0d" average. Only count leads with ≥ 1 day difference.
     const closeTimes = won
       .filter(l => l.created_at && l.updated_at)
       .map(l => differenceInDays(new Date(l.updated_at), new Date(l.created_at)))
+      .filter(d => d >= 1)
     const avgCloseDays = closeTimes.length
       ? Math.round(closeTimes.reduce((a, b) => a + b, 0) / closeTimes.length)
       : null
@@ -190,17 +195,27 @@ export function AnalyticsPage() {
       return differenceInDays(new Date(), new Date(c.data_fim)) <= 180
     }).length
     const retencao = totalActive + encerrados6m > 0 ? totalActive / (totalActive + encerrados6m) : 0.9
-    const npsMedia = 6 // placeholder until clientes have nps_score in leads query
+
+    // NPS real: média dos clientes que já têm nps_score registrado
+    const clientesComNps = clientes.filter(c => typeof c.nps_score === 'number')
+    const npsMedia = clientesComNps.length > 0
+      ? clientesComNps.reduce((sum, c) => sum + (c.nps_score as number), 0) / clientesComNps.length
+      : null  // null = sem dados coletados ainda
+    const npsNormalizado = npsMedia !== null ? npsMedia / 10 : 0.6  // fallback neutro enquanto sem dados
+
     const indicacoesConvertidas = filteredLeads.filter(l => l.origem === 'indicacao_cliente' || l.origem === 'indicacao_parceiro').length
     const pctIndicacao = filteredLeads.length > 0 ? indicacoesConvertidas / filteredLeads.length : 0
     const comResponsavel = filteredLeads.filter(l => l.responsavel).length
     const engajamento = filteredLeads.length > 0 ? comResponsavel / filteredLeads.length : 0.7
-    const ivmPct = Math.round((retencao * 0.30 + (npsMedia / 10) * 0.25 + pctIndicacao * 0.25 + engajamento * 0.20) * 100)
+    const ivmPct = Math.round((retencao * 0.30 + npsNormalizado * 0.25 + pctIndicacao * 0.25 + engajamento * 0.20) * 100)
+    const npsLabel = npsMedia !== null
+      ? `NPS Médio (${npsMedia.toFixed(1)} / 10 — ${clientesComNps.length} resp.)`
+      : 'NPS Médio (sem dados ainda)'
     const ivmComponents = [
-      { label: 'Retenção de Contratos',     value: Math.round(retencao * 100),      weight: 30 },
-      { label: 'NPS Médio (normalizado)',    value: Math.round(npsMedia * 10),       weight: 25 },
-      { label: '% Leads por Indicação',     value: Math.round(pctIndicacao * 100),  weight: 25 },
-      { label: 'Leads com Responsável',     value: Math.round(engajamento * 100),   weight: 20 },
+      { label: 'Retenção de Contratos', value: Math.round(retencao * 100),         weight: 30 },
+      { label: npsLabel,                value: Math.round(npsNormalizado * 100),   weight: 25 },
+      { label: '% Leads por Indicação', value: Math.round(pctIndicacao * 100),     weight: 25 },
+      { label: 'Leads com Responsável', value: Math.round(engajamento * 100),      weight: 20 },
     ]
 
     return {
@@ -210,8 +225,9 @@ export function AnalyticsPage() {
       bySource, bySegment, byResponsavel,
       stagnant, expiring60, winLossPie, byLossReason,
       ivm: ivmPct, ivmComponents,
+      npsMedia, clientesComNpsCount: clientesComNps.length,
     }
-  }, [leads, contratos, indicacoes, period])
+  }, [leads, contratos, indicacoes, clientes, period])
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -252,7 +268,7 @@ export function AnalyticsPage() {
         <StatCard
           label="Tempo médio de fechamento"
           value={metrics.avgCloseDays !== null ? `${metrics.avgCloseDays}d` : '—'}
-          sub="Criação → Contrato assinado"
+          sub={metrics.avgCloseDays !== null ? 'Criação → Contrato assinado' : 'Dados insuficientes (leads importados em bloco)'}
           icon={Clock}
           accent="bg-blue-50 text-blue-600"
         />
@@ -284,7 +300,11 @@ export function AnalyticsPage() {
                 <AlertCircle className="w-5 h-5 shrink-0" style={{ color: '#fb923c' }} />
                 <div>
                   <p className="text-sm font-semibold" style={{ color: 'rgba(251,191,36,0.85)' }}>{metrics.stagnant.length} lead{metrics.stagnant.length > 1 ? 's' : ''} parado{metrics.stagnant.length > 1 ? 's' : ''}</p>
-                  <p className="text-xs" style={{ color: 'rgba(251,191,36,0.65)' }}>Requerem follow-up imediato</p>
+                  <p className="text-xs" style={{ color: 'rgba(251,191,36,0.65)' }}>
+                    {metrics.stagnant.length > leads.filter(l => !['ganho_assessoria','ganho_consultoria','perdido','cancelado'].includes(l.status)).length * 0.4
+                      ? 'Inclui leads importados em bloco ainda não trabalhados no CRM'
+                      : 'Requerem follow-up imediato'}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -633,7 +653,7 @@ export function AnalyticsPage() {
               <p className="text-xs text-fg4 mb-1">Próxima alavanca</p>
               <p className="text-sm text-white leading-relaxed">
                 {metrics.stagnant.length > 0
-                  ? `${metrics.stagnant.length} leads parados. Um follow-up sistemático pode recuperar receita imediata sem novos leads.`
+                  ? `${metrics.stagnant.length} leads sem atividade recente. Trabalhar esses leads no CRM é a alavanca de conversão mais rápida disponível.`
                   : metrics.expiring60.length > 0
                   ? `${metrics.expiring60.length} contratos vencem em 60 dias. Inicie conversas de renovação antes do prazo — não depois.`
                   : 'Pipeline saudável. Foque em aumentar o volume de novos leads e indicações.'}
