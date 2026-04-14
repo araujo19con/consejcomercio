@@ -293,15 +293,24 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
   )
 }
 
+type TipoFilter = 'todos' | 'assessoria' | 'consultoria'
+
+const TIPO_TABS: { value: TipoFilter; label: string; color: string; activeColor: string }[] = [
+  { value: 'todos',       label: 'Todos',       color: 'rgba(255,255,255,0.08)', activeColor: '#0089ac' },
+  { value: 'assessoria',  label: 'Assessoria',  color: 'rgba(6,182,212,0.12)',   activeColor: '#06b6d4' },
+  { value: 'consultoria', label: 'Consultoria', color: 'rgba(139,92,246,0.12)',  activeColor: '#8b5cf6' },
+]
+
 export function ContratosPage() {
   const { data: contratos, isLoading } = useContratos()
   const [search, setSearch] = useState('')
+  const [tipoFilter, setTipoFilter] = useState<TipoFilter>('todos')
   const [selected, setSelected] = useState<Contrato | null>(null)
 
   const filtered = contratos?.filter(c => {
-    if (!search) return true
-    const q = search.toLowerCase()
-    return c.cliente?.nome?.toLowerCase().includes(q) || c.cliente?.empresa?.toLowerCase().includes(q)
+    const matchSearch = !search || c.cliente?.nome?.toLowerCase().includes(search.toLowerCase()) || c.cliente?.empresa?.toLowerCase().includes(search.toLowerCase())
+    const matchTipo   = tipoFilter === 'todos' || c.tipo === tipoFilter
+    return matchSearch && matchTipo
   }) || []
 
   const expiringSoon = filtered.filter(c => {
@@ -328,9 +337,33 @@ export function ContratosPage() {
         </div>
       )}
 
-      <div className="relative max-w-xs mb-5">
-        <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
-        <Input placeholder="Buscar por cliente..." className="pl-8" value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="flex flex-col sm:flex-row gap-3 mb-5 items-start">
+        <div className="relative max-w-xs w-full">
+          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
+          <Input placeholder="Buscar por cliente..." className="pl-8" value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <div className="flex items-center gap-1.5">
+          {TIPO_TABS.map(tab => {
+            const count = tab.value === 'todos'
+              ? (contratos?.length ?? 0)
+              : (contratos?.filter(c => c.tipo === tab.value).length ?? 0)
+            const isActive = tipoFilter === tab.value
+            return (
+              <button
+                key={tab.value}
+                onClick={() => setTipoFilter(tab.value)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border"
+                style={isActive
+                  ? { backgroundColor: `${tab.activeColor}22`, borderColor: `${tab.activeColor}55`, color: tab.activeColor }
+                  : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }
+                }
+              >
+                {tab.label}
+                <span className="tabular-nums text-[10px]">{count}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {isLoading ? (

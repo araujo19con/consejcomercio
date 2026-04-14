@@ -9,8 +9,9 @@ import {
   classifyMessage,
   type SlackChannel,
   type SlackMessage,
+  type MessageClassification,
 } from '@/lib/slack'
-import { detectSuggestions, type Suggestion, type ReuniaoSuggestion, type LeadSuggestion, type OportunidadeSuggestion } from '@/lib/slack-suggestions'
+import { detectSuggestions, type Suggestion, type ReuniaoSuggestion, type LeadSuggestion, type OportunidadeSuggestion, type IndicacaoSuggestion } from '@/lib/slack-suggestions'
 import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
@@ -25,20 +26,20 @@ function getSet(key: string): Set<string> {
 
 // ─── Badges ────────────────────────────────────────────────────────────────
 
+const BADGE_CONFIG: Record<Suggestion['type'], { label: string; bg: string; color: string; Icon: React.FC<{ className?: string }> }> = {
+  reuniao:     { label: 'Reunião',      bg: 'rgba(59,130,246,0.15)',  color: '#93c5fd', Icon: Calendar    },
+  lead:        { label: 'Novo Lead',    bg: 'rgba(16,185,129,0.15)',  color: '#34d399', Icon: UserSearch  },
+  oportunidade:{ label: 'Oportunidade', bg: 'rgba(139,92,246,0.15)',  color: '#a78bfa', Icon: TrendingUp  },
+  indicacao:   { label: 'Indicação',    bg: 'rgba(245,158,11,0.15)',  color: '#fbbf24', Icon: Sparkles    },
+}
+
 function TypeBadge({ type }: { type: Suggestion['type'] }) {
-  if (type === 'reuniao') return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgba(59,130,246,0.15)] text-[#93c5fd]">
-      <Calendar className="w-3 h-3" />Reunião
-    </span>
-  )
-  if (type === 'lead') return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgba(16,185,129,0.15)] text-[#34d399]">
-      <UserSearch className="w-3 h-3" />Novo Lead
-    </span>
-  )
+  const cfg = BADGE_CONFIG[type]
+  if (!cfg) return null
+  const { label, bg, color, Icon } = cfg
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgba(139,92,246,0.15)] text-[#a78bfa]">
-      <TrendingUp className="w-3 h-3" />Oportunidade
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: bg, color }}>
+      <Icon className="w-3 h-3" />{label}
     </span>
   )
 }
@@ -104,6 +105,13 @@ function SuggestionCard({
         </div>
       )}
 
+      {suggestion.type === 'indicacao' && (
+        <div className="text-sm text-[rgba(150,165,180,0.70)] space-y-0.5">
+          {(suggestion as IndicacaoSuggestion).indicadoEmail && <p>📧 {(suggestion as IndicacaoSuggestion).indicadoEmail}</p>}
+          {(suggestion as IndicacaoSuggestion).indicadoTelefone && <p>📱 {(suggestion as IndicacaoSuggestion).indicadoTelefone}</p>}
+        </div>
+      )}
+
       <p className="text-xs text-[rgba(100,120,140,0.55)] italic line-clamp-2 border-l-2 border-slate-200 pl-2">
         "{formatSlackText(suggestion.rawText).slice(0, 120)}"
       </p>
@@ -131,15 +139,22 @@ function SuggestionCard({
 
 // ─── Message Card ────────────────────────────────────────────────────────────
 
-function MessageBadge({ type }: { type: 'reuniao' | 'prospeccao' }) {
-  if (type === 'reuniao') return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgba(59,130,246,0.15)] text-[#93c5fd]">
-      <Calendar className="w-3 h-3" />Reunião
-    </span>
-  )
+const MSG_BADGE_CONFIG: Record<MessageClassification, { label: string; bg: string; color: string; Icon: React.FC<{ className?: string }> }> = {
+  reuniao:     { label: 'Reunião',      bg: 'rgba(59,130,246,0.15)',  color: '#93c5fd', Icon: Calendar    },
+  lead:        { label: 'Lead',         bg: 'rgba(16,185,129,0.15)',  color: '#34d399', Icon: UserSearch  },
+  oportunidade:{ label: 'Oportunidade', bg: 'rgba(139,92,246,0.15)',  color: '#a78bfa', Icon: TrendingUp  },
+  indicacao:   { label: 'Indicação',    bg: 'rgba(245,158,11,0.15)',  color: '#fbbf24', Icon: Sparkles    },
+  demanda:     { label: 'Demanda',      bg: 'rgba(239,68,68,0.15)',   color: '#fca5a5', Icon: AlertCircle },
+  contrato:    { label: 'Contrato',     bg: 'rgba(6,182,212,0.15)',   color: '#67e8f9', Icon: Check       },
+}
+
+function MessageBadge({ type }: { type: MessageClassification }) {
+  const cfg = MSG_BADGE_CONFIG[type]
+  if (!cfg) return null
+  const { label, bg, color, Icon } = cfg
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgba(16,185,129,0.15)] text-[#34d399]">
-      <UserSearch className="w-3 h-3" />Prospecção
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: bg, color }}>
+      <Icon className="w-3 h-3" />{label}
     </span>
   )
 }
@@ -173,7 +188,8 @@ function ChannelMessages({
   channelId: string
   onMessagesLoaded: (msgs: SlackMessage[]) => void
 }) {
-  const [filter, setFilter] = useState<'todos' | 'reuniao' | 'prospeccao'>('todos')
+  type FilterType = 'todos' | MessageClassification
+  const [filter, setFilter] = useState<FilterType>('todos')
 
   const { data: messages, isLoading, error, refetch } = useQuery<SlackMessage[]>({
     queryKey: ['slack-messages', channelId],
@@ -192,20 +208,36 @@ function ChannelMessages({
     return classifyMessage(m.text) === filter
   })
 
+  const filterTabs: { value: FilterType; label: string }[] = [
+    { value: 'todos',       label: 'Todos' },
+    { value: 'reuniao',     label: 'Reuniões' },
+    { value: 'lead',        label: 'Leads' },
+    { value: 'oportunidade',label: 'Oportunidades' },
+    { value: 'indicacao',   label: 'Indicações' },
+    { value: 'demanda',     label: 'Demandas' },
+    { value: 'contrato',    label: 'Contratos' },
+  ]
+
   return (
     <div className="mt-3">
-      <div className="flex items-center gap-2 mb-3">
-        {(['todos', 'reuniao', 'prospeccao'] as const).map(f => (
-          <button key={f} onClick={() => setFilter(f)}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              filter === f
-                ? f === 'todos' ? 'bg-slate-800 text-white' : f === 'reuniao' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'
-                : 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] hover:bg-[rgba(255,255,255,0.08)]'
-            }`}
-          >
-            {f === 'todos' ? 'Todos' : f === 'reuniao' ? 'Reuniões' : 'Prospecção'}
-          </button>
-        ))}
+      <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+        {filterTabs.map(f => {
+          const isActive = filter === f.value
+          const cfg = f.value !== 'todos' ? MSG_BADGE_CONFIG[f.value as MessageClassification] : null
+          return (
+            <button key={f.value} onClick={() => setFilter(f.value)}
+              className="px-2.5 py-1 rounded-full text-xs font-medium transition-colors border"
+              style={isActive && cfg
+                ? { background: cfg.bg, color: cfg.color, borderColor: `${cfg.color}44` }
+                : isActive
+                ? { background: 'rgba(255,255,255,0.12)', color: '#fff', borderColor: 'rgba(255,255,255,0.20)' }
+                : { background: 'transparent', color: 'rgba(150,165,180,0.70)', borderColor: 'rgba(255,255,255,0.07)' }
+              }
+            >
+              {f.label}
+            </button>
+          )
+        })}
         <button onClick={() => refetch()} className="ml-auto p-1.5 rounded-md text-[rgba(100,120,140,0.55)] hover:text-[rgba(150,165,180,0.70)] hover:bg-[rgba(255,255,255,0.04)]">
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
@@ -332,6 +364,19 @@ export function SlackPage() {
         toast.success('Oportunidade criada!')
         markConfirmed(suggestion.id)
       } catch { toast.error('Erro ao criar oportunidade') }
+    } else if (suggestion.type === 'indicacao') {
+      const ind = suggestion as IndicacaoSuggestion
+      try {
+        await supabase.from('indicacoes').insert([{
+          indicado_nome: ind.indicadoNome ?? 'Indicado via Slack',
+          indicado_telefone: ind.indicadoTelefone ?? '',
+          indicado_email: ind.indicadoEmail ?? null,
+          status: 'pendente',
+          notas: `Detectado no canal #${ind.channelName}\n\n"${ind.rawText.slice(0, 300)}"`,
+        }])
+        toast.success('Indicação registrada!')
+        markConfirmed(suggestion.id)
+      } catch { toast.error('Erro ao registrar indicação') }
     }
   }
 

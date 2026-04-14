@@ -1,6 +1,6 @@
 import type { SlackMessage } from './slack'
 
-export type SuggestionType = 'reuniao' | 'lead' | 'oportunidade'
+export type SuggestionType = 'reuniao' | 'lead' | 'oportunidade' | 'indicacao'
 
 export interface BaseSuggestion {
   id: string // `${channelId}-${msg.ts}`
@@ -33,7 +33,14 @@ export interface OportunidadeSuggestion extends BaseSuggestion {
   valorEstimado?: number
 }
 
-export type Suggestion = ReuniaoSuggestion | LeadSuggestion | OportunidadeSuggestion
+export interface IndicacaoSuggestion extends BaseSuggestion {
+  type: 'indicacao'
+  indicadoNome?: string
+  indicadoTelefone?: string
+  indicadoEmail?: string
+}
+
+export type Suggestion = ReuniaoSuggestion | LeadSuggestion | OportunidadeSuggestion | IndicacaoSuggestion
 
 // ─── Patterns ────────────────────────────────────────────────────────────────
 
@@ -46,7 +53,9 @@ const DATE_PATTERNS = [
 const TIME_PATTERN = /\b(\d{1,2})h(\d{2})?|\b(\d{1,2}):(\d{2})\b/i
 const LINK_PATTERN = /https?:\/\/[^\s]+(?:zoom|meet\.google|teams|calendly)[^\s]*/i
 
-const LEAD_KEYWORDS = /\b(novo contato|novo lead|novo cliente|indicação|indicacao|conheci|prospecção|prospectei|interessado em|quer contratar|procurando advogado|precisa de assessoria|me indicaram|ele quer|ela quer)\b/i
+const INDICACAO_KEYWORDS = /\b(indicou|foi indicado|veio por indicação|indicação de|indicou o|indicou a|recomendou|trouxe um contato|me mandou contato|indicou para nós|indicado pelo|indicada pela)\b/i
+
+const LEAD_KEYWORDS = /\b(novo contato|novo lead|novo cliente|conheci|prospecção|prospectei|interessado em|quer contratar|procurando advogado|precisa de (advogado|assessoria|consultoria)|busca(ndo)? (advogado|assessoria|consultoria)|potencial cliente|primeira consulta|diagnóstico gratuito|me indicaram|ele quer contratar|ela quer contratar)\b/i
 const PHONE_PATTERN = /(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\s?)?\d{4}[-.\s]?\d{4}/
 const EMAIL_PATTERN = /\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b/
 
@@ -155,6 +164,25 @@ export function detectSuggestions(
         local: linkMatch ? undefined : text.match(/\b(sala|escritório|escritorio|online|presencial)\b/i)?.[0],
         link: linkMatch?.[0],
       } as ReuniaoSuggestion)
+      continue
+    }
+
+    // ── Indicação ──
+    if (INDICACAO_KEYWORDS.test(text)) {
+      const phoneMatch = text.match(PHONE_PATTERN)
+      const emailMatch = text.match(EMAIL_PATTERN)
+      const phone = phoneMatch?.[0]
+      const email = emailMatch?.[0]
+      const textKey = `ind-${text.slice(0, 60)}`
+      if (seenEmails.has(textKey)) continue
+      seenEmails.add(textKey)
+
+      suggestions.push({
+        ...base,
+        type: 'indicacao',
+        indicadoTelefone: phone,
+        indicadoEmail: email,
+      } as IndicacaoSuggestion)
       continue
     }
 

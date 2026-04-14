@@ -60,13 +60,29 @@ export function formatSlackText(text: string): string {
     .replace(/&gt;/g, '>')
 }
 
-// Palavras-chave para destacar mensagens relevantes
-const KEYWORDS_REUNIAO = ['reunião', 'reuniao', 'meeting', 'call', 'ligação', 'ligacao', 'agendado', 'confirmado', 'remarcado']
-const KEYWORDS_PROSPECCAO = ['lead', 'prospect', 'proposta', 'followup', 'follow-up', 'follow up', 'enviado', 'interessado', 'contato', 'cliente']
+// ─── Message classification ───────────────────────────────────────────────────
 
-export function classifyMessage(text: string): 'reuniao' | 'prospeccao' | null {
-  const lower = text.toLowerCase()
-  if (KEYWORDS_REUNIAO.some((k) => lower.includes(k))) return 'reuniao'
-  if (KEYWORDS_PROSPECCAO.some((k) => lower.includes(k))) return 'prospeccao'
+export type MessageClassification = 'reuniao' | 'lead' | 'oportunidade' | 'indicacao' | 'demanda' | 'contrato'
+
+// Ordered by priority — first match wins
+const CLASSIFY_MAP: [MessageClassification, RegExp][] = [
+  ['reuniao',
+    /\b(reunião|reuniao|meeting|call|ligação|ligacao|videoconferência|videochamada|zoom|google meet|teams|calendly|agendado para|confirmado para|às \d{1,2}h|remarcado)\b/i],
+  ['indicacao',
+    /\b(indicou|foi indicado|veio por indicação|indicação de|indicou o|indicou a|recomendou|trouxe um contato|me mandou contato|indicou para nós|indicado pelo|indicada pela)\b/i],
+  ['lead',
+    /\b(novo contato|novo lead|novo cliente|conheci|prospecção|prospectei|interessado em|quer contratar|procurando advogado|precisa de advogado|precisa de assessoria|precisa de consultoria|busca(ndo)? (advogado|assessoria|consultoria)|potencial cliente|primeira consulta|diagnóstico gratuito|me indicaram|ele quer contratar|ela quer contratar)\b/i],
+  ['demanda',
+    /\b(demanda|solicitação do cliente|pedido do cliente|cliente pediu|cliente solicitou|prazo urgente|atividade pendente|tarefa para o cliente|entrega de (contrato|documento|parecer)|precisam de nós)\b/i],
+  ['oportunidade',
+    /\b(proposta|orçamento|orcamento|negociação|negociando|honorários|honorarios|fechar contrato|prestes a assinar|pipeline|follow.?up de proposta|R\$\s*\d)\b/i],
+  ['contrato',
+    /\b(contrato assinado|assinou o contrato|contrato fechado|enviamos o contrato|contrato enviado|renovação de contrato|renovacao|vencimento do contrato|vigência|vigencia)\b/i],
+]
+
+export function classifyMessage(text: string): MessageClassification | null {
+  for (const [type, pattern] of CLASSIFY_MAP) {
+    if (pattern.test(text)) return type
+  }
   return null
 }
