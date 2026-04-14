@@ -93,13 +93,13 @@ export function ClienteDetailPage() {
                     <p className="text-sm font-medium text-[rgba(230,235,240,0.92)]">{value || '—'}</p>
                   </div>
                 ))}
-                {(cliente as any).indicado_por_cliente && (
+                {cliente.indicado_por_cliente && (
                   <div>
                     <p className="text-xs text-[rgba(130,150,170,0.65)]">Indicado por</p>
                     <p className="text-sm font-medium text-violet-400 flex items-center gap-1">
                       <UserCheck className="w-3.5 h-3.5" />
-                      {(cliente as any).indicado_por_cliente.nome}
-                      <span className="text-[rgba(100,120,140,0.55)] font-normal text-xs">· {(cliente as any).indicado_por_cliente.empresa}</span>
+                      {cliente.indicado_por_cliente.nome}
+                      <span className="text-[rgba(100,120,140,0.55)] font-normal text-xs">· {cliente.indicado_por_cliente.empresa}</span>
                     </p>
                   </div>
                 )}
