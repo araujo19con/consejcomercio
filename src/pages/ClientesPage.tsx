@@ -1,16 +1,18 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useClientes, useDeleteCliente } from '@/hooks/useClientes'
+import { useClientes, useDeleteCliente, useUpdateCliente } from '@/hooks/useClientes'
 import { useIndicacoes } from '@/hooks/useIndicacoes'
+import { useCreateOportunidade } from '@/hooks/useOportunidades'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EmptyState } from '@/components/ui/empty-state'
 import { CLIENT_STATUS_OPTIONS, SEGMENTS } from '@/lib/constants'
-import { getDaysUntilExpiry } from '@/lib/utils'
-import { Search, Briefcase, AlertCircle, Plus, Trash2, ArrowUpDown } from 'lucide-react'
+import { getDaysUntilExpiry, formatCurrency, formatDate } from '@/lib/utils'
+import { Search, Briefcase, AlertCircle, Plus, Trash2, ArrowUpDown, RefreshCw, TrendingUp, CheckCircle2, XCircle, Clock, DollarSign } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Cliente, Contrato } from '@/types'
 import { NewClienteModal } from '@/components/clientes/NewClienteModal'
+import { toast } from 'sonner'
 
 // ─── Health Score ──────────────────────────────────────────────────────────────
 
@@ -183,13 +185,30 @@ function getTipoServico(cliente: Cliente): TipoServico {
   return 'sem_contrato'
 }
 
+// ─── Renovação helpers ────────────────────────────────────────────────────────
+
+function getUrgencyLevel(daysLeft: number | null): 'critico' | 'atencao' | 'ok' {
+  if (daysLeft === null) return 'ok'
+  if (daysLeft < 0 || daysLeft <= 30) return 'critico'
+  if (daysLeft <= 60) return 'atencao'
+  return 'ok'
+}
+
+const URGENCY_CONFIG = {
+  critico: { label: 'Crítico',    bg: 'rgba(239,68,68,0.12)',  border: 'rgba(239,68,68,0.30)',  text: '#f87171' },
+  atencao: { label: 'Atenção',    bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.30)', text: '#fbbf24' },
+  ok:      { label: 'Em tempo',   bg: 'rgba(16,185,129,0.10)', border: 'rgba(16,185,129,0.25)', text: '#34d399' },
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function ClientesPage() {
   const navigate   = useNavigate()
   const { data: clientes, isLoading } = useClientes()
   const { data: indicacoes = [] }     = useIndicacoes()
-  const deleteCliente = useDeleteCliente()
+  const deleteCliente      = useDeleteCliente()
+  const updateCliente      = useUpdateCliente()
+  const createOportunidade = useCreateOportunidade()
 
   const [search, setSearch]               = useState('')
   const [statusFilter, setStatusFilter]   = useState('todos')
@@ -241,6 +260,60 @@ export function ClientesPage() {
     setDeleteConfirm(null)
   }
 
+  function handleStatusTabClick(value: string) {
+    setStatusFilter(value)
+    if (value === 'em_renovacao') setSortBy('vencimento')
+    if (value === 'encerrado') setSortBy('padrao')
+  }
+
+  async function handleCriarProposta(e: React.MouseEvent, cliente: Cliente) {
+    e.stopPropagation()
+    const contrato = cliente.contratos?.filter(c => c.status === 'ativo').sort((a, b) =>
+      new Date(a.data_fim ?? '9999').getTime() - new Date(b.data_fim ?? '9999').getTime()
+    )[0]
+    await createOportunidade.mutateAsync({
+      cliente_id: cliente.id,
+      titulo: `Renovação — ${cliente.empresa}`,
+      descricao: `Proposta de renovação de contrato de ${contrato?.tipo ?? 'assessoria'}.`,
+      tipo: 'renovacao',
+      status: 'identificada',
+      valor_estimado: contrato?.valor_total ?? null,
+    } as never)
+    toast.success('Proposta de renovação criada em Oportunidades!')
+  }
+
+  async function handleMarcarRenovado(e: React.MouseEvent, id: string) {
+    e.stopPropagation()
+    await updateCliente.mutateAsync({ id, status: 'ativo' })
+    toast.success('Cliente marcado como renovado!')
+  }
+
+  async function handleNaoRenovou(e: React.MouseEvent, id: string) {
+    e.stopPropagation()
+    await updateCliente.mutateAsync({ id, status: 'encerrado' })
+    toast.success('Cliente movido para Encerrados.')
+  }
+
+  async function handleWinBack(e: React.MouseEvent, cliente: Cliente) {
+    e.stopPropagation()
+    const totalValor = cliente.contratos?.reduce((sum, c) => sum + (c.valor_total ?? 0), 0) ?? 0
+    await createOportunidade.mutateAsync({
+      cliente_id: cliente.id,
+      titulo: `Win-back — ${cliente.empresa}`,
+      descricao: `Reengajamento de ex-cliente. Relacionamento anterior: ${cliente.contratos?.length ?? 0} contrato(s).`,
+      tipo: 'upsell',
+      status: 'identificada',
+      valor_estimado: totalValor > 0 ? totalValor : null,
+    } as never)
+    toast.success('Oportunidade de win-back criada!')
+  }
+
+  async function handleReativar(e: React.MouseEvent, id: string) {
+    e.stopPropagation()
+    await updateCliente.mutateAsync({ id, status: 'ativo' })
+    toast.success('Cliente reativado!')
+  }
+
   return (
     <div className="space-y-5">
 
@@ -284,7 +357,7 @@ export function ClientesPage() {
               return (
                 <button
                   key={tab.value}
-                  onClick={() => setStatusFilter(tab.value)}
+                  onClick={() => handleStatusTabClick(tab.value)}
                   className={cn(
                     'px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5',
                     isActive ? 'bg-white text-[rgba(230,235,240,0.92)] shadow-sm' : 'text-[rgba(130,150,170,0.65)] hover:text-[rgba(215,225,235,0.85)]'
@@ -388,6 +461,81 @@ export function ClientesPage() {
         </div>
       </div>
 
+      {/* ── Em Renovação banner ── */}
+      {statusFilter === 'em_renovacao' && !isLoading && filtered.length > 0 && (() => {
+        const criticos = filtered.filter(c => getUrgencyLevel(getDaysUntilExpiry(getNextExpiry(c.contratos))) === 'critico').length
+        const atencao  = filtered.filter(c => getUrgencyLevel(getDaysUntilExpiry(getNextExpiry(c.contratos))) === 'atencao').length
+        const mrrTotal = filtered.reduce((sum, c) => sum + (c.contratos?.filter(x => x.status === 'ativo').reduce((s, x) => s + (x.valor_mensal ?? 0), 0) ?? 0), 0)
+        return (
+          <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.20)' }}>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-400" />
+                <span className="text-sm font-semibold text-amber-300">Janela de Renovação</span>
+              </div>
+              {mrrTotal > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-amber-400/70">
+                  <DollarSign className="w-3.5 h-3.5" />
+                  <span className="font-semibold text-amber-300">{formatCurrency(mrrTotal)}/mês</span>
+                  <span>em MRR sob risco</span>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3 flex-wrap text-xs">
+              {criticos > 0 && (
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171' }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> {criticos} crítico{criticos !== 1 ? 's' : ''} — vence em &lt;30 dias
+                </span>
+              )}
+              {atencao > 0 && (
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(245,158,11,0.12)', color: '#fbbf24' }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> {atencao} atenção — 30–60 dias
+                </span>
+              )}
+              {filtered.length - criticos - atencao > 0 && (
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(16,185,129,0.10)', color: '#34d399' }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {filtered.length - criticos - atencao} em tempo — +60 dias
+                </span>
+              )}
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* ── Encerrados banner ── */}
+      {statusFilter === 'encerrado' && !isLoading && filtered.length > 0 && (() => {
+        const recent90 = filtered.filter(c => {
+          const last = getNextExpiry(c.contratos) // use last contract date as proxy
+          if (!last) return false
+          return (Date.now() - new Date(last).getTime()) / (1000 * 60 * 60 * 24) <= 90
+        }).length
+        const totalHistorico = filtered.reduce((sum, c) =>
+          sum + (c.contratos?.reduce((s, x) => s + (x.valor_total ?? 0), 0) ?? 0), 0)
+        return (
+          <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(100,116,139,0.08)', border: '1px solid rgba(100,116,139,0.20)' }}>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <XCircle className="w-4 h-4 text-slate-400" />
+                <span className="text-sm font-semibold text-slate-300">Ex-clientes — Oportunidades de Win-back</span>
+              </div>
+              {totalHistorico > 0 && (
+                <span className="text-xs text-slate-400">
+                  {formatCurrency(totalHistorico)} em valor histórico
+                </span>
+              )}
+            </div>
+            <div className="flex gap-3 flex-wrap text-xs">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(239,68,68,0.10)', color: '#fca5a5' }}>
+                {recent90} encerrado{recent90 !== 1 ? 's' : ''} nos últimos 90 dias
+              </span>
+              <span className="text-slate-500 flex items-center">
+                Use "Win-back" para criar uma oportunidade de reengajamento
+              </span>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* ── List ── */}
       {isLoading ? (
         <div className="space-y-2">
@@ -417,12 +565,21 @@ export function ClientesPage() {
             const nivel          = getNivelPertencimento(cliente, refCount)
             const nivelInfo      = NIVEL_LABELS[nivel]
 
+            const urgency        = getUrgencyLevel(daysLeft)
+            const urgencyCfg     = URGENCY_CONFIG[urgency]
+            const mrrAtivo       = cliente.contratos?.filter(c => c.status === 'ativo').reduce((s, c) => s + (c.valor_mensal ?? 0), 0) ?? 0
+            const totalHistorico = cliente.contratos?.reduce((s, c) => s + (c.valor_total ?? 0), 0) ?? 0
+            const lastContrato   = cliente.contratos?.filter(c => c.data_fim).sort((a, b) => new Date(b.data_fim!).getTime() - new Date(a.data_fim!).getTime())[0]
+            const daysSinceEnd   = lastContrato?.data_fim ? Math.floor((Date.now() - new Date(lastContrato.data_fim).getTime()) / 86400000) : null
+
             return (
               <div
                 key={cliente.id}
                 className="bg-card rounded-xl p-4 cursor-pointer transition-all group"
                 style={isConfirming
                   ? { border: '1px solid rgba(239,68,68,0.30)', background: 'rgba(239,68,68,0.05)' }
+                  : cliente.status === 'em_renovacao'
+                  ? { border: `1px solid ${urgencyCfg.border}`, background: urgencyCfg.bg }
                   : { border: '1px solid rgba(255,255,255,0.07)' }}
                 onClick={() => { if (!isConfirming) navigate(`/clientes/${cliente.id}`) }}
               >
@@ -510,6 +667,81 @@ export function ClientesPage() {
                     </div>
                   )}
                 </div>
+
+                {/* ── Em Renovação actions ── */}
+                {cliente.status === 'em_renovacao' && !isConfirming && (
+                  <div className="mt-3 pt-3 flex flex-wrap items-center gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} onClick={e => e.stopPropagation()}>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium mr-1" style={{ background: urgencyCfg.bg, color: urgencyCfg.text, border: `1px solid ${urgencyCfg.border}` }}>
+                      {urgencyCfg.label} {daysLeft !== null && daysLeft >= 0 ? `— ${daysLeft}d restantes` : daysLeft !== null && daysLeft < 0 ? '— vencido' : ''}
+                    </span>
+                    {mrrAtivo > 0 && <span className="text-xs text-[rgba(130,150,170,0.55)]">{formatCurrency(mrrAtivo)}/mês em risco</span>}
+                    <div className="flex items-center gap-1.5 ml-auto flex-wrap">
+                      <button
+                        onClick={e => handleCriarProposta(e, cliente)}
+                        disabled={createOportunidade.isPending}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors text-white"
+                        style={{ backgroundColor: '#0089ac' }}
+                      >
+                        <TrendingUp className="w-3 h-3" />Proposta de Renovação
+                      </button>
+                      <button
+                        onClick={e => handleMarcarRenovado(e, cliente.id)}
+                        disabled={updateCliente.isPending}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors border"
+                        style={{ borderColor: 'rgba(16,185,129,0.40)', color: '#34d399', background: 'rgba(16,185,129,0.08)' }}
+                      >
+                        <CheckCircle2 className="w-3 h-3" />Renovado
+                      </button>
+                      <button
+                        onClick={e => handleNaoRenovou(e, cliente.id)}
+                        disabled={updateCliente.isPending}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors border"
+                        style={{ borderColor: 'rgba(239,68,68,0.30)', color: '#f87171', background: 'rgba(239,68,68,0.06)' }}
+                      >
+                        <XCircle className="w-3 h-3" />Não Renovou
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── Encerrado actions ── */}
+                {cliente.status === 'encerrado' && !isConfirming && (
+                  <div className="mt-3 pt-3 flex flex-wrap items-center gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center gap-3 flex-wrap text-xs text-[rgba(130,150,170,0.55)]">
+                      {daysSinceEnd !== null && (
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          Encerrado há {daysSinceEnd < 30 ? `${daysSinceEnd}d` : daysSinceEnd < 365 ? `${Math.floor(daysSinceEnd / 30)}m` : `${Math.floor(daysSinceEnd / 365)}a`}
+                        </span>
+                      )}
+                      {totalHistorico > 0 && (
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="w-3 h-3" />
+                          {formatCurrency(totalHistorico)} histórico
+                        </span>
+                      )}
+                      <span>{cliente.contratos?.length ?? 0} contrato{(cliente.contratos?.length ?? 0) !== 1 ? 's' : ''} no total</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      <button
+                        onClick={e => handleWinBack(e, cliente)}
+                        disabled={createOportunidade.isPending}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors text-white"
+                        style={{ backgroundColor: '#7c3aed' }}
+                      >
+                        <TrendingUp className="w-3 h-3" />Win-back
+                      </button>
+                      <button
+                        onClick={e => handleReativar(e, cliente.id)}
+                        disabled={updateCliente.isPending}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors border"
+                        style={{ borderColor: 'rgba(16,185,129,0.40)', color: '#34d399', background: 'rgba(16,185,129,0.08)' }}
+                      >
+                        <RefreshCw className="w-3 h-3" />Reativar
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
