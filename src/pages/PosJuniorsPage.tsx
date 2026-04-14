@@ -299,7 +299,7 @@ function PosJuniorForm({
               'text-sm font-medium',
               form.disponivel_mentoria
                 ? 'text-emerald-400'
-                : 'text-[rgba(130,150,170,0.65)]'
+                : 'text-muted-foreground'
             )}
           >
             Disponível para mentoria
@@ -378,8 +378,8 @@ function StatCard({
         <Icon className="w-4 h-4 text-[#6bd0e7]" />
       </div>
       <div>
-        <p className="text-lg font-bold text-[rgba(230,235,240,0.92)] leading-none">{value}</p>
-        <p className="text-xs text-[rgba(130,150,170,0.65)] mt-0.5">{label}</p>
+        <p className="text-lg font-bold text-foreground leading-none">{value}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
       </div>
     </div>
   )
@@ -456,8 +456,8 @@ export function PosJuniorsPage() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Pós-Juniors</h1>
-          <p className="text-sm text-[rgba(130,150,170,0.65)] mt-0.5">
+          <h1 className="text-xl font-bold text-foreground">Pós-Juniors</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Rede de ex-membros da CONSEJ
           </p>
         </div>
@@ -484,7 +484,7 @@ export function PosJuniorsPage() {
       {/* ── Filters ── */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
+          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-fg4" />
           <Input
             placeholder="Buscar por nome, empresa, cargo…"
             className="pl-8 h-9 text-sm"
@@ -503,8 +503,8 @@ export function PosJuniorsPage() {
                 className={cn(
                   'px-3 py-1.5 rounded-md text-xs font-medium transition-all',
                   isActive
-                    ? 'bg-white shadow-sm text-[rgba(230,235,240,0.92)]'
-                    : 'text-[rgba(130,150,170,0.65)] hover:text-[rgba(215,225,235,0.85)]'
+                    ? 'bg-white shadow-sm text-foreground'
+                    : 'text-muted-foreground hover:text-fg2'
                 )}
                 style={isActive ? { backgroundColor: '#0089ac', color: '#fff' } : {}}
               >
@@ -533,12 +533,12 @@ export function PosJuniorsPage() {
             <GraduationCap className="w-7 h-7 text-[#6bd0e7]" />
           </div>
           <div className="text-center">
-            <p className="font-semibold text-[rgba(230,235,240,0.92)]">
+            <p className="font-semibold text-foreground">
               {search || areaFilter
                 ? 'Nenhum resultado encontrado'
                 : 'Nenhum pós-junior cadastrado ainda'}
             </p>
-            <p className="text-sm text-[rgba(130,150,170,0.65)] mt-1 max-w-xs">
+            <p className="text-sm text-muted-foreground mt-1 max-w-xs">
               {search || areaFilter
                 ? 'Tente outros termos ou limpe os filtros.'
                 : 'Adicione o primeiro ex-membro e comece a construir a rede de alumni.'}
@@ -592,7 +592,7 @@ export function PosJuniorsPage() {
                   {/* Main info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-[rgba(230,235,240,0.92)] truncate">
+                      <p className="font-semibold text-foreground truncate">
                         {pj.nome}
                       </p>
                       {/* Mentoria badge */}
@@ -605,7 +605,7 @@ export function PosJuniorsPage() {
                           Disponível p/ mentoria
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full font-medium bg-[rgba(255,255,255,0.05)] text-[rgba(130,150,170,0.65)]">
+                        <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full font-medium bg-[rgba(255,255,255,0.05)] text-muted-foreground">
                           <span className="w-1.5 h-1.5 rounded-full bg-[rgba(100,120,140,0.40)]" />
                           Não disponível
                         </span>
@@ -614,7 +614,7 @@ export function PosJuniorsPage() {
 
                     {/* Empresa · Cargo */}
                     {(pj.empresa || pj.cargo) && (
-                      <p className="text-sm text-[rgba(130,150,170,0.65)] truncate mt-0.5">
+                      <p className="text-sm text-muted-foreground truncate mt-0.5">
                         {[pj.cargo, pj.empresa].filter(Boolean).join(' · ')}
                       </p>
                     )}
@@ -657,14 +657,14 @@ export function PosJuniorsPage() {
 
                   {/* Semestre de saída */}
                   {pj.semestre_saida && (
-                    <span className="text-xs text-[rgba(130,150,170,0.65)] bg-[rgba(255,255,255,0.04)] px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-muted-foreground bg-[rgba(255,255,255,0.04)] px-2 py-0.5 rounded-full">
                       Saída: {pj.semestre_saida}
                     </span>
                   )}
 
                   {/* Semestres na CONSEJ */}
                   {pj.anos_consej != null && (
-                    <span className="text-xs text-[rgba(130,150,170,0.65)] bg-[rgba(255,255,255,0.04)] px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-muted-foreground bg-[rgba(255,255,255,0.04)] px-2 py-0.5 rounded-full">
                       {pj.anos_consej} sem. na CONSEJ
                     </span>
                   )}
@@ -699,7 +699,7 @@ export function PosJuniorsPage() {
                     </button>
                     <button
                       onClick={e => { e.stopPropagation(); setDeleteConfirm(null) }}
-                      className="text-xs px-2.5 py-1 rounded-md border border-[rgba(255,255,255,0.12)] text-[rgba(150,165,180,0.70)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                      className="text-xs px-2.5 py-1 rounded-md border border-[rgba(255,255,255,0.12)] text-muted-foreground hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                     >
                       Cancelar
                     </button>

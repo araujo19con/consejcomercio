@@ -118,7 +118,7 @@ export function OnboardingWizard() {
             <Icon className={cn('w-8 h-8', current.color)} />
           </div>
 
-          <h2 className="text-xl font-bold text-[rgba(230,235,240,0.95)] mb-3">{current.title}</h2>
+          <h2 className="text-xl font-bold text-foreground mb-3">{current.title}</h2>
           <p className="text-sm text-[rgba(150,165,180,0.75)] leading-relaxed">{current.description}</p>
         </div>
 
@@ -127,7 +127,7 @@ export function OnboardingWizard() {
           <button
             onClick={() => setStep(s => s - 1)}
             className={cn(
-              'flex items-center gap-1 text-sm text-[rgba(100,120,140,0.55)] hover:text-[rgba(180,195,210,0.75)] transition-colors',
+              'flex items-center gap-1 text-sm text-fg4 hover:text-[rgba(180,195,210,0.75)] transition-colors',
               step === 0 && 'invisible'
             )}
           >
@@ -140,7 +140,7 @@ export function OnboardingWizard() {
                 variant="outline"
                 size="sm"
                 onClick={() => handleCta(current.route)}
-                className="text-xs border-[rgba(255,255,255,0.10)] text-[rgba(150,165,180,0.70)] hover:text-[rgba(215,225,235,0.85)]"
+                className="text-xs border-[rgba(255,255,255,0.10)] text-muted-foreground hover:text-fg2"
               >
                 {current.cta}
               </Button>

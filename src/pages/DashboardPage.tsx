@@ -106,7 +106,7 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Dashboard</h1>
+      <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
 
       {/* ── Para hoje ── */}
       {hasActionItems && (
@@ -220,27 +220,27 @@ export function DashboardPage() {
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-1">
               <Share2 className="w-4 h-4 text-indigo-500" />
-              <p className="text-sm text-[rgba(130,150,170,0.65)]">Indicações totais</p>
+              <p className="text-sm text-muted-foreground">Indicações totais</p>
             </div>
-            <p className="text-2xl font-bold text-[rgba(230,235,240,0.92)]">{indicacoes?.length || 0}</p>
+            <p className="text-2xl font-bold text-foreground">{indicacoes?.length || 0}</p>
           </CardContent>
         </Card>
         <Card style={recompensasPendentes > 0 ? { borderColor: 'rgba(245,158,11,0.35)' } : {}}>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-1">
               {recompensasPendentes > 0 && <AlertCircle className="w-4 h-4 text-amber-500" />}
-              <p className="text-sm text-[rgba(130,150,170,0.65)]">Recompensas pendentes</p>
+              <p className="text-sm text-muted-foreground">Recompensas pendentes</p>
             </div>
-            <p className={cn('text-2xl font-bold', recompensasPendentes > 0 ? 'text-amber-600' : 'text-[rgba(230,235,240,0.92)]')}>{recompensasPendentes}</p>
+            <p className={cn('text-2xl font-bold', recompensasPendentes > 0 ? 'text-amber-600' : 'text-foreground')}>{recompensasPendentes}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-1">
               <Activity className="w-4 h-4 text-emerald-500" />
-              <p className="text-sm text-[rgba(130,150,170,0.65)]">Upsell pós-consultoria</p>
+              <p className="text-sm text-muted-foreground">Upsell pós-consultoria</p>
             </div>
-            <p className={cn('text-2xl font-bold', postConsultoriaUpsell.length > 0 ? 'text-violet-400' : 'text-[rgba(230,235,240,0.92)]')}>{postConsultoriaUpsell.length}</p>
+            <p className={cn('text-2xl font-bold', postConsultoriaUpsell.length > 0 ? 'text-violet-400' : 'text-foreground')}>{postConsultoriaUpsell.length}</p>
           </CardContent>
         </Card>
       </div>
@@ -252,7 +252,7 @@ export function DashboardPage() {
             <CardTitle className="text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-orange-500" />
               Fila de Renovação
-              <span className="text-xs font-normal text-[rgba(100,120,140,0.55)] ml-1">— ação requerida por janela</span>
+              <span className="text-xs font-normal text-fg4 ml-1">— ação requerida por janela</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -267,7 +267,7 @@ export function DashboardPage() {
                     <span className={cn('text-xs font-bold', color)}>{label}</span>
                     <span className={cn('text-lg font-bold', color)}>{list.length}</span>
                   </div>
-                  <p className="text-[10px] text-[rgba(100,120,140,0.55)] mb-2">{sublabel}</p>
+                  <p className="text-[10px] text-fg4 mb-2">{sublabel}</p>
                   {list.slice(0, 3).map(c => (
                     <p key={c.id} className="text-xs text-[rgba(180,195,210,0.70)] truncate">{c.cliente?.nome ?? '—'}</p>
                   ))}
@@ -298,7 +298,7 @@ export function DashboardPage() {
         </CardHeader>
         <CardContent>
           {reunioesSemana.length === 0 ? (
-            <p className="text-sm text-[rgba(100,120,140,0.55)] text-center py-4">Nenhuma reunião esta semana.</p>
+            <p className="text-sm text-fg4 text-center py-4">Nenhuma reunião esta semana.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {reunioesSemana.map(r => {
@@ -307,16 +307,16 @@ export function DashboardPage() {
                 return (
                   <div key={r.id} className="rounded-xl border p-3 space-y-1.5" style={{ borderLeftWidth: 3, borderLeftColor: statusColors[r.status] }}>
                     <div className="flex items-start justify-between gap-1">
-                      <p className="text-sm font-semibold text-[rgba(230,235,240,0.92)] leading-tight">{r.titulo}</p>
+                      <p className="text-sm font-semibold text-foreground leading-tight">{r.titulo}</p>
                       <span className="text-xs shrink-0 font-medium" style={{ color: statusColors[r.status] }}>
                         {DIAS_SEMANA[dt.getDay()]}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-[rgba(130,150,170,0.65)]">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock className="w-3 h-3" />
                       {dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} às {dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                     </div>
-                    {r.local && <div className="flex items-center gap-1 text-xs text-[rgba(100,120,140,0.55)]"><MapPin className="w-3 h-3" />{r.local}</div>}
+                    {r.local && <div className="flex items-center gap-1 text-xs text-fg4"><MapPin className="w-3 h-3" />{r.local}</div>}
                     {r.link_video && (
                       <a href={r.link_video} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-white px-2 py-1 rounded-md w-fit" style={{ backgroundColor: '#0089ac' }}>
                         <Video className="w-3 h-3" />Entrar
@@ -370,7 +370,7 @@ export function DashboardPage() {
             <CardTitle className="text-sm flex items-center gap-2">
               <Flame className="w-4 h-4 text-orange-500" />
               Leads parados ({stagnantLeads.length})
-              <span className="text-xs font-normal text-[rgba(100,120,140,0.55)] ml-1">— precisam de atenção</span>
+              <span className="text-xs font-normal text-fg4 ml-1">— precisam de atenção</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -378,7 +378,7 @@ export function DashboardPage() {
               {stagnantLeads.slice(0, 6).map(l => {
                 const days = differenceInDays(new Date(), new Date(l.updated_at))
                 const stageLabel = PIPELINE_STAGES.find(s => s.id === l.status)?.label ?? l.status
-                const stageCss = STAGE_COLORS[l.status] ?? 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)]'
+                const stageCss = STAGE_COLORS[l.status] ?? 'bg-[rgba(255,255,255,0.04)] text-muted-foreground'
                 return (
                   <div
                     key={l.id}
@@ -386,8 +386,8 @@ export function DashboardPage() {
                     onClick={() => navigate(`/leads/${l.id}`)}
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[rgba(230,235,240,0.92)] truncate">{l.nome}</p>
-                      <p className="text-xs text-[rgba(130,150,170,0.65)] truncate">{l.empresa}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{l.nome}</p>
+                      <p className="text-xs text-muted-foreground truncate">{l.empresa}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 ml-2">
                       <span className={cn('text-[10px] font-medium px-2 py-0.5 rounded-full border', stageCss)}>
@@ -402,7 +402,7 @@ export function DashboardPage() {
               })}
             </div>
             {stagnantLeads.length > 6 && (
-              <button onClick={() => navigate('/leads')} className="mt-3 text-xs text-[rgba(100,120,140,0.55)] hover:text-[rgba(150,165,180,0.70)] underline w-full text-center">
+              <button onClick={() => navigate('/leads')} className="mt-3 text-xs text-fg4 hover:text-muted-foreground underline w-full text-center">
                 Ver todos os {stagnantLeads.length} leads parados →
               </button>
             )}

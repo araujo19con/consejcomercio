@@ -47,7 +47,7 @@ export function ConfiguracoesPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)] mb-6">Configurações</h1>
+      <h1 className="text-xl font-bold text-foreground mb-6">Configurações</h1>
       <div className="max-w-2xl space-y-4">
 
         {/* Serviços e preços */}
@@ -58,7 +58,7 @@ export function ConfiguracoesPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-xs text-[rgba(130,150,170,0.65)]">Edite os serviços disponíveis e seus respectivos valores.</p>
+            <p className="text-xs text-muted-foreground">Edite os serviços disponíveis e seus respectivos valores.</p>
 
             {isLoading ? (
               <div className="space-y-2">
@@ -83,7 +83,7 @@ export function ConfiguracoesPage() {
                       <option value="complexa">Complexa</option>
                     </select>
                     <div className="relative w-32">
-                      <span className="absolute left-2.5 top-2 text-[rgba(100,120,140,0.55)] text-sm">R$</span>
+                      <span className="absolute left-2.5 top-2 text-fg4 text-sm">R$</span>
                       <Input
                         type="number"
                         value={s.valor}
@@ -94,7 +94,7 @@ export function ConfiguracoesPage() {
                     </div>
                     <button
                       onClick={() => setServicos(prev => prev.filter(sv => sv.id !== s.id))}
-                      className="p-2 rounded-lg hover:bg-red-500/10 text-[rgba(100,120,140,0.55)] hover:text-red-500"
+                      className="p-2 rounded-lg hover:bg-red-500/10 text-fg4 hover:text-red-500"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -105,7 +105,7 @@ export function ConfiguracoesPage() {
 
             {/* Add new service */}
             <div className="border-t pt-3 space-y-2">
-              <p className="text-xs font-medium text-[rgba(150,165,180,0.70)]">Adicionar serviço</p>
+              <p className="text-xs font-medium text-muted-foreground">Adicionar serviço</p>
               <div className="flex items-center gap-2">
                 <Input
                   value={novoNome}
@@ -122,7 +122,7 @@ export function ConfiguracoesPage() {
                   <option value="complexa">Complexa</option>
                 </select>
                 <div className="relative w-32">
-                  <span className="absolute left-2.5 top-2 text-[rgba(100,120,140,0.55)] text-sm">R$</span>
+                  <span className="absolute left-2.5 top-2 text-fg4 text-sm">R$</span>
                   <Input
                     type="number"
                     value={novoValor}
@@ -168,8 +168,8 @@ export function ConfiguracoesPage() {
         <Card>
           <CardHeader><CardTitle className="text-base">Sobre o Sistema</CardTitle></CardHeader>
           <CardContent>
-            <p className="text-sm text-[rgba(130,150,170,0.65)]">CONSEJ CRM v2.0</p>
-            <p className="text-xs text-[rgba(100,120,140,0.55)] mt-1">Assessoria Jurídica Júnior — Gestão de relacionamento com clientes e leads passivos.</p>
+            <p className="text-sm text-muted-foreground">CONSEJ CRM v2.0</p>
+            <p className="text-xs text-fg4 mt-1">Assessoria Jurídica Júnior — Gestão de relacionamento com clientes e leads passivos.</p>
           </CardContent>
         </Card>
       </div>

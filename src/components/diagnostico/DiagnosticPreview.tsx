@@ -32,7 +32,7 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
             <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(0,137,172,0.15)', color: '#6bd0e7', border: '1px solid rgba(0,137,172,0.30)' }}>
               {clusterInfo?.label}
             </span>
-            <span className="text-xs text-[rgba(100,120,140,0.55)]">{clusterInfo?.price}</span>
+            <span className="text-xs text-fg4">{clusterInfo?.price}</span>
           </div>
         </div>
 
@@ -40,11 +40,11 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
         <div className="bg-card rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="flex items-center gap-2 mb-3">
             <Target className="w-4 h-4" style={{ color: '#6bd0e7' }} />
-            <h3 className="text-sm font-semibold text-[rgba(230,235,240,0.92)]">Necessidades Identificadas</h3>
+            <h3 className="text-sm font-semibold text-foreground">Necessidades Identificadas</h3>
           </div>
           <ul className="space-y-2">
             {analise.necessidades.map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-[rgba(215,225,235,0.85)]">
+              <li key={i} className="flex items-start gap-2 text-sm text-fg2">
                 <span className="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full text-xs font-bold flex items-center justify-center" style={{ background: 'rgba(0,137,172,0.20)', color: '#6bd0e7' }}>
                   {i + 1}
                 </span>
@@ -74,7 +74,7 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
         <div className="bg-card rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="flex items-center gap-2 mb-3">
             <Lightbulb className="w-4 h-4" style={{ color: '#fbbf24' }} />
-            <h3 className="text-sm font-semibold text-[rgba(230,235,240,0.92)]">Serviços CONSEJ Recomendados</h3>
+            <h3 className="text-sm font-semibold text-foreground">Serviços CONSEJ Recomendados</h3>
           </div>
           <div className="space-y-2">
             {analise.servicos_recomendados.map((s, i) => {
@@ -82,12 +82,12 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
               return (
                 <div key={i} className="p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-sm font-semibold text-[rgba(230,235,240,0.92)]">{s.nome}</span>
+                    <span className="text-sm font-semibold text-foreground">{s.nome}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full border font-medium" style={{ background: p.bg, color: p.color, borderColor: p.border }}>
                       {s.prioridade === 'alta' ? 'Alta' : s.prioridade === 'media' ? 'Média' : 'Baixa'}
                     </span>
                   </div>
-                  <p className="text-xs text-[rgba(130,150,170,0.65)]">{s.justificativa}</p>
+                  <p className="text-xs text-muted-foreground">{s.justificativa}</p>
                 </div>
               )
             })}

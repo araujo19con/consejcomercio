@@ -27,7 +27,7 @@ export const STAGE_COLORS: Record<string, string> = {
   educar_lead:               'bg-violet-100 text-violet-700 border-violet-200',
   proposta_comercial:        'bg-amber-100 text-amber-700 border-amber-200',
   negociacao:                'bg-orange-100 text-orange-700 border-orange-200',
-  stand_by:                  'bg-[rgba(255,255,255,0.06)] text-[rgba(150,165,180,0.70)] border-[rgba(255,255,255,0.10)]',
+  stand_by:                  'bg-[rgba(255,255,255,0.06)] text-muted-foreground border-[rgba(255,255,255,0.10)]',
   ganho_assessoria:          'bg-green-100 text-green-700 border-green-200',
   ganho_consultoria:         'bg-emerald-100 text-emerald-700 border-emerald-200',
   perdido:                   'bg-red-100 text-red-700 border-red-200',
@@ -133,7 +133,7 @@ export const REWARD_TYPES = [
 
 // Indicacao status
 export const INDICACAO_STATUS = [
-  { value: 'pendente', label: 'Pendente', color: 'bg-[rgba(255,255,255,0.06)] text-[rgba(130,150,170,0.65)]' },
+  { value: 'pendente', label: 'Pendente', color: 'bg-[rgba(255,255,255,0.06)] text-muted-foreground' },
   { value: 'contactado', label: 'Contactado', color: 'bg-blue-100 text-blue-700' },
   { value: 'em_negociacao', label: 'Em Negociação', color: 'bg-amber-100 text-amber-700' },
   { value: 'convertido', label: 'Convertido', color: 'bg-green-100 text-green-700' },
@@ -144,7 +144,7 @@ export const INDICACAO_STATUS = [
 export const CLIENT_STATUS_OPTIONS = [
   { value: 'ativo', label: 'Ativo', color: 'bg-green-100 text-green-700' },
   { value: 'em_renovacao', label: 'Em Renovação', color: 'bg-amber-100 text-amber-700' },
-  { value: 'encerrado', label: 'Encerrado', color: 'bg-[rgba(255,255,255,0.06)] text-[rgba(130,150,170,0.65)]' },
+  { value: 'encerrado', label: 'Encerrado', color: 'bg-[rgba(255,255,255,0.06)] text-muted-foreground' },
 ]
 
 // RM status
@@ -164,7 +164,7 @@ export const OPORTUNIDADE_TIPOS = [
 ]
 
 export const OPORTUNIDADE_STATUS = [
-  { value: 'identificada', label: 'Identificada', color: 'bg-[rgba(255,255,255,0.06)] text-[rgba(150,165,180,0.70)]' },
+  { value: 'identificada', label: 'Identificada', color: 'bg-[rgba(255,255,255,0.06)] text-muted-foreground' },
   { value: 'abordada', label: 'Abordada', color: 'bg-blue-100 text-blue-700' },
   { value: 'em_proposta', label: 'Em Proposta', color: 'bg-amber-100 text-amber-700' },
   { value: 'convertida', label: 'Convertida', color: 'bg-green-100 text-green-700' },

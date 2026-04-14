@@ -22,7 +22,7 @@ const HEALTH_STYLES: Record<HealthLevel, { dot: string; label: string }> = {
   green:  { dot: 'bg-emerald-500', label: 'text-emerald-400' },
   yellow: { dot: 'bg-amber-400',   label: 'text-amber-400'   },
   red:    { dot: 'bg-red-500',     label: 'text-red-400'     },
-  gray:   { dot: 'bg-slate-500',   label: 'text-[rgba(100,120,140,0.55)]' },
+  gray:   { dot: 'bg-slate-500',   label: 'text-fg4' },
 }
 
 // ─── Nível de Pertencimento ───────────────────────────────────────────────────
@@ -95,7 +95,7 @@ function getInitials(name: string) {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getStatusColor(status: string) {
-  return CLIENT_STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)]'
+  return CLIENT_STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-[rgba(255,255,255,0.04)] text-muted-foreground'
 }
 
 function getSegmentLabel(value: string) {
@@ -320,8 +320,8 @@ export function ClientesPage() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Clientes</h1>
-          <p className="text-sm text-[rgba(130,150,170,0.65)] mt-0.5">Gerencie sua carteira de clientes ativos e histórico de contratos</p>
+          <h1 className="text-xl font-bold text-foreground">Clientes</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Gerencie sua carteira de clientes ativos e histórico de contratos</p>
         </div>
         <Button
           size="sm"
@@ -338,7 +338,7 @@ export function ClientesPage() {
       <div className="space-y-2">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
+            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-fg4" />
             <Input
               placeholder="Buscar por nome ou empresa…"
               className="pl-8 h-9 text-sm"
@@ -360,13 +360,13 @@ export function ClientesPage() {
                   onClick={() => handleStatusTabClick(tab.value)}
                   className={cn(
                     'px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5',
-                    isActive ? 'bg-white text-[rgba(230,235,240,0.92)] shadow-sm' : 'text-[rgba(130,150,170,0.65)] hover:text-[rgba(215,225,235,0.85)]'
+                    isActive ? 'bg-white text-foreground shadow-sm' : 'text-muted-foreground hover:text-fg2'
                   )}
                 >
                   {tab.label}
                   <span className={cn(
                     'text-[10px] px-1.5 py-0.5 rounded-full font-semibold tabular-nums',
-                    isActive ? 'text-white' : 'bg-[rgba(255,255,255,0.07)] text-[rgba(130,150,170,0.65)]'
+                    isActive ? 'text-white' : 'bg-[rgba(255,255,255,0.07)] text-muted-foreground'
                   )} style={isActive ? { backgroundColor: '#0089ac' } : {}}>
                     {count}
                   </span>
@@ -378,7 +378,7 @@ export function ClientesPage() {
 
         {/* Tipo de serviço filter */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.55)]">Tipo:</span>
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4">Tipo:</span>
           {TIPO_TABS.map(tab => {
             const count = tab.value === 'todos'
               ? (clientes?.length ?? 0)
@@ -406,7 +406,7 @@ export function ClientesPage() {
         <div className="flex items-center gap-3 flex-wrap">
           {/* Health */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.55)]">Saúde:</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4">Saúde:</span>
             {HEALTH_FILTER_TABS.map(tab => {
               const count = tab.value === 'todos'
                 ? (clientes?.length ?? 0)
@@ -448,7 +448,7 @@ export function ClientesPage() {
 
           {/* Sort */}
           <div className="flex items-center gap-1.5 ml-auto">
-            <ArrowUpDown className="w-3.5 h-3.5 text-[rgba(100,120,140,0.55)]" />
+            <ArrowUpDown className="w-3.5 h-3.5 text-fg4" />
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value as ClienteSort)}
@@ -596,12 +596,12 @@ export function ClientesPage() {
                   {/* Name + company */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-[rgba(230,235,240,0.92)]">{cliente.nome}</p>
+                      <p className="font-semibold text-foreground">{cliente.nome}</p>
                       <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', getStatusColor(cliente.status))}>
                         {CLIENT_STATUS_OPTIONS.find(s => s.value === cliente.status)?.label}
                       </span>
                     </div>
-                    <p className="text-sm text-[rgba(130,150,170,0.65)] truncate">
+                    <p className="text-sm text-muted-foreground truncate">
                       {cliente.empresa} · {getSegmentLabel(cliente.segmento)}
                     </p>
                   </div>
@@ -623,13 +623,13 @@ export function ClientesPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-[rgba(130,150,170,0.65)]">
+                        <p className="text-xs text-muted-foreground">
                           {cliente.contratos?.length || 0} contrato{(cliente.contratos?.length || 0) !== 1 ? 's' : ''}
                         </p>
                         {nextExpiry && (
                           <div className={cn(
                             'flex items-center justify-end gap-1 text-xs mt-0.5',
-                            isExpiringSoon ? 'text-orange-600 font-medium' : 'text-[rgba(100,120,140,0.55)]'
+                            isExpiringSoon ? 'text-orange-600 font-medium' : 'text-fg4'
                           )}>
                             {isExpiringSoon && <AlertCircle className="w-3 h-3" />}
                             {daysLeft === 0
@@ -660,7 +660,7 @@ export function ClientesPage() {
                       </button>
                       <button
                         onClick={e => { e.stopPropagation(); setDeleteConfirm(null) }}
-                        className="text-xs px-2.5 py-1 rounded-md border border text-[rgba(150,165,180,0.70)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-md border border text-muted-foreground hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                       >
                         Cancelar
                       </button>

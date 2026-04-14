@@ -115,8 +115,8 @@ export function LeadCard({ lead, isDragging = false, stageId }: Props) {
       {/* Header row */}
       <div className="flex items-start justify-between gap-1">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-[rgba(230,235,240,0.92)] leading-tight truncate">{lead.nome}</p>
-          <p className="text-xs text-[rgba(130,150,170,0.65)] mt-0.5 truncate">{lead.empresa}</p>
+          <p className="text-sm font-semibold text-foreground leading-tight truncate">{lead.nome}</p>
+          <p className="text-xs text-muted-foreground mt-0.5 truncate">{lead.empresa}</p>
         </div>
         {isStagnant && (
           <div
@@ -137,7 +137,7 @@ export function LeadCard({ lead, isDragging = false, stageId }: Props) {
         >
           {lead.segmento.replace(/_/g, ' ')}
         </span>
-        <span className="text-xs text-[rgba(100,120,140,0.55)]">
+        <span className="text-xs text-fg4">
           {LEAD_SOURCE_LABELS[lead.origem] || lead.origem}
         </span>
       </div>
@@ -150,7 +150,7 @@ export function LeadCard({ lead, isDragging = false, stageId }: Props) {
           </div>
         )}
         {lead.responsavel && (
-          <div className="flex items-center gap-1 text-xs text-[rgba(100,120,140,0.55)] ml-auto">
+          <div className="flex items-center gap-1 text-xs text-fg4 ml-auto">
             <User className="w-3 h-3" />
             <span>{lead.responsavel}</span>
           </div>

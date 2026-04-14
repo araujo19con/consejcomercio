@@ -73,7 +73,7 @@ export function DemandasPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Demandas</h1>
+        <h1 className="text-xl font-bold text-foreground">Demandas</h1>
         <Button size="sm" onClick={() => setShowNew(true)} className="bg-primary hover:bg-primary/90">
           <Plus className="w-4 h-4 mr-1" /> Nova Demanda
         </Button>
@@ -92,7 +92,7 @@ export function DemandasPage() {
         </div>
       </div>
 
-      {isLoading ? <div className="text-center text-[rgba(130,150,170,0.65)] py-8">Carregando...</div> : (
+      {isLoading ? <div className="text-center text-muted-foreground py-8">Carregando...</div> : (
         <div className="space-y-2">
           {filtered.map(demanda => {
             const statusInfo = DEMANDA_STATUS.find(s => s.value === demanda.status)
@@ -102,16 +102,16 @@ export function DemandasPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-[rgba(230,235,240,0.92)]">{demanda.titulo}</p>
-                      <p className="text-sm text-[rgba(130,150,170,0.65)]">{demanda.cliente?.nome} · {demanda.cliente?.empresa}</p>
-                      {demanda.area_direito && <p className="text-xs text-[rgba(100,120,140,0.55)] mt-0.5">{demanda.area_direito.replace(/_/g, ' ')}</p>}
+                      <p className="font-semibold text-foreground">{demanda.titulo}</p>
+                      <p className="text-sm text-muted-foreground">{demanda.cliente?.nome} · {demanda.cliente?.empresa}</p>
+                      {demanda.area_direito && <p className="text-xs text-fg4 mt-0.5">{demanda.area_direito.replace(/_/g, ' ')}</p>}
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="text-right">
                         <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', tipoInfo?.valor === 500 ? 'bg-[rgba(139,92,246,0.15)] text-[#a78bfa]' : 'bg-[rgba(59,130,246,0.15)] text-[#93c5fd]')}>
                           {tipoInfo?.label} · {formatCurrency(tipoInfo?.valor || 0)}
                         </span>
-                        <p className="text-xs text-[rgba(100,120,140,0.55)] mt-0.5">{formatDate(demanda.data_abertura)}</p>
+                        <p className="text-xs text-fg4 mt-0.5">{formatDate(demanda.data_abertura)}</p>
                       </div>
                       <Select value={demanda.status} onValueChange={v => updateDemanda.mutate({ id: demanda.id, status: v })}>
                         <SelectTrigger className={cn('w-36 h-7 text-xs', statusInfo?.color)}>
@@ -137,7 +137,7 @@ export function DemandasPage() {
               </Card>
             )
           })}
-          {filtered.length === 0 && <div className="text-center text-[rgba(100,120,140,0.55)] py-12">Nenhuma demanda encontrada.</div>}
+          {filtered.length === 0 && <div className="text-center text-fg4 py-12">Nenhuma demanda encontrada.</div>}
         </div>
       )}
 

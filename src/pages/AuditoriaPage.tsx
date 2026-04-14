@@ -17,9 +17,9 @@ export function AuditoriaPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)] mb-6">Auditoria</h1>
+      <h1 className="text-xl font-bold text-foreground mb-6">Auditoria</h1>
 
-      {isLoading ? <div className="text-center text-[rgba(130,150,170,0.65)] py-8">Carregando...</div> : (
+      {isLoading ? <div className="text-center text-muted-foreground py-8">Carregando...</div> : (
         <Card>
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
@@ -42,17 +42,17 @@ export function AuditoriaPage() {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[rgba(215,225,235,0.85)]">
+                    <p className="text-sm text-fg2">
                       <span className="font-medium capitalize">{log.tabela.replace(/_/g, ' ')}</span>
-                      {log.campo && <span className="text-[rgba(100,120,140,0.55)]"> · {log.campo}</span>}
+                      {log.campo && <span className="text-fg4"> · {log.campo}</span>}
                     </p>
-                    {log.usuario && <p className="text-xs text-[rgba(100,120,140,0.55)]">{log.usuario}</p>}
+                    {log.usuario && <p className="text-xs text-fg4">{log.usuario}</p>}
                   </div>
-                  <p className="text-xs text-[rgba(100,120,140,0.55)] shrink-0">{formatDate(log.created_at)}</p>
+                  <p className="text-xs text-fg4 shrink-0">{formatDate(log.created_at)}</p>
                 </div>
               ))}
               {!logs?.length && (
-                <div className="text-center text-[rgba(100,120,140,0.55)] py-12">Nenhuma atividade registrada.</div>
+                <div className="text-center text-fg4 py-12">Nenhuma atividade registrada.</div>
               )}
             </div>
           </CardContent>

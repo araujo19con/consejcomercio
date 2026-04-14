@@ -15,7 +15,7 @@ export function DiagnosticosPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)] mb-6">Diagnósticos</h1>
+      <h1 className="text-xl font-bold text-foreground mb-6">Diagnósticos</h1>
 
       {pendentes.length > 0 && (
         <div className="mb-6">
@@ -47,15 +47,15 @@ export function DiagnosticosPage() {
       <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'rgba(52,211,153,0.85)' }}>
         <CheckCircle2 className="w-4 h-4" /> Concluídos ({withDiagnostico.length})
       </h2>
-      {isLoading ? <div className="text-center text-[rgba(130,150,170,0.65)] py-8">Carregando...</div> : (
+      {isLoading ? <div className="text-center text-muted-foreground py-8">Carregando...</div> : (
         <div className="space-y-2">
           {withDiagnostico.map(lead => (
             <Card key={lead.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/leads/${lead.id}`)}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-[rgba(230,235,240,0.92)]">{lead.nome} — {lead.empresa}</p>
-                    <p className="text-xs text-[rgba(130,150,170,0.65)] mt-0.5">
+                    <p className="font-semibold text-foreground">{lead.nome} — {lead.empresa}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       Cluster: <span className="font-medium text-[#a5b4fc]">{lead.diagnostico?.cluster_recomendado || '—'}</span>
                       {' · '}Concluído em {formatDate(lead.diagnostico?.completed_at)}
                     </p>
@@ -69,7 +69,7 @@ export function DiagnosticosPage() {
               </CardContent>
             </Card>
           ))}
-          {withDiagnostico.length === 0 && <div className="text-center text-[rgba(100,120,140,0.55)] py-8">Nenhum diagnóstico concluído.</div>}
+          {withDiagnostico.length === 0 && <div className="text-center text-fg4 py-8">Nenhum diagnóstico concluído.</div>}
         </div>
       )}
     </div>

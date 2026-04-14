@@ -15,7 +15,7 @@ import type { Parceiro } from '@/types'
 const PARCEIRO_STATUS = [
   { value: 'ativo', label: 'Ativo', color: 'bg-[rgba(16,185,129,0.15)] text-[#34d399]' },
   { value: 'potencial', label: 'Potencial', color: 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]' },
-  { value: 'inativo', label: 'Inativo', color: 'bg-[rgba(255,255,255,0.04)] text-[rgba(130,150,170,0.65)]' },
+  { value: 'inativo', label: 'Inativo', color: 'bg-[rgba(255,255,255,0.04)] text-muted-foreground' },
 ]
 
 function useParceiroForm(initial?: Parceiro) {
@@ -112,13 +112,13 @@ export function ParceirosPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Parceiros</h1>
+        <h1 className="text-xl font-bold text-foreground">Parceiros</h1>
         <Button size="sm" onClick={() => setShowNew(true)} className="bg-primary hover:bg-primary/90">
           <Plus className="w-4 h-4 mr-1" /> Novo Parceiro
         </Button>
       </div>
 
-      {isLoading ? <div className="text-center text-[rgba(130,150,170,0.65)] py-8">Carregando...</div> : (
+      {isLoading ? <div className="text-center text-muted-foreground py-8">Carregando...</div> : (
         <div className="grid grid-cols-2 gap-3">
           {parceiros?.map(parceiro => {
             const tipoInfo = PARCEIRO_TIPOS.find(t => t.value === parceiro.tipo)
@@ -132,8 +132,8 @@ export function ParceirosPage() {
                         <Handshake className="w-4 h-4 text-[#6bd0e7]" />
                       </div>
                       <div>
-                        <p className="font-semibold text-[rgba(230,235,240,0.92)]">{parceiro.nome}</p>
-                        <p className="text-xs text-[rgba(130,150,170,0.65)]">{tipoInfo?.label}</p>
+                        <p className="font-semibold text-foreground">{parceiro.nome}</p>
+                        <p className="text-xs text-muted-foreground">{tipoInfo?.label}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -142,7 +142,7 @@ export function ParceirosPage() {
                           {statusInfo.label}
                         </span>
                       )}
-                      <button onClick={() => handleEdit(parceiro)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-[rgba(100,120,140,0.55)]">
+                      <button onClick={() => handleEdit(parceiro)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-fg4">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       {deletingId === parceiro.id ? (
@@ -157,8 +157,8 @@ export function ParceirosPage() {
                       )}
                     </div>
                   </div>
-                  {parceiro.contato_nome && <p className="text-xs text-[rgba(150,165,180,0.70)] mt-2">Contato: {parceiro.contato_nome}</p>}
-                  {parceiro.contato_email && <p className="text-xs text-[rgba(100,120,140,0.55)]">{parceiro.contato_email}</p>}
+                  {parceiro.contato_nome && <p className="text-xs text-muted-foreground mt-2">Contato: {parceiro.contato_nome}</p>}
+                  {parceiro.contato_email && <p className="text-xs text-fg4">{parceiro.contato_email}</p>}
                   {parceiro.website && (
                     <a href={parceiro.website} target="_blank" rel="noopener noreferrer" className="text-xs text-[#6bd0e7] flex items-center gap-1 mt-1 hover:underline">
                       <Globe className="w-3 h-3" /> {parceiro.website}
@@ -168,7 +168,7 @@ export function ParceirosPage() {
               </Card>
             )
           })}
-          {!parceiros?.length && <div className="col-span-2 text-center text-[rgba(100,120,140,0.55)] py-12">Nenhum parceiro cadastrado.</div>}
+          {!parceiros?.length && <div className="col-span-2 text-center text-fg4 py-12">Nenhum parceiro cadastrado.</div>}
         </div>
       )}
 

@@ -427,8 +427,8 @@ export function MensagensPage() {
           <Sparkles className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[rgba(230,235,240,0.95)]">Mensagens de Abordagem</h1>
-          <p className="text-sm text-[rgba(130,150,170,0.65)]">Gere mensagens personalizadas para cada etapa do funil e tipo de cliente</p>
+          <h1 className="text-2xl font-bold text-foreground">Mensagens de Abordagem</h1>
+          <p className="text-sm text-muted-foreground">Gere mensagens personalizadas para cada etapa do funil e tipo de cliente</p>
         </div>
       </div>
 
@@ -439,10 +439,10 @@ export function MensagensPage() {
 
           {/* Contact info */}
           <div>
-            <h2 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mb-3">Dados do contato</h2>
+            <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-3">Dados do contato</h2>
             <div className="space-y-3">
               <div>
-                <Label className="text-[rgba(150,165,180,0.70)] text-xs mb-1 block">Nome do contato</Label>
+                <Label className="text-muted-foreground text-xs mb-1 block">Nome do contato</Label>
                 <Input
                   placeholder="Ex: João Silva"
                   value={nome}
@@ -451,7 +451,7 @@ export function MensagensPage() {
                 />
               </div>
               <div>
-                <Label className="text-[rgba(150,165,180,0.70)] text-xs mb-1 block">Empresa</Label>
+                <Label className="text-muted-foreground text-xs mb-1 block">Empresa</Label>
                 <Input
                   placeholder="Ex: Tech Solutions Ltda"
                   value={empresa}
@@ -460,7 +460,7 @@ export function MensagensPage() {
                 />
               </div>
               <div>
-                <Label className="text-[rgba(150,165,180,0.70)] text-xs mb-1 block">Advogado(a) responsável</Label>
+                <Label className="text-muted-foreground text-xs mb-1 block">Advogado(a) responsável</Label>
                 <Input
                   placeholder="Ex: Ana Carolina"
                   value={responsavel}
@@ -475,7 +475,7 @@ export function MensagensPage() {
 
           {/* Channel */}
           <div>
-            <h2 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mb-3">Canal</h2>
+            <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-3">Canal</h2>
             <div className="grid grid-cols-3 gap-2">
               {CHANNELS.map(ch => (
                 <button
@@ -485,7 +485,7 @@ export function MensagensPage() {
                     'flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border text-xs font-medium transition-all',
                     channel === ch.id
                       ? 'border-cyan-500 bg-cyan-50 text-cyan-700'
-                      : 'text-[rgba(130,150,170,0.65)] hover:border hover:bg-background'
+                      : 'text-muted-foreground hover:border hover:bg-background'
                   )}
                 >
                   <ch.icon className="w-4 h-4" />
@@ -499,7 +499,7 @@ export function MensagensPage() {
 
           {/* Stage */}
           <div>
-            <h2 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mb-3">Etapa do funil</h2>
+            <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-3">Etapa do funil</h2>
             <div className="space-y-1.5">
               {STAGES.map(s => (
                 <button
@@ -520,7 +520,7 @@ export function MensagensPage() {
 
           {/* Sector */}
           <div>
-            <h2 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mb-3">Setor / Área jurídica</h2>
+            <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-3">Setor / Área jurídica</h2>
             <div className="grid grid-cols-2 gap-1.5">
               {SECTORS.map(sec => (
                 <button
@@ -530,7 +530,7 @@ export function MensagensPage() {
                     'flex items-center gap-1.5 px-2.5 py-2 rounded-lg border text-xs font-medium transition-all text-left',
                     sector === sec.id
                       ? 'border-cyan-500 bg-cyan-50 text-cyan-700'
-                      : 'text-[rgba(150,165,180,0.70)] hover:border hover:bg-background'
+                      : 'text-muted-foreground hover:border hover:bg-background'
                   )}
                 >
                   <span>{sec.emoji}</span>
@@ -549,14 +549,14 @@ export function MensagensPage() {
             <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ background: stageInfo.bgVal, color: stageInfo.colorVal, borderColor: stageInfo.colorVal + '80' }}>
               {stageInfo.label}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background text-[rgba(150,165,180,0.70)]" style={{ border: '1px solid rgba(255,255,255,0.10)' }}>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background text-muted-foreground" style={{ border: '1px solid rgba(255,255,255,0.10)' }}>
               {sectorInfo.emoji} {sectorInfo.label}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold border bg-background text-[rgba(150,165,180,0.70)] capitalize">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold border bg-background text-muted-foreground capitalize">
               {channel === 'whatsapp' ? '📱 WhatsApp' : channel === 'email' ? '📧 E-mail' : '💼 LinkedIn'}
             </span>
             {messages.length > 1 && (
-              <span className="px-3 py-1 rounded-full text-xs font-medium border bg-background text-[rgba(100,120,140,0.55)]">
+              <span className="px-3 py-1 rounded-full text-xs font-medium border bg-background text-fg4">
                 Variação {varIdx + 1} de {messages.length}
               </span>
             )}
@@ -568,14 +568,14 @@ export function MensagensPage() {
             {/* Email subject */}
             {channel === 'email' && currentMsg?.subject && (
               <div className="px-5 py-3 border-b border-slate-100 bg-background">
-                <span className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider mr-2">Assunto:</span>
-                <span className="text-sm font-medium text-[rgba(230,235,240,0.92)]">{currentMsg.subject}</span>
+                <span className="text-xs font-semibold text-fg4 uppercase tracking-wider mr-2">Assunto:</span>
+                <span className="text-sm font-medium text-foreground">{currentMsg.subject}</span>
               </div>
             )}
 
             {/* Body */}
             <div className="p-5">
-              <pre className="whitespace-pre-wrap text-sm text-[rgba(215,225,235,0.85)] font-sans leading-relaxed">
+              <pre className="whitespace-pre-wrap text-sm text-fg2 font-sans leading-relaxed">
                 {currentMsg?.body ?? '—'}
               </pre>
             </div>
@@ -586,7 +586,7 @@ export function MensagensPage() {
                 {channel === 'whatsapp' && (
                   <span className={cn(
                     'text-xs',
-                    charCount > 1000 ? 'text-orange-500' : charCount > 600 ? 'text-amber-500' : 'text-[rgba(100,120,140,0.55)]'
+                    charCount > 1000 ? 'text-orange-500' : charCount > 600 ? 'text-amber-500' : 'text-fg4'
                   )}>
                     {charCount} caracteres
                     {charCount > 1000 && ' — considere encurtar'}
@@ -630,7 +630,7 @@ export function MensagensPage() {
           {/* All variations preview */}
           {messages.length > 1 && (
             <div className="space-y-3">
-              <h3 className="text-xs font-semibold text-[rgba(100,120,140,0.55)] uppercase tracking-wider">Todas as variações</h3>
+              <h3 className="text-xs font-semibold text-fg4 uppercase tracking-wider">Todas as variações</h3>
               {messages.map((msg, i) => (
                 <button
                   key={i}
@@ -642,8 +642,8 @@ export function MensagensPage() {
                       : 'border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.14)] hover:bg-[rgba(255,255,255,0.06)]'
                   )}
                 >
-                  <div className="text-xs font-semibold text-[rgba(100,120,140,0.55)] mb-1.5">Variação {i + 1}</div>
-                  <p className="text-[rgba(150,165,180,0.70)] text-xs leading-relaxed line-clamp-3 whitespace-pre-wrap">
+                  <div className="text-xs font-semibold text-fg4 mb-1.5">Variação {i + 1}</div>
+                  <p className="text-muted-foreground text-xs leading-relaxed line-clamp-3 whitespace-pre-wrap">
                     {msg.body}
                   </p>
                 </button>

@@ -58,7 +58,7 @@ function getAccent(acao: string) {
   if (acao === 'criado') return { dot: 'bg-emerald-500', text: 'text-emerald-400' }
   if (acao === 'status_alterado') return { dot: 'bg-[#0089ac]', text: 'text-[#6bd0e7]' }
   if (acao === 'convertido') return { dot: 'bg-violet-500', text: 'text-violet-400' }
-  return { dot: 'bg-[rgba(130,150,170,0.4)]', text: 'text-[rgba(130,150,170,0.65)]' }
+  return { dot: 'bg-[rgba(130,150,170,0.4)]', text: 'text-muted-foreground' }
 }
 
 export function ActivityTimeline({ tabela, registroId }: Props) {
@@ -82,7 +82,7 @@ export function ActivityTimeline({ tabela, registroId }: Props) {
 
   if (!logs?.length) {
     return (
-      <div className="text-center py-10 text-[rgba(100,120,140,0.55)] text-sm">
+      <div className="text-center py-10 text-fg4 text-sm">
         Nenhuma atividade registrada.
       </div>
     )
@@ -108,10 +108,10 @@ export function ActivityTimeline({ tabela, registroId }: Props) {
                 <div>
                   <div className="flex items-center gap-1.5">
                     <Icon className={cn('w-3 h-3 shrink-0', accent.text)} />
-                    <span className="text-sm font-medium text-[rgba(215,225,235,0.85)]">{label}</span>
+                    <span className="text-sm font-medium text-fg2">{label}</span>
                   </div>
                   {detail && (
-                    <p className="text-xs text-[rgba(130,150,170,0.65)] mt-0.5 ml-4.5">{detail}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 ml-4.5">{detail}</p>
                   )}
                   {log.usuario && (
                     <p className="text-xs text-[rgba(100,120,140,0.45)] mt-0.5 ml-4.5">por {log.usuario}</p>

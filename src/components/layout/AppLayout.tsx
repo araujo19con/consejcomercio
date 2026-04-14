@@ -37,9 +37,9 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen" style={{ backgroundColor: '#0a1628' }}>
+    <div className="flex h-screen bg-background">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto" style={{ backgroundColor: '#0a1628' }}>
+      <main className="flex-1 overflow-y-auto bg-background">
         <div key={location.pathname} className="p-6 animate-in fade-in duration-150">
           <Outlet />
         </div>
@@ -50,9 +50,9 @@ export function AppLayout() {
         position="top-right"
         toastOptions={{
           style: {
-            background: '#101e33',
-            color: 'rgba(220,230,240,0.92)',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: 'hsl(var(--card))',
+            color: 'hsl(var(--foreground))',
+            border: '1px solid hsl(var(--border))',
           },
         }}
       />

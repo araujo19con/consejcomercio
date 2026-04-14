@@ -37,13 +37,13 @@ function StatCard({
     <Card style={alert ? { borderColor: 'rgba(239,68,68,0.35)' } : {}}>
       <CardContent className="p-5">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-[rgba(130,150,170,0.65)]">{label}</p>
+          <p className="text-sm text-muted-foreground">{label}</p>
           <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center', accent)}>
             <Icon className="w-4 h-4" />
           </div>
         </div>
         <p className="text-2xl font-bold" style={{ color: alert ? 'rgba(248,113,113,0.90)' : 'rgba(230,235,240,0.92)' }}>{value}</p>
-        {sub && <p className="text-xs text-[rgba(100,120,140,0.55)] mt-1">{sub}</p>}
+        {sub && <p className="text-xs text-fg4 mt-1">{sub}</p>}
       </CardContent>
     </Card>
   )
@@ -219,8 +219,8 @@ export function AnalyticsPage() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Analytics Comercial</h1>
-          <p className="text-sm text-[rgba(130,150,170,0.65)] mt-0.5">Métricas de conversão, tempo de funil e performance por canal</p>
+          <h1 className="text-xl font-bold text-foreground">Analytics Comercial</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Métricas de conversão, tempo de funil e performance por canal</p>
         </div>
         {/* Period selector */}
         <div className="flex items-center gap-1 bg-[rgba(255,255,255,0.04)] p-1 rounded-lg shrink-0">
@@ -230,7 +230,7 @@ export function AnalyticsPage() {
               onClick={() => setPeriod(p)}
               className={cn(
                 'px-3 py-1.5 rounded-md text-xs font-medium transition-all',
-                period === p ? 'bg-white shadow-sm text-[rgba(230,235,240,0.92)]' : 'text-[rgba(130,150,170,0.65)] hover:text-[rgba(215,225,235,0.85)]'
+                period === p ? 'bg-white shadow-sm text-foreground' : 'text-muted-foreground hover:text-fg2'
               )}
             >
               {PERIOD_LABELS[p]}
@@ -323,15 +323,15 @@ export function AnalyticsPage() {
                 ]
                 return (
                   <div key={stage.id} className="flex items-center gap-3">
-                    <span className="text-xs text-[rgba(130,150,170,0.65)] w-36 shrink-0 truncate">{stage.label}</span>
+                    <span className="text-xs text-muted-foreground w-36 shrink-0 truncate">{stage.label}</span>
                     <div className="flex-1 bg-[rgba(255,255,255,0.04)] rounded-full h-5 relative overflow-hidden">
                       <div
                         className={cn('h-full rounded-full transition-all', stageColors[i])}
                         style={{ width: `${widthPct}%` }}
                       />
                     </div>
-                    <span className="text-sm font-bold text-[rgba(215,225,235,0.85)] w-6 text-right">{stage.count}</span>
-                    <span className="text-xs text-[rgba(100,120,140,0.55)] w-8 text-right">{pctTotal}%</span>
+                    <span className="text-sm font-bold text-fg2 w-6 text-right">{stage.count}</span>
+                    <span className="text-xs text-fg4 w-8 text-right">{pctTotal}%</span>
                   </div>
                 )
               })}
@@ -364,7 +364,7 @@ export function AnalyticsPage() {
             </ResponsiveContainer>
             <div className="flex justify-center gap-4 mt-1">
               {metrics.winLossPie.map((d, i) => (
-                <div key={d.name} className="flex items-center gap-1.5 text-xs text-[rgba(130,150,170,0.65)]">
+                <div key={d.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ['#10b981', '#ef4444', '#94a3b8'][i] }} />
                   {d.name} ({d.value})
                 </div>
@@ -384,12 +384,12 @@ export function AnalyticsPage() {
         </CardHeader>
         <CardContent>
           {metrics.bySource.length === 0 ? (
-            <p className="text-sm text-[rgba(100,120,140,0.55)] py-4 text-center">Nenhum lead com fonte definida.</p>
+            <p className="text-sm text-fg4 py-4 text-center">Nenhum lead com fonte definida.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-xs text-[rgba(100,120,140,0.55)] border-b border-slate-100">
+                  <tr className="text-xs text-fg4 border-b border-slate-100">
                     <th className="text-left py-2 font-medium">Canal</th>
                     <th className="text-right py-2 font-medium">Total Leads</th>
                     <th className="text-right py-2 font-medium">Fechados</th>
@@ -400,12 +400,12 @@ export function AnalyticsPage() {
                 <tbody className="divide-y divide-slate-50">
                   {metrics.bySource.map((row, i) => (
                     <tr key={row.name} className="hover:bg-background">
-                      <td className="py-2.5 font-medium text-[rgba(215,225,235,0.85)] flex items-center gap-2">
+                      <td className="py-2.5 font-medium text-fg2 flex items-center gap-2">
                         {i === 0 && <Trophy className="w-3.5 h-3.5 text-amber-500" />}
                         {row.name}
                       </td>
-                      <td className="py-2.5 text-right text-[rgba(150,165,180,0.70)] tabular-nums">{row.total}</td>
-                      <td className="py-2.5 text-right text-[rgba(150,165,180,0.70)] tabular-nums">{row.won}</td>
+                      <td className="py-2.5 text-right text-muted-foreground tabular-nums">{row.total}</td>
+                      <td className="py-2.5 text-right text-muted-foreground tabular-nums">{row.won}</td>
                       <td className="py-2.5 text-right">
                         <span className={cn(
                           'font-bold tabular-nums',
@@ -470,7 +470,7 @@ export function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             {metrics.byResponsavel.filter(r => r.name !== 'Sem responsável').length === 0 ? (
-              <p className="text-sm text-[rgba(100,120,140,0.55)] py-4 text-center">Nenhum lead com responsável atribuído.</p>
+              <p className="text-sm text-fg4 py-4 text-center">Nenhum lead com responsável atribuído.</p>
             ) : (
               <div className="space-y-3">
                 {metrics.byResponsavel
@@ -480,13 +480,13 @@ export function AnalyticsPage() {
                     <div key={r.name} className="flex items-center gap-3">
                       <span className={cn(
                         'w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0',
-                        i === 0 ? 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]' : 'bg-[rgba(255,255,255,0.04)] text-[rgba(130,150,170,0.65)]'
+                        i === 0 ? 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]' : 'bg-[rgba(255,255,255,0.04)] text-muted-foreground'
                       )}>{i + 1}</span>
-                      <span className="text-sm text-[rgba(215,225,235,0.85)] flex-1 truncate">{r.name}</span>
-                      <span className="text-xs text-[rgba(100,120,140,0.55)]">{r.won}/{r.total}</span>
+                      <span className="text-sm text-fg2 flex-1 truncate">{r.name}</span>
+                      <span className="text-xs text-fg4">{r.won}/{r.total}</span>
                       <span className={cn(
                         'text-xs font-bold w-10 text-right',
-                        r.taxa >= 50 ? 'text-emerald-600' : r.taxa >= 25 ? 'text-amber-600' : 'text-[rgba(100,120,140,0.55)]'
+                        r.taxa >= 50 ? 'text-emerald-600' : r.taxa >= 25 ? 'text-amber-600' : 'text-fg4'
                       )}>{r.taxa}%</span>
                     </div>
                   ))}
@@ -502,7 +502,7 @@ export function AnalyticsPage() {
           <CardTitle className="text-sm flex items-center gap-2">
             <Activity className="w-4 h-4 text-[#6bd0e7]" />
             IVM — Índice de Vitalidade do Movimento
-            <span className="text-xs font-normal text-[rgba(100,120,140,0.55)] ml-1">— saúde do movimento em 1 número</span>
+            <span className="text-xs font-normal text-fg4 ml-1">— saúde do movimento em 1 número</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -525,10 +525,10 @@ export function AnalyticsPage() {
               {metrics.ivmComponents.map(c => (
                 <div key={c.label}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-[rgba(150,165,180,0.70)]">{c.label}</span>
+                    <span className="text-xs text-muted-foreground">{c.label}</span>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-[rgba(100,120,140,0.45)]">peso {c.weight}%</span>
-                      <span className="text-sm font-bold text-[rgba(215,225,235,0.85)]">{c.value}%</span>
+                      <span className="text-sm font-bold text-fg2">{c.value}%</span>
                     </div>
                   </div>
                   <div className="h-1.5 bg-[rgba(255,255,255,0.04)] rounded-full">
@@ -577,7 +577,7 @@ export function AnalyticsPage() {
 
                     {/* reason + bar */}
                     <div className="min-w-0">
-                      <p className="text-xs text-[rgba(215,225,235,0.85)] truncate leading-snug">{r.reason}</p>
+                      <p className="text-xs text-fg2 truncate leading-snug">{r.reason}</p>
                       <div className="mt-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                         <div className="h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: color, opacity: 0.7 }} />
                       </div>
@@ -612,7 +612,7 @@ export function AnalyticsPage() {
           <h3 className="text-sm font-semibold text-[rgba(80,100,120,0.50)] uppercase tracking-wider mb-4">💡 Insights de Processo Comercial</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-              <p className="text-xs text-[rgba(100,120,140,0.55)] mb-1">O que o Win Rate diz</p>
+              <p className="text-xs text-fg4 mb-1">O que o Win Rate diz</p>
               <p className="text-sm text-white leading-relaxed">
                 {metrics.winRate >= 50
                   ? 'Excelente qualificação de leads. Mantenha os critérios atuais e foque em aumentar o volume.'
@@ -622,7 +622,7 @@ export function AnalyticsPage() {
               </p>
             </div>
             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-              <p className="text-xs text-[rgba(100,120,140,0.55)] mb-1">Melhor canal de aquisição</p>
+              <p className="text-xs text-fg4 mb-1">Melhor canal de aquisição</p>
               <p className="text-sm text-white leading-relaxed">
                 {metrics.bySource[0]
                   ? `"${metrics.bySource[0].name}" tem o maior win rate (${metrics.bySource[0].taxa}%). Invista mais esforço e indicações nesse canal.`
@@ -630,7 +630,7 @@ export function AnalyticsPage() {
               </p>
             </div>
             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-              <p className="text-xs text-[rgba(100,120,140,0.55)] mb-1">Próxima alavanca</p>
+              <p className="text-xs text-fg4 mb-1">Próxima alavanca</p>
               <p className="text-sm text-white leading-relaxed">
                 {metrics.stagnant.length > 0
                   ? `${metrics.stagnant.length} leads parados. Um follow-up sistemático pode recuperar receita imediata sem novos leads.`

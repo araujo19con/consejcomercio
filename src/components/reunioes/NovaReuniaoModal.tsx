@@ -158,15 +158,15 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-card rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 sticky top-0 z-10 bg-card border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-          <h2 className="text-lg font-semibold text-[rgba(230,235,240,0.92)]">{isEdit ? 'Editar Reunião' : 'Nova Reunião'}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-[rgba(100,120,140,0.55)]">
+          <h2 className="text-lg font-semibold text-foreground">{isEdit ? 'Editar Reunião' : 'Nova Reunião'}</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-fg4">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[rgba(215,225,235,0.85)] mb-1">Título *</label>
+            <label className="block text-sm font-medium text-fg2 mb-1">Título *</label>
             <input
               value={titulo}
               onChange={e => setTitulo(e.target.value)}
@@ -177,7 +177,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-[rgba(215,225,235,0.85)] mb-1">
+              <label className="block text-sm font-medium text-fg2 mb-1">
                 <Calendar className="w-3.5 h-3.5 inline mr-1" />Data e Hora *
               </label>
               <input
@@ -188,7 +188,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[rgba(215,225,235,0.85)] mb-1">
+              <label className="block text-sm font-medium text-fg2 mb-1">
                 <Clock className="w-3.5 h-3.5 inline mr-1" />Duração (min)
               </label>
               <select
@@ -204,7 +204,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[rgba(215,225,235,0.85)] mb-1">
+            <label className="block text-sm font-medium text-fg2 mb-1">
               <MapPin className="w-3.5 h-3.5 inline mr-1" />Local
             </label>
             <input
@@ -216,7 +216,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[rgba(215,225,235,0.85)] mb-1">
+            <label className="block text-sm font-medium text-fg2 mb-1">
               <Link className="w-3.5 h-3.5 inline mr-1" />Link de vídeo
             </label>
             <input
@@ -228,7 +228,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[rgba(215,225,235,0.85)] mb-1">
+            <label className="block text-sm font-medium text-fg2 mb-1">
               <Users className="w-3.5 h-3.5 inline mr-1" />Participantes
             </label>
 
@@ -262,10 +262,10 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
                           className="rounded"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[rgba(215,225,235,0.85)] truncate">{m.nome}</p>
-                          {m.cargo && <p className="text-xs text-[rgba(100,120,140,0.55)]">{m.cargo}</p>}
+                          <p className="text-sm font-medium text-fg2 truncate">{m.nome}</p>
+                          {m.cargo && <p className="text-xs text-fg4">{m.cargo}</p>}
                         </div>
-                        <span className="text-xs text-[rgba(100,120,140,0.55)] truncate max-w-[160px]">{m.email}</span>
+                        <span className="text-xs text-fg4 truncate max-w-[160px]">{m.email}</span>
                       </label>
                     )
                   })}
@@ -279,11 +279,11 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
               placeholder="email@exemplo.com, outro@empresa.com"
               className="form-control"
             />
-            <p className="text-xs text-[rgba(100,120,140,0.55)] mt-1">Os participantes receberão convite ao criar no Google Calendar</p>
+            <p className="text-xs text-fg4 mt-1">Os participantes receberão convite ao criar no Google Calendar</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[rgba(215,225,235,0.85)] mb-1">Descrição</label>
+            <label className="block text-sm font-medium text-fg2 mb-1">Descrição</label>
             <textarea
               value={descricao}
               onChange={e => setDescricao(e.target.value)}
@@ -309,7 +309,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background"
+              className="flex-1 px-4 py-2 border rounded-lg text-sm text-muted-foreground hover:bg-background"
             >
               Cancelar
             </button>

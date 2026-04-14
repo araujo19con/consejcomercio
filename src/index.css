@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer base {
+  /* ── Dark theme (default) ─────────────────────────────────────── */
   :root {
     --background:          214 65% 7%;    /* #0a1628 */
     --foreground:          210 20% 92%;   /* rgba(230,235,240) */
@@ -29,6 +30,49 @@
     --chart-3:             160 60% 45%;   /* #29b87a */
     --chart-4:             35 90% 55%;    /* #f0a030 */
     --chart-5:             0 72% 55%;     /* #e04040 */
+
+    /* Text hierarchy */
+    --fg-2:                210 14% 72%;   /* ~rgba(165,175,185) secondary text */
+    --fg-4:                214 14% 38%;   /* ~rgba(72,88,104) subtle text */
+
+    /* Sidebar (always dark — not overridden in light) */
+    --sidebar-bg:          214 100% 6%;   /* #00081d */
+    --sidebar-border:      214 100% 10%;  /* #000d32 */
+    --sidebar-text:        191 56% 68%;   /* #6bd0e7 */
+    --sidebar-active:      194 100% 27%;  /* #006d88 */
+    --sidebar-hover:       209 100% 11%;  /* #00263a */
+  }
+
+  /* ── Light theme ──────────────────────────────────────────────── */
+  html.light {
+    --background:          210 25% 96%;   /* #f2f5f9 */
+    --foreground:          215 30% 12%;   /* #1a2030 */
+    --card:                0 0% 100%;     /* #ffffff */
+    --card-foreground:     215 30% 12%;
+    --popover:             0 0% 100%;
+    --popover-foreground:  215 30% 12%;
+    --primary:             194 100% 34%;  /* same brand color */
+    --primary-foreground:  0 0% 100%;
+    --secondary:           210 20% 92%;   /* #e5eaf0 */
+    --secondary-foreground: 215 25% 25%;
+    --muted:               210 18% 94%;   /* #edf0f4 */
+    --muted-foreground:    215 15% 44%;   /* #5e6e80 */
+    --accent:              194 100% 34%;
+    --accent-foreground:   0 0% 100%;
+    --destructive:         0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border:              214 22% 85%;   /* #ccd2de */
+    --input:               214 25% 97%;   /* #f4f6fa */
+    --ring:                194 100% 34%;
+    --chart-1:             194 100% 34%;
+    --chart-2:             191 56% 40%;
+    --chart-3:             160 60% 35%;
+    --chart-4:             35 90% 42%;
+    --chart-5:             0 72% 42%;
+
+    /* Text hierarchy */
+    --fg-2:                215 22% 30%;   /* dark secondary text */
+    --fg-4:                215 12% 52%;   /* light subtle text */
   }
 }
 
@@ -63,6 +107,12 @@
     background: hsl(var(--popover));
     color: hsl(var(--foreground));
   }
+}
+
+@layer utilities {
+  /* Text hierarchy utilities — theme-aware */
+  .text-fg2 { color: hsl(var(--fg-2)); }
+  .text-fg4 { color: hsl(var(--fg-4)); }
 }
 
 @layer base {

@@ -97,7 +97,7 @@ export function IndicacoesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Indicações — Clube de Parceiros</h1>
+        <h1 className="text-xl font-bold text-foreground">Indicações — Clube de Parceiros</h1>
         <Button size="sm" onClick={() => setShowNew(true)} className="bg-primary hover:bg-primary/90">
           <Plus className="w-4 h-4 mr-1" /> Nova Indicação
         </Button>
@@ -106,20 +106,20 @@ export function IndicacoesPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-5">
         {[
-          { label: 'Total', value: totalIndicacoes, color: 'text-[rgba(230,235,240,0.92)]' },
+          { label: 'Total', value: totalIndicacoes, color: 'text-foreground' },
           { label: 'Convertidas', value: `${convertidas} (${totalIndicacoes ? Math.round((convertidas/totalIndicacoes)*100) : 0}%)`, color: 'text-green-700' },
           { label: 'Recompensas Pendentes', value: recompensasPendentes, color: 'text-amber-700' },
         ].map(({ label, value, color }) => (
           <Card key={label}>
             <CardContent className="p-4">
-              <p className="text-xs text-[rgba(130,150,170,0.65)]">{label}</p>
+              <p className="text-xs text-muted-foreground">{label}</p>
               <p className={cn('text-2xl font-bold mt-0.5', color)}>{value}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {isLoading ? <div className="text-center text-[rgba(130,150,170,0.65)] py-8">Carregando...</div> : (
+      {isLoading ? <div className="text-center text-muted-foreground py-8">Carregando...</div> : (
         <div className="space-y-2">
           {indicacoes?.map(ind => {
             const statusInfo = INDICACAO_STATUS.find(s => s.value === ind.status)
@@ -135,12 +135,12 @@ export function IndicacoesPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-xs text-[rgba(100,120,140,0.55)]">{indicanteTipo === 'cliente' ? 'Cliente' : 'Parceiro'}: <span className="font-medium text-[rgba(150,165,180,0.70)]">{indicanteNome}</span></p>
+                        <p className="text-xs text-fg4">{indicanteTipo === 'cliente' ? 'Cliente' : 'Parceiro'}: <span className="font-medium text-muted-foreground">{indicanteNome}</span></p>
                         <span>→</span>
-                        <p className="font-semibold text-[rgba(230,235,240,0.92)]">{ind.indicado_nome}</p>
-                        {ind.indicado_empresa && <p className="text-xs text-[rgba(130,150,170,0.65)]">({ind.indicado_empresa})</p>}
+                        <p className="font-semibold text-foreground">{ind.indicado_nome}</p>
+                        {ind.indicado_empresa && <p className="text-xs text-muted-foreground">({ind.indicado_empresa})</p>}
                       </div>
-                      <p className="text-xs text-[rgba(100,120,140,0.55)] mt-0.5">{formatDate(ind.created_at)}</p>
+                      <p className="text-xs text-fg4 mt-0.5">{formatDate(ind.created_at)}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {ind.status === 'convertido' && !ind.recompensa_entregue && (
@@ -174,7 +174,7 @@ export function IndicacoesPage() {
               </Card>
             )
           })}
-          {!indicacoes?.length && <div className="text-center text-[rgba(100,120,140,0.55)] py-12">Nenhuma indicação registrada.</div>}
+          {!indicacoes?.length && <div className="text-center text-fg4 py-12">Nenhuma indicação registrada.</div>}
         </div>
       )}
 

@@ -71,10 +71,10 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit, perfilByEmail 
   return (
     <div className="bg-card rounded-xl border p-3 shadow-sm hover:shadow transition-shadow">
       <div className="flex items-start justify-between gap-2 mb-2">
-        <p className="text-sm font-semibold text-[rgba(230,235,240,0.92)] leading-tight">{reuniao.titulo}</p>
+        <p className="text-sm font-semibold text-foreground leading-tight">{reuniao.titulo}</p>
         <StatusBadge status={reuniao.status} />
       </div>
-      <div className="space-y-1 text-xs text-[rgba(130,150,170,0.65)]">
+      <div className="space-y-1 text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
           {dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {reuniao.duracao_minutos}min
@@ -94,7 +94,7 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit, perfilByEmail 
         )}
       </div>
       <div className="flex gap-1.5 mt-2 pt-2 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <button onClick={() => onEdit(reuniao)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[rgba(130,150,170,0.65)] hover:bg-[rgba(255,255,255,0.04)]">
+        <button onClick={() => onEdit(reuniao)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-muted-foreground hover:bg-[rgba(255,255,255,0.04)]">
           <Pencil className="w-3 h-3" />Editar
         </button>
         {reuniao.status === 'agendada' && (<>
@@ -149,8 +149,8 @@ export function ReunioesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[rgba(230,235,240,0.95)]">Reuniões</h1>
-          <p className="text-[rgba(130,150,170,0.65)] text-sm mt-0.5">Calendário semanal</p>
+          <h1 className="text-2xl font-bold text-foreground">Reuniões</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Calendário semanal</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -164,20 +164,20 @@ export function ReunioesPage() {
       {/* Week nav */}
       <div className="flex items-center gap-3">
         <button onClick={prevWeek} className="p-1.5 rounded-lg border hover:bg-background">
-          <ChevronLeft className="w-4 h-4 text-[rgba(130,150,170,0.65)]" />
+          <ChevronLeft className="w-4 h-4 text-muted-foreground" />
         </button>
-        <button onClick={goToday} className="px-3 py-1.5 rounded-lg border text-sm hover:bg-background text-[rgba(150,165,180,0.70)]">
+        <button onClick={goToday} className="px-3 py-1.5 rounded-lg border text-sm hover:bg-background text-muted-foreground">
           Hoje
         </button>
         <button onClick={nextWeek} className="p-1.5 rounded-lg border hover:bg-background">
-          <ChevronRight className="w-4 h-4 text-[rgba(130,150,170,0.65)]" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </button>
-        <span className="text-sm font-medium text-[rgba(215,225,235,0.85)]">{weekRange}</span>
+        <span className="text-sm font-medium text-fg2">{weekRange}</span>
       </div>
 
       {/* Week grid */}
       {isLoading ? (
-        <div className="text-center py-16 text-[rgba(100,120,140,0.55)]">Carregando...</div>
+        <div className="text-center py-16 text-fg4">Carregando...</div>
       ) : (
         <div className="grid grid-cols-7 gap-2">
           {weekDays.map((day) => {
@@ -188,10 +188,10 @@ export function ReunioesPage() {
             return (
               <div key={day.toISOString()} className="min-h-32">
                 {/* Day header */}
-                <div className={`text-center mb-2 py-2 rounded-lg ${isToday ? 'text-white' : 'text-[rgba(150,165,180,0.70)]'}`}
+                <div className={`text-center mb-2 py-2 rounded-lg ${isToday ? 'text-white' : 'text-muted-foreground'}`}
                   style={isToday ? { backgroundColor: 'rgba(0,137,172,0.25)' } : {}}>
                   <div className="text-xs font-medium">{DIAS[day.getDay()]}</div>
-                  <div className={`text-lg font-bold ${isPast && !isToday ? 'text-[rgba(100,120,140,0.55)]' : ''}`}>
+                  <div className={`text-lg font-bold ${isPast && !isToday ? 'text-fg4' : ''}`}>
                     {day.getDate()}
                   </div>
                 </div>
@@ -220,7 +220,7 @@ export function ReunioesPage() {
 
       {/* Upcoming list */}
       <div className="mt-6">
-        <h2 className="text-base font-semibold text-[rgba(230,235,240,0.92)] mb-3 flex items-center gap-2">
+        <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
           <Calendar className="w-4 h-4" />Próximas Reuniões
         </h2>
         <div className="space-y-2">
@@ -232,12 +232,12 @@ export function ReunioesPage() {
               return (
                 <div key={r.id} className="flex items-center gap-4 bg-card rounded-xl px-4 py-3" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
                   <div className="text-center w-10 shrink-0">
-                    <div className="text-xs text-[rgba(100,120,140,0.55)]">{DIAS[dt.getDay()]}</div>
-                    <div className="text-lg font-bold text-[rgba(230,235,240,0.92)]">{dt.getDate()}</div>
+                    <div className="text-xs text-fg4">{DIAS[dt.getDay()]}</div>
+                    <div className="text-lg font-bold text-foreground">{dt.getDate()}</div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-[rgba(230,235,240,0.92)] text-sm">{r.titulo}</p>
-                    <p className="text-xs text-[rgba(100,120,140,0.55)]">
+                    <p className="font-medium text-foreground text-sm">{r.titulo}</p>
+                    <p className="text-xs text-fg4">
                       {dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {r.duracao_minutos}min
                       {r.local ? ` · ${r.local}` : ''}
                     </p>
@@ -260,7 +260,7 @@ export function ReunioesPage() {
               )
             })}
           {reunioes.filter(r => new Date(r.data_hora) >= today && r.status === 'agendada').length === 0 && (
-            <div className="text-center py-8 text-[rgba(100,120,140,0.55)] text-sm">Nenhuma reunião agendada.</div>
+            <div className="text-center py-8 text-fg4 text-sm">Nenhuma reunião agendada.</div>
           )}
         </div>
       </div>

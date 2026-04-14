@@ -31,7 +31,7 @@ export function LeadsPage() {
   }
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-64 text-[rgba(130,150,170,0.65)]">Carregando leads...</div>
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando leads...</div>
   }
 
   return (
@@ -41,8 +41,8 @@ export function LeadsPage() {
       <div className="space-y-2">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Pipeline de Leads</h1>
-            <p className="text-sm text-[rgba(130,150,170,0.65)] mt-0.5">
+            <h1 className="text-xl font-bold text-foreground">Pipeline de Leads</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
               Arraste os cards entre as colunas para avançar leads no funil
               {hasFilter && (
                 <span className="ml-2 font-medium" style={{ color: '#0089ac' }}>
@@ -90,7 +90,7 @@ export function LeadsPage() {
           {hasFilter && (
             <button
               onClick={() => { setSearch(''); setOrigemFilter('todos'); setSegmentoFilter('todos') }}
-              className="h-8 px-2.5 flex items-center gap-1 text-xs rounded-lg border transition-colors text-[rgba(130,150,170,0.65)] hover:text-white hover:border-[rgba(255,255,255,0.15)]"
+              className="h-8 px-2.5 flex items-center gap-1 text-xs rounded-lg border transition-colors text-muted-foreground hover:text-white hover:border-[rgba(255,255,255,0.15)]"
               style={{ borderColor: 'rgba(255,255,255,0.08)' }}
             >
               <X className="w-3 h-3" />Limpar filtros

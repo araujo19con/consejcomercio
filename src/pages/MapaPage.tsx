@@ -134,8 +134,8 @@ export function MapaPage() {
 
         {/* Header */}
         <div>
-          <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">Mapa de Alcance</h1>
-          <p className="text-xs text-[rgba(100,120,140,0.55)] mt-0.5">Leads e clientes por estado</p>
+          <h1 className="text-xl font-bold text-foreground">Mapa de Alcance</h1>
+          <p className="text-xs text-fg4 mt-0.5">Leads e clientes por estado</p>
         </div>
 
         {/* Filter pills */}
@@ -178,10 +178,10 @@ export function MapaPage() {
         <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="px-3 py-2 flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <MapPin className="w-3.5 h-3.5" style={{ color: 'rgba(107,208,231,0.60)' }} />
-            <span className="text-xs font-semibold text-[rgba(150,165,180,0.70)] uppercase tracking-wide">Estados com presença</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Estados com presença</span>
           </div>
           {topStates.length === 0 ? (
-            <p className="text-xs text-[rgba(100,120,140,0.55)] p-4 text-center">Nenhum lead/cliente com estado cadastrado ainda.</p>
+            <p className="text-xs text-fg4 p-4 text-center">Nenhum lead/cliente com estado cadastrado ainda.</p>
           ) : (
             <div className="divide-y" style={{ '--tw-divide-opacity': 1 } as React.CSSProperties}>
               {topStates.map(s => (
@@ -201,7 +201,7 @@ export function MapaPage() {
                     {s.uf}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[rgba(215,225,235,0.85)] truncate">{s.nome}</p>
+                    <p className="text-xs font-medium text-fg2 truncate">{s.nome}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       {s.leads > 0 && <span className="text-[10px]" style={{ color: 'rgba(107,208,231,0.70)' }}>{s.leads} lead{s.leads > 1 ? 's' : ''}</span>}
                       {s.clientes > 0 && <span className="text-[10px]" style={{ color: 'rgba(52,211,153,0.70)' }}>{s.clientes} cliente{s.clientes > 1 ? 's' : ''}</span>}
@@ -224,8 +224,8 @@ export function MapaPage() {
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                 onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(0,137,172,0.12)'}
                 onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'}>
-                <p className="text-xs font-medium text-[rgba(215,225,235,0.85)] truncate">{l.nome}</p>
-                <p className="text-[10px] text-[rgba(100,120,140,0.55)] truncate">{l.empresa}</p>
+                <p className="text-xs font-medium text-fg2 truncate">{l.nome}</p>
+                <p className="text-[10px] text-fg4 truncate">{l.empresa}</p>
               </button>
             ))}
             {selectedClientes.map(c => (
@@ -234,7 +234,7 @@ export function MapaPage() {
                 style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.20)' }}
                 onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(16,185,129,0.14)'}
                 onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'rgba(16,185,129,0.07)'}>
-                <p className="text-xs font-medium text-[rgba(215,225,235,0.85)] truncate">{c.nome}</p>
+                <p className="text-xs font-medium text-fg2 truncate">{c.nome}</p>
                 <p className="text-[10px] truncate" style={{ color: 'rgba(52,211,153,0.60)' }}>{c.empresa} · cliente</p>
               </button>
             ))}
@@ -248,7 +248,7 @@ export function MapaPage() {
         {/* Legend */}
         <div className="absolute top-3 right-3 z-10 rounded-xl px-3 py-2 text-[10px]"
           style={{ background: 'rgba(10,22,40,0.85)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)' }}>
-          <p className="font-semibold text-[rgba(150,165,180,0.70)] uppercase tracking-wide mb-1.5">Legenda</p>
+          <p className="font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Legenda</p>
           <div className="space-y-1">
             {[
               { color: 'rgba(255,255,255,0.04)', label: 'Sem dados', border: '1px solid rgba(255,255,255,0.10)' },
@@ -278,7 +278,7 @@ export function MapaPage() {
               transform: tooltip.x > window.innerWidth * 0.7 ? 'translateX(-110%)' : 'none',
             }}
           >
-            <p className="font-semibold text-[rgba(230,235,240,0.92)]">{ESTADO_NOME[hovered] || hovered} <span className="text-[rgba(100,120,140,0.55)] font-normal">· {hovered}</span></p>
+            <p className="font-semibold text-foreground">{ESTADO_NOME[hovered] || hovered} <span className="text-fg4 font-normal">· {hovered}</span></p>
             <div className="flex gap-3 mt-1">
               <span style={{ color: '#6bd0e7' }}>
                 {activeLeadsByState[hovered] ?? 0} lead{(activeLeadsByState[hovered] ?? 0) !== 1 ? 's' : ''}

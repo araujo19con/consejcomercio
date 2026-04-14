@@ -42,7 +42,7 @@ export function ClienteDetailPage() {
   const indicacoes = todasIndicacoes?.filter(i => i.indicante_cliente_id === id) || []
   const oportunidades = todasOportunidades?.filter(o => o.cliente_id === id) || []
 
-  if (!cliente) return <div className="text-[rgba(130,150,170,0.65)]">Cliente não encontrado.</div>
+  if (!cliente) return <div className="text-muted-foreground">Cliente não encontrado.</div>
 
   const statusInfo = CLIENT_STATUS_OPTIONS.find(s => s.value === cliente.status)
 
@@ -50,17 +50,17 @@ export function ClienteDetailPage() {
     <div className="max-w-4xl mx-auto">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-sm mb-5">
-        <button onClick={() => navigate('/clientes')} className="text-[rgba(100,120,140,0.55)] hover:text-[rgba(215,225,235,0.85)] transition-colors flex items-center gap-1">
+        <button onClick={() => navigate('/clientes')} className="text-fg4 hover:text-fg2 transition-colors flex items-center gap-1">
           <ArrowLeft className="w-3.5 h-3.5" /> Clientes
         </button>
         <span className="text-[rgba(80,100,120,0.50)]">/</span>
-        <span className="text-[rgba(215,225,235,0.85)] font-medium truncate">{cliente.nome}</span>
+        <span className="text-fg2 font-medium truncate">{cliente.nome}</span>
       </div>
 
       <div className="flex items-center gap-3 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-[rgba(230,235,240,0.92)]">{cliente.nome}</h1>
-          <p className="text-sm text-[rgba(130,150,170,0.65)]">{cliente.empresa}</p>
+          <h1 className="text-xl font-bold text-foreground">{cliente.nome}</h1>
+          <p className="text-sm text-muted-foreground">{cliente.empresa}</p>
         </div>
         {statusInfo && (
           <span className={cn('ml-auto text-xs font-medium px-2.5 py-1 rounded-full', statusInfo.color)}>
@@ -89,24 +89,24 @@ export function ClienteDetailPage() {
                   { label: 'Cliente desde', value: formatDate(cliente.created_at) },
                 ].map(({ label, value }) => (
                   <div key={label}>
-                    <p className="text-xs text-[rgba(130,150,170,0.65)]">{label}</p>
-                    <p className="text-sm font-medium text-[rgba(230,235,240,0.92)]">{value || '—'}</p>
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                    <p className="text-sm font-medium text-foreground">{value || '—'}</p>
                   </div>
                 ))}
                 {cliente.indicado_por_cliente && (
                   <div>
-                    <p className="text-xs text-[rgba(130,150,170,0.65)]">Indicado por</p>
+                    <p className="text-xs text-muted-foreground">Indicado por</p>
                     <p className="text-sm font-medium text-violet-400 flex items-center gap-1">
                       <UserCheck className="w-3.5 h-3.5" />
                       {cliente.indicado_por_cliente.nome}
-                      <span className="text-[rgba(100,120,140,0.55)] font-normal text-xs">· {cliente.indicado_por_cliente.empresa}</span>
+                      <span className="text-fg4 font-normal text-xs">· {cliente.indicado_por_cliente.empresa}</span>
                     </p>
                   </div>
                 )}
                 {cliente.notas && (
                   <div className="col-span-2">
-                    <p className="text-xs text-[rgba(130,150,170,0.65)]">Observações</p>
-                    <p className="text-sm text-[rgba(215,225,235,0.85)] mt-0.5">{cliente.notas}</p>
+                    <p className="text-xs text-muted-foreground">Observações</p>
+                    <p className="text-sm text-fg2 mt-0.5">{cliente.notas}</p>
                   </div>
                 )}
               </CardContent>
@@ -118,16 +118,16 @@ export function ClienteDetailPage() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-amber-400" />
-                    <p className="text-sm font-semibold text-[rgba(215,225,235,0.85)]">NPS do Cliente</p>
+                    <p className="text-sm font-semibold text-fg2">NPS do Cliente</p>
                   </div>
                   {!editingNps ? (
-                    <button onClick={() => { setNpsInput(cliente.nps_score ?? 0); setEditingNps(true) }} className="text-xs text-[rgba(100,120,140,0.55)] hover:text-[rgba(150,165,180,0.70)]">
+                    <button onClick={() => { setNpsInput(cliente.nps_score ?? 0); setEditingNps(true) }} className="text-xs text-fg4 hover:text-muted-foreground">
                       {cliente.nps_score !== null && cliente.nps_score !== undefined ? 'Atualizar' : 'Registrar'}
                     </button>
                   ) : (
                     <div className="flex gap-1.5">
                       <button onClick={() => { updateNps.mutate({ id: id!, nps_score: npsInput }); setEditingNps(false) }} className="text-xs px-2 py-1 rounded bg-[#0089ac] text-white">Salvar</button>
-                      <button onClick={() => setEditingNps(false)} className="text-xs px-2 py-1 rounded border border-[rgba(255,255,255,0.10)] text-[rgba(130,150,170,0.65)]">Cancelar</button>
+                      <button onClick={() => setEditingNps(false)} className="text-xs px-2 py-1 rounded border border-[rgba(255,255,255,0.10)] text-muted-foreground">Cancelar</button>
                     </div>
                   )}
                 </div>
@@ -159,7 +159,7 @@ export function ClienteDetailPage() {
                         </div>
                       </>
                     ) : (
-                      <p className="text-sm text-[rgba(100,120,140,0.55)]">Nenhum NPS registrado ainda. Clique em "Registrar" para avaliar.</p>
+                      <p className="text-sm text-fg4">Nenhum NPS registrado ainda. Clique em "Registrar" para avaliar.</p>
                     )}
                   </div>
                 )}
@@ -190,7 +190,7 @@ export function ClienteDetailPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold text-[rgba(230,235,240,0.92)]">
+                          <p className="font-semibold text-foreground">
                             {CONTRACT_TYPES.find(t => t.value === contrato.tipo)?.label} — {PRICING_MODELS.find(m => m.value === contrato.modelo_precificacao)?.label}
                           </p>
                           {contrato.caso_manifesto && (
@@ -201,7 +201,7 @@ export function ClienteDetailPage() {
                         </div>
                         <div className="flex gap-1.5 mt-1.5 flex-wrap">
                           {contrato.areas_direito?.map(a => (
-                            <span key={a} className="text-xs bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] px-2 py-0.5 rounded-full border border-[rgba(255,255,255,0.06)]">
+                            <span key={a} className="text-xs bg-[rgba(255,255,255,0.04)] text-muted-foreground px-2 py-0.5 rounded-full border border-[rgba(255,255,255,0.06)]">
                               {SERVICE_AREAS.find(s => s.value === a)?.label ?? a.replace(/_/g, ' ')}
                             </span>
                           ))}
@@ -250,17 +250,17 @@ export function ClienteDetailPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Valor Total</p>
-                        <p className="text-sm font-bold text-[rgba(230,235,240,0.92)]">{contrato.valor_total ? formatCurrency(contrato.valor_total) : '—'}</p>
+                        <p className="text-sm font-bold text-foreground">{contrato.valor_total ? formatCurrency(contrato.valor_total) : '—'}</p>
                       </div>
                       <div>
                         <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Valor Mensal</p>
-                        <p className="text-sm font-medium text-[rgba(215,225,235,0.85)]">{contrato.valor_mensal ? formatCurrency(contrato.valor_mensal) : '—'}</p>
+                        <p className="text-sm font-medium text-fg2">{contrato.valor_mensal ? formatCurrency(contrato.valor_mensal) : '—'}</p>
                       </div>
                     </div>
 
                     {/* Timeline */}
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-[rgba(130,150,170,0.65)]">
+                      <div className="flex justify-between text-xs text-muted-foreground">
                         <span>{formatDate(contrato.data_inicio)} → {formatDate(contrato.data_fim)}</span>
                         {isExpiring && (
                           <span className="text-orange-500 font-medium flex items-center gap-1">
@@ -301,7 +301,7 @@ export function ClienteDetailPage() {
                 </Card>
               )
             })}
-            {!contratos?.length && <div className="text-center text-[rgba(100,120,140,0.55)] py-8">Nenhum contrato cadastrado.</div>}
+            {!contratos?.length && <div className="text-center text-fg4 py-8">Nenhum contrato cadastrado.</div>}
           </div>
           {showNewContrato && (
             <NewContratoModal clienteId={id!} open={showNewContrato} onClose={() => setShowNewContrato(false)} />
@@ -315,8 +315,8 @@ export function ClienteDetailPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-[rgba(230,235,240,0.92)]">{ind.indicado_nome}</p>
-                      <p className="text-sm text-[rgba(130,150,170,0.65)]">{ind.indicado_empresa || '—'}</p>
+                      <p className="font-medium text-foreground">{ind.indicado_nome}</p>
+                      <p className="text-sm text-muted-foreground">{ind.indicado_empresa || '—'}</p>
                     </div>
                     <span className={cn('text-xs px-2 py-0.5 rounded-full', ind.recompensa_entregue ? 'bg-[rgba(16,185,129,0.15)] text-[#34d399]' : 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]')}>
                       {ind.recompensa_entregue ? 'Recompensa entregue' : 'Recompensa pendente'}
@@ -325,7 +325,7 @@ export function ClienteDetailPage() {
                 </CardContent>
               </Card>
             ))}
-            {!indicacoes.length && <div className="text-center text-[rgba(100,120,140,0.55)] py-8">Nenhuma indicação feita.</div>}
+            {!indicacoes.length && <div className="text-center text-fg4 py-8">Nenhuma indicação feita.</div>}
           </div>
         </TabsContent>
 
@@ -338,8 +338,8 @@ export function ClienteDetailPage() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[rgba(230,235,240,0.92)]">{op.titulo}</p>
-                        <p className="text-xs text-[rgba(130,150,170,0.65)] capitalize">{op.tipo.replace('_', '-sell')} · {op.servico_alvo.replace(/_/g, ' ')}</p>
+                        <p className="font-medium text-foreground">{op.titulo}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{op.tipo.replace('_', '-sell')} · {op.servico_alvo.replace(/_/g, ' ')}</p>
                       </div>
                       {statusInfo && (
                         <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', statusInfo.color)}>
@@ -351,7 +351,7 @@ export function ClienteDetailPage() {
                 </Card>
               )
             })}
-            {!oportunidades.length && <div className="text-center text-[rgba(100,120,140,0.55)] py-8">Nenhuma oportunidade identificada.</div>}
+            {!oportunidades.length && <div className="text-center text-fg4 py-8">Nenhuma oportunidade identificada.</div>}
           </div>
         </TabsContent>
         <TabsContent value="historico">

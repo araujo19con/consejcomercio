@@ -74,7 +74,7 @@ export function KanbanBoard({ leads }: Props) {
       <div className="flex items-center justify-between mb-3 gap-3">
         <button
           onClick={() => setShowClosed(v => !v)}
-          className="flex items-center gap-1.5 text-xs text-[rgba(100,120,140,0.55)] hover:text-[rgba(150,165,180,0.70)] transition-colors"
+          className="flex items-center gap-1.5 text-xs text-fg4 hover:text-muted-foreground transition-colors"
         >
           {showClosed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
           {showClosed ? 'Ocultar encerrados' : 'Ver encerrados'}

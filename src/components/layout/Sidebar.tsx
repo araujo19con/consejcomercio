@@ -3,9 +3,11 @@ import {
   LayoutDashboard, KanbanSquare, Stethoscope, Users, FileText,
   Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings,
   LogOut, MessageSquare, CalendarDays, Sparkles, Search, BarChart2, Map, Upload, GraduationCap,
+  Sun, Moon,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useMeuPerfil } from '@/hooks/usePerfis'
+import { useTheme } from '@/contexts/ThemeContext'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -85,6 +87,7 @@ function NavItem({ to, label, icon: Icon }: { to: string; label: string; icon: R
 export function Sidebar() {
   const navigate = useNavigate()
   const { data: perfil } = useMeuPerfil()
+  const { theme, toggleTheme } = useTheme()
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -142,7 +145,7 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Profile + Logout */}
+      {/* Profile + Theme + Logout */}
       <div className="p-2 space-y-1" style={{ borderTop: '1px solid #000d32' }}>
         <NavLink
           to="/perfil"
@@ -160,6 +163,22 @@ export function Sidebar() {
           )}
           <span className="truncate">{perfil?.nome || 'Meu perfil'}</span>
         </NavLink>
+
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm w-full transition-colors"
+          style={{ color: '#6bd0e7' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = HOVER_BG; (e.currentTarget as HTMLElement).style.color = '#fff' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = ''; (e.currentTarget as HTMLElement).style.color = '#6bd0e7' }}
+          title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+        >
+          {theme === 'dark'
+            ? <Sun className="w-4 h-4 shrink-0" />
+            : <Moon className="w-4 h-4 shrink-0" />
+          }
+          {theme === 'dark' ? 'Tema Claro' : 'Tema Escuro'}
+        </button>
 
         <button
           onClick={handleLogout}

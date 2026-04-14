@@ -68,15 +68,15 @@ function SuggestionCard({
               <Check className="w-3 h-3" />Confirmado
             </span>
           )}
-          <span className="text-xs text-[rgba(100,120,140,0.55)]">#{suggestion.channelName}</span>
+          <span className="text-xs text-fg4">#{suggestion.channelName}</span>
         </div>
       </div>
 
       {suggestion.type === 'reuniao' && (
         <div>
-          <p className="text-sm font-semibold text-[rgba(230,235,240,0.92)]">{(suggestion as ReuniaoSuggestion).titulo}</p>
+          <p className="text-sm font-semibold text-foreground">{(suggestion as ReuniaoSuggestion).titulo}</p>
           {(suggestion as ReuniaoSuggestion).dataHora && (
-            <p className="text-xs text-[rgba(130,150,170,0.65)]">
+            <p className="text-xs text-muted-foreground">
               📅 {(suggestion as ReuniaoSuggestion).dataHora!.toLocaleDateString('pt-BR')} às{' '}
               {(suggestion as ReuniaoSuggestion).dataHora!.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
             </p>
@@ -88,15 +88,15 @@ function SuggestionCard({
       )}
 
       {suggestion.type === 'lead' && (
-        <div className="text-sm text-[rgba(150,165,180,0.70)]">
+        <div className="text-sm text-muted-foreground">
           {(suggestion as LeadSuggestion).email && <p>📧 {(suggestion as LeadSuggestion).email}</p>}
           {(suggestion as LeadSuggestion).telefone && <p>📱 {(suggestion as LeadSuggestion).telefone}</p>}
         </div>
       )}
 
       {suggestion.type === 'oportunidade' && (
-        <div className="text-sm text-[rgba(150,165,180,0.70)]">
-          <p className="text-xs text-[rgba(130,150,170,0.65)] line-clamp-2">{(suggestion as OportunidadeSuggestion).descricao}</p>
+        <div className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground line-clamp-2">{(suggestion as OportunidadeSuggestion).descricao}</p>
           {(suggestion as OportunidadeSuggestion).valorEstimado && (
             <p className="text-xs font-medium text-green-700 mt-1">
               💰 R$ {(suggestion as OportunidadeSuggestion).valorEstimado!.toLocaleString('pt-BR')}
@@ -106,13 +106,13 @@ function SuggestionCard({
       )}
 
       {suggestion.type === 'indicacao' && (
-        <div className="text-sm text-[rgba(150,165,180,0.70)] space-y-0.5">
+        <div className="text-sm text-muted-foreground space-y-0.5">
           {(suggestion as IndicacaoSuggestion).indicadoEmail && <p>📧 {(suggestion as IndicacaoSuggestion).indicadoEmail}</p>}
           {(suggestion as IndicacaoSuggestion).indicadoTelefone && <p>📱 {(suggestion as IndicacaoSuggestion).indicadoTelefone}</p>}
         </div>
       )}
 
-      <p className="text-xs text-[rgba(100,120,140,0.55)] italic line-clamp-2 border-l-2 pl-2">
+      <p className="text-xs text-fg4 italic line-clamp-2 border-l-2 pl-2">
         "{formatSlackText(suggestion.rawText).slice(0, 120)}"
       </p>
 
@@ -127,7 +127,7 @@ function SuggestionCard({
           </button>
           <button
             onClick={() => onDismiss(suggestion.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[rgba(130,150,170,0.65)] border hover:bg-background"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-muted-foreground border hover:bg-background"
           >
             <X className="w-3 h-3" />Ignorar
           </button>
@@ -165,12 +165,12 @@ function MessageCard({ msg }: { msg: SlackMessage }) {
   return (
     <div className="bg-card border rounded-lg p-4 hover:shadow-sm transition-shadow">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm text-[rgba(230,235,240,0.92)] whitespace-pre-wrap break-words flex-1">
-          {formatSlackText(msg.text) || <span className="italic text-[rgba(100,120,140,0.55)]">[mensagem sem texto]</span>}
+        <p className="text-sm text-foreground whitespace-pre-wrap break-words flex-1">
+          {formatSlackText(msg.text) || <span className="italic text-fg4">[mensagem sem texto]</span>}
         </p>
         <div className="flex flex-col items-end gap-1 shrink-0">
           {classification && <MessageBadge type={classification} />}
-          <span className="text-xs text-[rgba(100,120,140,0.55)] whitespace-nowrap">
+          <span className="text-xs text-fg4 whitespace-nowrap">
             {date.toLocaleDateString('pt-BR')} {date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
@@ -238,18 +238,18 @@ function ChannelMessages({
             </button>
           )
         })}
-        <button onClick={() => refetch()} className="ml-auto p-1.5 rounded-md text-[rgba(100,120,140,0.55)] hover:text-[rgba(150,165,180,0.70)] hover:bg-[rgba(255,255,255,0.04)]">
+        <button onClick={() => refetch()} className="ml-auto p-1.5 rounded-md text-fg4 hover:text-muted-foreground hover:bg-[rgba(255,255,255,0.04)]">
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
       </div>
-      {isLoading && <div className="text-center py-8 text-[rgba(100,120,140,0.55)] text-sm">Carregando mensagens...</div>}
+      {isLoading && <div className="text-center py-8 text-fg4 text-sm">Carregando mensagens...</div>}
       {error && (
         <div className="flex items-center gap-2 p-3 rounded-lg text-sm" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}>
           <AlertCircle className="w-4 h-4 shrink-0" />{(error as Error).message}
         </div>
       )}
       {!isLoading && !error && filtered.length === 0 && (
-        <div className="text-center py-8 text-[rgba(100,120,140,0.55)] text-sm">Nenhuma mensagem encontrada.</div>
+        <div className="text-center py-8 text-fg4 text-sm">Nenhuma mensagem encontrada.</div>
       )}
       <div className="space-y-2">
         {filtered.map(msg => <MessageCard key={msg.ts} msg={msg} />)}
@@ -269,10 +269,10 @@ function ChannelAccordion({ channel, onMessages }: {
     <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
       <button onClick={() => setOpen(v => !v)}
         className="w-full flex items-center gap-3 px-4 py-3 bg-card hover:bg-[rgba(255,255,255,0.05)] transition-colors text-left">
-        {channel.is_private ? <Lock className="w-4 h-4 text-[rgba(100,120,140,0.55)] shrink-0" /> : <Hash className="w-4 h-4 text-[rgba(100,120,140,0.55)] shrink-0" />}
-        <span className="font-medium text-[rgba(230,235,240,0.92)] flex-1">{channel.name}</span>
-        {channel.num_members > 0 && <span className="text-xs text-[rgba(100,120,140,0.55)]">{channel.num_members} membros</span>}
-        <ChevronDown className={`w-4 h-4 text-[rgba(100,120,140,0.55)] shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+        {channel.is_private ? <Lock className="w-4 h-4 text-fg4 shrink-0" /> : <Hash className="w-4 h-4 text-fg4 shrink-0" />}
+        <span className="font-medium text-foreground flex-1">{channel.name}</span>
+        {channel.num_members > 0 && <span className="text-xs text-fg4">{channel.num_members} membros</span>}
+        <ChevronDown className={`w-4 h-4 text-fg4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
         <div className="px-4 pb-4 bg-background border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
@@ -397,11 +397,11 @@ export function SlackPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[rgba(230,235,240,0.95)]">Slack</h1>
-          <p className="text-[rgba(130,150,170,0.65)] text-sm mt-0.5">Andamentos de reuniões e prospecção</p>
+          <h1 className="text-2xl font-bold text-foreground">Slack</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Andamentos de reuniões e prospecção</p>
         </div>
         <button onClick={() => setShowSelector(v => !v)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-[rgba(215,225,235,0.85)] hover:bg-[rgba(255,255,255,0.05)]" style={{ border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.04)' }}>
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-fg2 hover:bg-[rgba(255,255,255,0.05)]" style={{ border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.04)' }}>
           <Settings className="w-4 h-4" />Gerenciar canais
         </button>
       </div>
@@ -456,33 +456,33 @@ export function SlackPage() {
       {/* Channel selector */}
       {showSelector && (
         <div className="bg-card border rounded-xl p-4 space-y-3">
-          <h2 className="font-semibold text-[rgba(230,235,240,0.92)]">Selecionar canais para monitorar</h2>
+          <h2 className="font-semibold text-foreground">Selecionar canais para monitorar</h2>
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Buscar canal..."
             className="form-control" />
-          {isLoading && <p className="text-sm text-[rgba(100,120,140,0.55)]">Carregando canais...</p>}
+          {isLoading && <p className="text-sm text-fg4">Carregando canais...</p>}
           <div className="max-h-64 overflow-y-auto space-y-1">
             {filteredAll.map(ch => (
               <label key={ch.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-background cursor-pointer">
                 <input type="checkbox" checked={selectedIds.includes(ch.id)} onChange={() => toggle(ch.id)} className="rounded" />
-                {ch.is_private ? <Lock className="w-3.5 h-3.5 text-[rgba(100,120,140,0.55)]" /> : <Hash className="w-3.5 h-3.5 text-[rgba(100,120,140,0.55)]" />}
-                <span className="text-sm text-[rgba(215,225,235,0.85)]">{ch.name}</span>
-                {ch.num_members > 0 && <span className="text-xs text-[rgba(100,120,140,0.55)] ml-auto">{ch.num_members}</span>}
+                {ch.is_private ? <Lock className="w-3.5 h-3.5 text-fg4" /> : <Hash className="w-3.5 h-3.5 text-fg4" />}
+                <span className="text-sm text-fg2">{ch.name}</span>
+                {ch.num_members > 0 && <span className="text-xs text-fg4 ml-auto">{ch.num_members}</span>}
               </label>
             ))}
             {filteredAll.length === 0 && !isLoading && (
-              <p className="text-sm text-[rgba(100,120,140,0.55)] text-center py-4">Nenhum canal encontrado.</p>
+              <p className="text-sm text-fg4 text-center py-4">Nenhum canal encontrado.</p>
             )}
           </div>
-          <p className="text-xs text-[rgba(100,120,140,0.55)]">{selectedIds.length} canal{selectedIds.length !== 1 ? 'is' : ''} selecionado{selectedIds.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-fg4">{selectedIds.length} canal{selectedIds.length !== 1 ? 'is' : ''} selecionado{selectedIds.length !== 1 ? 's' : ''}</p>
         </div>
       )}
 
       {/* Empty state */}
       {monitoredChannels.length === 0 && !showSelector && (
-        <div className="text-center py-16 text-[rgba(100,120,140,0.55)]">
+        <div className="text-center py-16 text-fg4">
           <Hash className="w-10 h-10 mx-auto mb-3 opacity-40" />
-          <p className="font-medium text-[rgba(130,150,170,0.65)]">Nenhum canal monitorado</p>
+          <p className="font-medium text-muted-foreground">Nenhum canal monitorado</p>
           <p className="text-sm mt-1">Clique em "Gerenciar canais" para selecionar canais do Slack.</p>
           <button onClick={() => setShowSelector(true)}
             className="mt-4 px-4 py-2 text-white rounded-lg text-sm" style={{ backgroundColor: '#0089ac' }}>
