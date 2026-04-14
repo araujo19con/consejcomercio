@@ -159,7 +159,7 @@ export function LeadCard({ lead, isDragging = false, stageId }: Props) {
 
       {/* Footer */}
       <div className="flex items-center justify-between mt-1.5">
-        <p className="text-xs text-[rgba(80,100,120,0.50)]">{formatRelative(lead.created_at)}</p>
+        <p className="text-xs text-fg4">{formatRelative(lead.created_at)}</p>
 
         {/* Quick message button */}
         <button

@@ -46,7 +46,7 @@ export function LeadDetailPage() {
         <button onClick={() => navigate('/leads')} className="text-fg4 hover:text-fg2 transition-colors flex items-center gap-1">
           <ArrowLeft className="w-3.5 h-3.5" /> Leads
         </button>
-        <span className="text-[rgba(80,100,120,0.50)]">/</span>
+        <span className="text-fg4">/</span>
         <span className="text-fg2 font-medium truncate">{lead.nome}</span>
       </div>
 

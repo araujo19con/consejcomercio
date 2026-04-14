@@ -642,7 +642,7 @@ export function ClientesPage() {
                       </div>
                       <button
                         onClick={e => { e.stopPropagation(); setDeleteConfirm(cliente.id) }}
-                        className="p-1.5 rounded-lg text-[rgba(80,100,120,0.50)] hover:bg-[rgba(239,68,68,0.12)] hover:text-[#f87171] transition-colors opacity-0 group-hover:opacity-100"
+                        className="p-1.5 rounded-lg text-fg4 hover:bg-[rgba(239,68,68,0.12)] hover:text-[#f87171] transition-colors opacity-0 group-hover:opacity-100"
                         title="Excluir cliente"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -674,7 +674,7 @@ export function ClientesPage() {
                     <span className="text-xs px-2 py-0.5 rounded-full font-medium mr-1" style={{ background: urgencyCfg.bg, color: urgencyCfg.text, border: `1px solid ${urgencyCfg.border}` }}>
                       {urgencyCfg.label} {daysLeft !== null && daysLeft >= 0 ? `— ${daysLeft}d restantes` : daysLeft !== null && daysLeft < 0 ? '— vencido' : ''}
                     </span>
-                    {mrrAtivo > 0 && <span className="text-xs text-[rgba(130,150,170,0.55)]">{formatCurrency(mrrAtivo)}/mês em risco</span>}
+                    {mrrAtivo > 0 && <span className="text-xs text-muted-foreground">{formatCurrency(mrrAtivo)}/mês em risco</span>}
                     <div className="flex items-center gap-1.5 ml-auto flex-wrap">
                       <button
                         onClick={e => handleCriarProposta(e, cliente)}
@@ -707,7 +707,7 @@ export function ClientesPage() {
                 {/* ── Encerrado actions ── */}
                 {cliente.status === 'encerrado' && !isConfirming && (
                   <div className="mt-3 pt-3 flex flex-wrap items-center gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} onClick={e => e.stopPropagation()}>
-                    <div className="flex items-center gap-3 flex-wrap text-xs text-[rgba(130,150,170,0.55)]">
+                    <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
                       {daysSinceEnd !== null && (
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />

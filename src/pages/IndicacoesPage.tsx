@@ -161,10 +161,10 @@ export function IndicacoesPage() {
                       {deletingId === ind.id ? (
                         <div className="flex items-center gap-1">
                           <button onClick={() => { deleteIndicacao.mutate(ind.id); setDeletingId(null) }} className="text-xs text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">ok</button>
-                          <button onClick={() => setDeletingId(null)} className="text-xs text-[rgba(130,150,170,0.55)] px-1">x</button>
+                          <button onClick={() => setDeletingId(null)} className="text-xs text-muted-foreground px-1">x</button>
                         </div>
                       ) : (
-                        <button onClick={() => setDeletingId(ind.id)} className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-1 rounded" title="Excluir">
+                        <button onClick={() => setDeletingId(ind.id)} className="text-fg4 hover:text-red-400 transition-colors p-1 rounded" title="Excluir">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}

@@ -148,10 +148,10 @@ export function ParceirosPage() {
                       {deletingId === parceiro.id ? (
                         <div className="flex items-center gap-1">
                           <button onClick={() => { deleteParceiro.mutate(parceiro.id); setDeletingId(null) }} className="text-xs text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">ok</button>
-                          <button onClick={() => setDeletingId(null)} className="text-xs text-[rgba(130,150,170,0.55)] px-1">x</button>
+                          <button onClick={() => setDeletingId(null)} className="text-xs text-muted-foreground px-1">x</button>
                         </div>
                       ) : (
-                        <button onClick={() => setDeletingId(parceiro.id)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors" title="Excluir">
+                        <button onClick={() => setDeletingId(parceiro.id)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-fg4 hover:text-red-400 transition-colors" title="Excluir">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}

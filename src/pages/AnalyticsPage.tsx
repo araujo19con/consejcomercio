@@ -518,7 +518,7 @@ export function AnalyticsPage() {
               <p className={cn('text-xs font-semibold mt-2', metrics.ivm >= 75 ? 'text-emerald-400' : metrics.ivm >= 50 ? 'text-amber-400' : 'text-red-400')}>
                 {metrics.ivm >= 75 ? '✅ Saudável' : metrics.ivm >= 50 ? '⚠️ Alerta Amarelo' : '🔴 Crise'}
               </p>
-              <p className="text-[10px] text-[rgba(100,120,140,0.45)] mt-0.5">meta: 75+</p>
+              <p className="text-[10px] text-fg4 mt-0.5">meta: 75+</p>
             </div>
             {/* Components */}
             <div className="space-y-3">
@@ -527,7 +527,7 @@ export function AnalyticsPage() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-muted-foreground">{c.label}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-[rgba(100,120,140,0.45)]">peso {c.weight}%</span>
+                      <span className="text-xs text-fg4">peso {c.weight}%</span>
                       <span className="text-sm font-bold text-fg2">{c.value}%</span>
                     </div>
                   </div>
@@ -556,10 +556,10 @@ export function AnalyticsPage() {
           <CardContent>
             {/* header row */}
             <div className="grid gap-x-3 mb-1 px-2" style={{ gridTemplateColumns: '24px 1fr 80px 40px' }}>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)]">#</span>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)]">Motivo</span>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)] text-right">Ocorr.</span>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)] text-right">%</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4">#</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4">Motivo</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4 text-right">Ocorr.</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4 text-right">%</span>
             </div>
             <div className="space-y-1">
               {metrics.byLossReason.slice(0, 8).map((r, i) => {
@@ -586,19 +586,19 @@ export function AnalyticsPage() {
                     {/* count */}
                     <div className="text-right">
                       <span className="text-xs font-bold tabular-nums" style={{ color }}>{r.count}</span>
-                      <span className="text-[10px] text-[rgba(100,120,140,0.45)] ml-0.5">
+                      <span className="text-[10px] text-fg4 ml-0.5">
                         {r.count === 1 ? 'lead' : 'leads'}
                       </span>
                     </div>
 
                     {/* pct */}
-                    <span className="text-xs text-[rgba(130,150,170,0.60)] tabular-nums text-right">{pct(r.count, metrics.lost.length)}%</span>
+                    <span className="text-xs text-muted-foreground tabular-nums text-right">{pct(r.count, metrics.lost.length)}%</span>
                   </div>
                 )
               })}
             </div>
             {metrics.byLossReason.length > 8 && (
-              <p className="text-[10px] text-[rgba(100,120,140,0.45)] mt-3 px-2">
+              <p className="text-[10px] text-fg4 mt-3 px-2">
                 +{metrics.byLossReason.length - 8} outros motivos não exibidos
               </p>
             )}
@@ -609,7 +609,7 @@ export function AnalyticsPage() {
       {/* ── Insight box ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="col-span-3 bg-slate-900 rounded-2xl p-6 text-white">
-          <h3 className="text-sm font-semibold text-[rgba(80,100,120,0.50)] uppercase tracking-wider mb-4">💡 Insights de Processo Comercial</h3>
+          <h3 className="text-sm font-semibold text-fg4 uppercase tracking-wider mb-4">💡 Insights de Processo Comercial</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
               <p className="text-xs text-fg4 mb-1">O que o Win Rate diz</p>

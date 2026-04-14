@@ -46,35 +46,82 @@
   /* ── Light theme ──────────────────────────────────────────────── */
   html.light {
     --background:          210 25% 96%;   /* #f2f5f9 */
-    --foreground:          215 30% 12%;   /* #1a2030 */
+    --foreground:          215 32% 10%;   /* #151e2b - rich dark navy */
     --card:                0 0% 100%;     /* #ffffff */
-    --card-foreground:     215 30% 12%;
+    --card-foreground:     215 32% 10%;
     --popover:             0 0% 100%;
-    --popover-foreground:  215 30% 12%;
-    --primary:             194 100% 34%;  /* same brand color */
+    --popover-foreground:  215 32% 10%;
+    --primary:             194 100% 30%;  /* slightly deeper brand for light bg */
     --primary-foreground:  0 0% 100%;
     --secondary:           210 20% 92%;   /* #e5eaf0 */
-    --secondary-foreground: 215 25% 25%;
-    --muted:               210 18% 94%;   /* #edf0f4 */
-    --muted-foreground:    215 15% 44%;   /* #5e6e80 */
-    --accent:              194 100% 34%;
+    --secondary-foreground: 215 25% 18%;
+    --muted:               210 18% 93%;   /* #edf0f4 */
+    --muted-foreground:    215 20% 34%;   /* #45586a — good contrast on white */
+    --accent:              194 100% 30%;
     --accent-foreground:   0 0% 100%;
-    --destructive:         0 72% 51%;
+    --destructive:         0 72% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border:              214 22% 85%;   /* #ccd2de */
-    --input:               214 25% 97%;   /* #f4f6fa */
-    --ring:                194 100% 34%;
-    --chart-1:             194 100% 34%;
-    --chart-2:             191 56% 40%;
-    --chart-3:             160 60% 35%;
-    --chart-4:             35 90% 42%;
-    --chart-5:             0 72% 42%;
+    --border:              214 22% 82%;   /* #c4ccd8 — visible on white */
+    --input:               0 0% 100%;     /* pure white inputs */
+    --ring:                194 100% 30%;
+    --chart-1:             194 100% 30%;
+    --chart-2:             191 56% 36%;
+    --chart-3:             160 60% 32%;
+    --chart-4:             35 90% 40%;
+    --chart-5:             0 72% 40%;
 
-    /* Text hierarchy */
-    --fg-2:                215 22% 30%;   /* dark secondary text */
-    --fg-4:                215 12% 52%;   /* light subtle text */
+    /* Text hierarchy — all ≥ 4.5:1 contrast on white */
+    --fg-2:                215 25% 22%;   /* #2b3d52 */
+    --fg-4:                215 18% 40%;   /* #526070 — 6.2:1 on white */
   }
 }
+
+/* ── Light mode: boost contrast for colored elements ──────────────────────── */
+/* Tailwind named color overrides */
+html.light .text-emerald-400 { color: #059669; }
+html.light .text-emerald-500 { color: #047857; }
+html.light .text-green-400   { color: #16a34a; }
+html.light .text-amber-400   { color: #b45309; }
+html.light .text-amber-500   { color: #92400e; }
+html.light .text-orange-500  { color: #c2410c; }
+html.light .text-red-400     { color: #b91c1c; }
+html.light .text-red-500     { color: #991b1b; }
+html.light .text-blue-500    { color: #1d4ed8; }
+html.light .text-violet-400  { color: #6d28d9; }
+html.light .text-cyan-400    { color: #0369a1; }
+html.light .text-sky-400     { color: #0369a1; }
+html.light .text-pink-400    { color: #be185d; }
+html.light .text-teal-400    { color: #0f766e; }
+
+/* Arbitrary hex color overrides (designed for dark bg — replace in light) */
+html.light [class*="text-[#34d399]"]  { color: #059669; }
+html.light [class*="text-[#6ee7b7]"]  { color: #047857; }
+html.light [class*="text-[#fbbf24]"]  { color: #b45309; }
+html.light [class*="text-[#f87171]"]  { color: #b91c1c; }
+html.light [class*="text-[#a78bfa]"]  { color: #6d28d9; }
+html.light [class*="text-[#93c5fd]"]  { color: #1d4ed8; }
+html.light [class*="text-[#6bd0e7]"]  { color: #0369a1; }
+html.light [class*="text-[#4bbdd4]"]  { color: #0369a1; }
+html.light [class*="text-[#60a5fa]"]  { color: #1d4ed8; }
+html.light [class*="text-[#fb923c]"]  { color: #c2410c; }
+
+/* rgba semi-transparent text — near-invisible on light bg */
+html.light [class*="text-[rgba(190,205,220"] { color: hsl(215 25% 25%); }
+html.light [class*="text-[rgba(230,235,240"] { color: hsl(215 32% 10%); }
+html.light [class*="text-[rgba(215,225,235"] { color: hsl(215 25% 22%); }
+html.light [class*="text-[rgba(150,165,180"] { color: hsl(215 20% 34%); }
+html.light [class*="text-[rgba(130,150,170"] { color: hsl(215 20% 34%); }
+html.light [class*="text-[rgba(100,120,140"] { color: hsl(215 18% 40%); }
+html.light [class*="text-[rgba(80,100,120"]  { color: hsl(215 18% 40%); }
+
+/* Semi-transparent backgrounds that look grey on dark but need visible borders on light */
+html.light [class*="bg-[rgba(255,255,255,0.04)"],
+html.light [class*="bg-[rgba(255,255,255,0.06)"] {
+  background-color: hsl(215 20% 93%);
+}
+
+/* Brand color primary in light mode */
+html.light [class*="text-[rgba(0,137,172"] { color: #007a9a; }
 
 @layer components {
   /* Dark-theme native <input>, <select>, <textarea> used in modals/forms */

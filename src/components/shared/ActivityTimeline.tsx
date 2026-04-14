@@ -114,10 +114,10 @@ export function ActivityTimeline({ tabela, registroId }: Props) {
                     <p className="text-xs text-muted-foreground mt-0.5 ml-4.5">{detail}</p>
                   )}
                   {log.usuario && (
-                    <p className="text-xs text-[rgba(100,120,140,0.45)] mt-0.5 ml-4.5">por {log.usuario}</p>
+                    <p className="text-xs text-fg4 mt-0.5 ml-4.5">por {log.usuario}</p>
                   )}
                 </div>
-                <span className="text-xs text-[rgba(100,120,140,0.45)] shrink-0 pt-0.5">
+                <span className="text-xs text-fg4 shrink-0 pt-0.5">
                   {formatDate(log.created_at)}
                 </span>
               </div>

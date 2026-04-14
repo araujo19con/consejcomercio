@@ -625,14 +625,14 @@ export function PosJuniorsPage() {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                       <button
                         onClick={() => openEdit(pj)}
-                        className="p-1.5 rounded-lg text-[rgba(80,100,120,0.50)] hover:bg-[rgba(255,255,255,0.07)] hover:text-[rgba(200,215,230,0.80)] transition-colors"
+                        className="p-1.5 rounded-lg text-fg4 hover:bg-[rgba(255,255,255,0.07)] hover:text-[rgba(200,215,230,0.80)] transition-colors"
                         title="Editar"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={e => { e.stopPropagation(); setDeleteConfirm(pj.id) }}
-                        className="p-1.5 rounded-lg text-[rgba(80,100,120,0.50)] hover:bg-[rgba(239,68,68,0.12)] hover:text-[#f87171] transition-colors"
+                        className="p-1.5 rounded-lg text-fg4 hover:bg-[rgba(239,68,68,0.12)] hover:text-[#f87171] transition-colors"
                         title="Excluir"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

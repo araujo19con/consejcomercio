@@ -201,7 +201,7 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
                     </button>
                   </div>
                 ) : (
-                  <button onClick={() => setConfirmDelete(true)} className="p-1.5 rounded-lg border border-transparent hover:border-red-500/30 text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors">
+                  <button onClick={() => setConfirmDelete(true)} className="p-1.5 rounded-lg border border-transparent hover:border-red-500/30 text-fg4 hover:text-red-400 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
@@ -384,7 +384,7 @@ export function ContratosPage() {
 
           {/* Tipo */}
           <div className="flex items-center gap-1">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)] mr-0.5">Tipo:</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4 mr-0.5">Tipo:</span>
             {TIPO_TABS.map(tab => {
               const count = tab.value === 'todos' ? (contratos?.length ?? 0) : (contratos?.filter(c => c.tipo === tab.value).length ?? 0)
               const isActive = tipoFilter === tab.value
@@ -401,7 +401,7 @@ export function ContratosPage() {
 
           {/* Status */}
           <div className="flex items-center gap-1">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)] mr-0.5">Status:</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4 mr-0.5">Status:</span>
             {STATUS_CONTRACT_TABS.map(tab => {
               const count = tab.value === 'todos' ? (contratos?.length ?? 0) : (contratos?.filter(c => c.status === tab.value).length ?? 0)
               const isActive = statusFilter === tab.value
@@ -419,7 +419,7 @@ export function ContratosPage() {
 
         {/* Row 2: RM filter + sort */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)]">RM:</span>
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-fg4">RM:</span>
           {[{ value: 'todos', label: 'Todos', color: '#0089ac' }, ...RM_STATUS_OPTIONS.map(r => ({ value: r.value, label: r.label, color: '#0089ac' }))].map(tab => {
             const count = tab.value === 'todos' ? (contratos?.length ?? 0) : (contratos?.filter(c => c.rm_status === tab.value).length ?? 0)
             const isActive = rmFilter === tab.value

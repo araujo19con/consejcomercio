@@ -271,7 +271,7 @@ export function DashboardPage() {
                   {list.slice(0, 3).map(c => (
                     <p key={c.id} className="text-xs text-[rgba(180,195,210,0.70)] truncate">{c.cliente?.nome ?? '—'}</p>
                   ))}
-                  {list.length > 3 && <p className="text-[10px] text-[rgba(100,120,140,0.45)] mt-1">+{list.length - 3} mais</p>}
+                  {list.length > 3 && <p className="text-[10px] text-fg4 mt-1">+{list.length - 3} mais</p>}
                 </div>
               ))}
             </div>

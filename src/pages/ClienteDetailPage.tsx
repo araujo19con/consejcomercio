@@ -1,28 +1,147 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useCliente } from '@/hooks/useClientes'
+import { useCliente, useUpdateCliente } from '@/hooks/useClientes'
 import { useContratosByCliente, useDeleteContrato } from '@/hooks/useContratos'
 import { useIndicacoes } from '@/hooks/useIndicacoes'
 import { useOportunidades } from '@/hooks/useOportunidades'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { ArrowLeft, Plus, AlertCircle, Trash2, Star, Shield, UserCheck } from 'lucide-react'
+import { ArrowLeft, Plus, AlertCircle, Trash2, Star, Shield, UserCheck, Pencil, X, Check } from 'lucide-react'
 import { useUpdateClienteNPS } from '@/hooks/useClientes'
 import { useUpdateContrato } from '@/hooks/useContratos'
-import { CONTRACT_TYPES, PRICING_MODELS, CLIENT_STATUS_OPTIONS, RM_STATUS_OPTIONS, OPORTUNIDADE_STATUS, SERVICE_AREAS } from '@/lib/constants'
+import {
+  CONTRACT_TYPES, PRICING_MODELS, CLIENT_STATUS_OPTIONS, RM_STATUS_OPTIONS,
+  OPORTUNIDADE_STATUS, SERVICE_AREAS, SEGMENTS, ESTADOS_BR,
+} from '@/lib/constants'
+import { formatDate, formatCurrency, getContractProgress, getDaysUntilExpiry } from '@/lib/utils'
+import { cn } from '@/lib/utils'
+import { useState, useEffect } from 'react'
+import { NewContratoModal } from '@/components/contratos/NewContratoModal'
+import { ActivityTimeline } from '@/components/shared/ActivityTimeline'
+import type { Cliente } from '@/types'
 
 const CONTRACT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   ativo:     { label: 'Ativo',     color: 'text-emerald-400 bg-[rgba(16,185,129,0.12)] border-[rgba(16,185,129,0.25)]' },
-  encerrado: { label: 'Encerrado', color: 'text-[rgba(150,165,180,0.65)] bg-[rgba(255,255,255,0.04)]' },
+  encerrado: { label: 'Encerrado', color: 'text-muted-foreground bg-[rgba(255,255,255,0.04)]' },
   suspenso:  { label: 'Suspenso',  color: 'text-amber-400 bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.25)]' },
 }
-import { formatDate, formatCurrency, getContractProgress, getDaysUntilExpiry } from '@/lib/utils'
-import { cn } from '@/lib/utils'
-import { useState } from 'react'
-import { NewContratoModal } from '@/components/contratos/NewContratoModal'
-import { ActivityTimeline } from '@/components/shared/ActivityTimeline'
+
+// ─── Edit form ────────────────────────────────────────────────────────────────
+
+function EditDadosForm({
+  cliente,
+  onCancel,
+}: {
+  cliente: Cliente
+  onCancel: () => void
+}) {
+  const updateCliente = useUpdateCliente()
+  const [nome, setNome]         = useState(cliente.nome ?? '')
+  const [empresa, setEmpresa]   = useState(cliente.empresa ?? '')
+  const [segmento, setSegmento] = useState(cliente.segmento ?? '')
+  const [telefone, setTelefone] = useState(cliente.telefone ?? '')
+  const [email, setEmail]       = useState(cliente.email ?? '')
+  const [status, setStatus]     = useState(cliente.status ?? 'ativo')
+  const [estado, setEstado]     = useState(cliente.estado ?? '')
+  const [notas, setNotas]       = useState(cliente.notas ?? '')
+
+  function handleSave() {
+    if (!nome.trim() || !empresa.trim()) return
+    updateCliente.mutate(
+      {
+        id: cliente.id, nome, empresa, segmento,
+        telefone: telefone || null, email: email || null,
+        status, estado: estado || null, notas: notas || null,
+      },
+      { onSuccess: onCancel },
+    )
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-5 space-y-4">
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-sm font-semibold text-foreground">Editar dados do cliente</p>
+          <button onClick={onCancel} className="text-muted-foreground hover:text-foreground transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Nome *</label>
+            <input value={nome} onChange={e => setNome(e.target.value)} className="form-control" placeholder="Nome do responsável" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Empresa *</label>
+            <input value={empresa} onChange={e => setEmpresa(e.target.value)} className="form-control" placeholder="Nome da empresa" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Telefone</label>
+            <input value={telefone} onChange={e => setTelefone(e.target.value)} className="form-control" placeholder="(00) 00000-0000" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">E-mail</label>
+            <input value={email} onChange={e => setEmail(e.target.value)} type="email" className="form-control" placeholder="email@empresa.com" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Status</label>
+            <select value={status} onChange={e => setStatus(e.target.value)} className="form-control">
+              {CLIENT_STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Segmento</label>
+            <select value={segmento} onChange={e => setSegmento(e.target.value)} className="form-control">
+              <option value="">Selecione</option>
+              {SEGMENTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">Estado (UF)</label>
+            <select value={estado} onChange={e => setEstado(e.target.value)} className="form-control">
+              <option value="">Selecione</option>
+              {ESTADOS_BR.map(e => <option key={e.uf} value={e.uf}>{e.uf} — {e.nome}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-muted-foreground">Observações</label>
+          <textarea
+            value={notas}
+            onChange={e => setNotas(e.target.value)}
+            rows={3}
+            className="form-control resize-none"
+            placeholder="Notas internas sobre o cliente…"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 pt-1">
+          <Button
+            size="sm"
+            onClick={handleSave}
+            disabled={!nome.trim() || !empresa.trim() || updateCliente.isPending}
+            className="bg-primary hover:bg-primary/90 gap-1.5"
+          >
+            <Check className="w-3.5 h-3.5" />
+            {updateCliente.isPending ? 'Salvando…' : 'Salvar alterações'}
+          </Button>
+          <Button size="sm" variant="outline" onClick={onCancel}>Cancelar</Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
 
 export function ClienteDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -35,9 +154,12 @@ export function ClienteDetailPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [editingNps, setEditingNps] = useState(false)
   const [npsInput, setNpsInput] = useState<number>(cliente?.nps_score ?? 0)
+  const [editingDados, setEditingDados] = useState(false)
   const deleteContrato = useDeleteContrato()
   const updateNps = useUpdateClienteNPS()
   const updateContrato = useUpdateContrato()
+
+  useEffect(() => { setEditingDados(false) }, [id])
 
   const indicacoes = todasIndicacoes?.filter(i => i.indicante_cliente_id === id) || []
   const oportunidades = todasOportunidades?.filter(o => o.cliente_id === id) || []
@@ -53,7 +175,7 @@ export function ClienteDetailPage() {
         <button onClick={() => navigate('/clientes')} className="text-fg4 hover:text-fg2 transition-colors flex items-center gap-1">
           <ArrowLeft className="w-3.5 h-3.5" /> Clientes
         </button>
-        <span className="text-[rgba(80,100,120,0.50)]">/</span>
+        <span className="text-fg4">/</span>
         <span className="text-fg2 font-medium truncate">{cliente.nome}</span>
       </div>
 
@@ -78,39 +200,57 @@ export function ClienteDetailPage() {
           <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
+        {/* ── Dados ── */}
         <TabsContent value="dados">
           <div className="space-y-3">
-            <Card>
-              <CardContent className="p-5 grid grid-cols-2 gap-4">
-                {[
-                  { label: 'Telefone', value: cliente.telefone },
-                  { label: 'Email', value: cliente.email },
-                  { label: 'Segmento', value: cliente.segmento?.replace(/_/g, ' ') },
-                  { label: 'Cliente desde', value: formatDate(cliente.created_at) },
-                ].map(({ label, value }) => (
-                  <div key={label}>
-                    <p className="text-xs text-muted-foreground">{label}</p>
-                    <p className="text-sm font-medium text-foreground">{value || '—'}</p>
+            {editingDados ? (
+              <EditDadosForm cliente={cliente} onCancel={() => setEditingDados(false)} />
+            ) : (
+              <Card>
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Informações</p>
+                    <button
+                      onClick={() => setEditingDados(true)}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Editar
+                    </button>
                   </div>
-                ))}
-                {cliente.indicado_por_cliente && (
-                  <div>
-                    <p className="text-xs text-muted-foreground">Indicado por</p>
-                    <p className="text-sm font-medium text-violet-400 flex items-center gap-1">
-                      <UserCheck className="w-3.5 h-3.5" />
-                      {cliente.indicado_por_cliente.nome}
-                      <span className="text-fg4 font-normal text-xs">· {cliente.indicado_por_cliente.empresa}</span>
-                    </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { label: 'Telefone', value: cliente.telefone },
+                      { label: 'Email', value: cliente.email },
+                      { label: 'Segmento', value: SEGMENTS.find(s => s.value === cliente.segmento)?.label ?? cliente.segmento?.replace(/_/g, ' ') },
+                      { label: 'Estado', value: cliente.estado ?? null },
+                      { label: 'Status', value: statusInfo?.label },
+                      { label: 'Cliente desde', value: formatDate(cliente.created_at) },
+                    ].map(({ label, value }) => (
+                      <div key={label}>
+                        <p className="text-xs text-muted-foreground">{label}</p>
+                        <p className="text-sm font-medium text-foreground">{value || '—'}</p>
+                      </div>
+                    ))}
+                    {cliente.indicado_por_cliente && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Indicado por</p>
+                        <p className="text-sm font-medium text-violet-400 flex items-center gap-1">
+                          <UserCheck className="w-3.5 h-3.5" />
+                          {cliente.indicado_por_cliente.nome}
+                          <span className="text-fg4 font-normal text-xs">· {cliente.indicado_por_cliente.empresa}</span>
+                        </p>
+                      </div>
+                    )}
+                    {cliente.notas && (
+                      <div className="col-span-2">
+                        <p className="text-xs text-muted-foreground">Observações</p>
+                        <p className="text-sm text-fg2 mt-0.5 whitespace-pre-line">{cliente.notas}</p>
+                      </div>
+                    )}
                   </div>
-                )}
-                {cliente.notas && (
-                  <div className="col-span-2">
-                    <p className="text-xs text-muted-foreground">Observações</p>
-                    <p className="text-sm text-fg2 mt-0.5">{cliente.notas}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* NPS Widget */}
             <Card>
@@ -126,8 +266,8 @@ export function ClienteDetailPage() {
                     </button>
                   ) : (
                     <div className="flex gap-1.5">
-                      <button onClick={() => { updateNps.mutate({ id: id!, nps_score: npsInput }); setEditingNps(false) }} className="text-xs px-2 py-1 rounded bg-[#0089ac] text-white">Salvar</button>
-                      <button onClick={() => setEditingNps(false)} className="text-xs px-2 py-1 rounded border border-[rgba(255,255,255,0.10)] text-muted-foreground">Cancelar</button>
+                      <button onClick={() => { updateNps.mutate({ id: id!, nps_score: npsInput }); setEditingNps(false) }} className="text-xs px-2 py-1 rounded bg-primary text-white">Salvar</button>
+                      <button onClick={() => setEditingNps(false)} className="text-xs px-2 py-1 rounded border text-muted-foreground">Cancelar</button>
                     </div>
                   )}
                 </div>
@@ -141,7 +281,7 @@ export function ClienteDetailPage() {
                           'w-9 h-9 rounded-lg text-sm font-bold border transition-all',
                           npsInput === i
                             ? (i >= 9 ? 'bg-emerald-600 border-emerald-500 text-white' : i >= 7 ? 'bg-amber-500 border-amber-400 text-white' : 'bg-red-600 border-red-500 text-white')
-                            : 'border-[rgba(255,255,255,0.10)] text-[rgba(150,165,180,0.60)] hover:border-[rgba(255,255,255,0.20)]'
+                            : 'border text-muted-foreground hover:border-primary/50'
                         )}
                       >{i}</button>
                     ))}
@@ -153,9 +293,9 @@ export function ClienteDetailPage() {
                         <span className={cn('text-4xl font-bold', cliente.nps_score >= 9 ? 'text-emerald-400' : cliente.nps_score >= 7 ? 'text-amber-400' : 'text-red-400')}>{cliente.nps_score}</span>
                         <div>
                           <p className={cn('text-sm font-semibold', cliente.nps_score >= 9 ? 'text-emerald-400' : cliente.nps_score >= 7 ? 'text-amber-400' : 'text-red-400')}>
-                            {cliente.nps_score >= 9 ? '🟢 Promotor — convidar para indicar' : cliente.nps_score >= 7 ? '🟡 Neutro — aprofundar relacionamento' : '🔴 Detrator — check-in urgente'}
+                            {cliente.nps_score >= 9 ? 'Promotor — convidar para indicar' : cliente.nps_score >= 7 ? 'Neutro — aprofundar relacionamento' : 'Detrator — check-in urgente'}
                           </p>
-                          {cliente.nps_updated_at && <p className="text-xs text-[rgba(100,120,140,0.45)]">Atualizado em {formatDate(cliente.nps_updated_at)}</p>}
+                          {cliente.nps_updated_at && <p className="text-xs text-fg4">Atualizado em {formatDate(cliente.nps_updated_at)}</p>}
                         </div>
                       </>
                     ) : (
@@ -168,6 +308,7 @@ export function ClienteDetailPage() {
           </div>
         </TabsContent>
 
+        {/* ── Contratos ── */}
         <TabsContent value="contratos">
           <div className="flex justify-end mb-3">
             <Button size="sm" onClick={() => setShowNewContrato(true)} className="bg-primary hover:bg-primary/90">
@@ -180,13 +321,11 @@ export function ClienteDetailPage() {
               const progress = getContractProgress(contrato.data_inicio, contrato.data_fim)
               const isExpiring = daysLeft !== null && daysLeft <= 30 && daysLeft >= 0
               const rmInfo = RM_STATUS_OPTIONS.find(r => r.value === contrato.rm_status)
-
               const statusInfo = CONTRACT_STATUS_LABELS[contrato.status] ?? CONTRACT_STATUS_LABELS['ativo']
 
               return (
                 <Card key={contrato.id} style={isExpiring ? { borderColor: 'rgba(249,115,22,0.35)' } : {}}>
                   <CardContent className="p-4 space-y-3">
-                    {/* Header row */}
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -201,7 +340,7 @@ export function ClienteDetailPage() {
                         </div>
                         <div className="flex gap-1.5 mt-1.5 flex-wrap">
                           {contrato.areas_direito?.map(a => (
-                            <span key={a} className="text-xs bg-[rgba(255,255,255,0.04)] text-muted-foreground px-2 py-0.5 rounded-full border border-[rgba(255,255,255,0.06)]">
+                            <span key={a} className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full border">
                               {SERVICE_AREAS.find(s => s.value === a)?.label ?? a.replace(/_/g, ' ')}
                             </span>
                           ))}
@@ -214,28 +353,23 @@ export function ClienteDetailPage() {
                             <div className="flex items-center gap-1">
                               <button
                                 onClick={() => { deleteContrato.mutate({ id: contrato.id, clienteId: contrato.cliente_id }); setDeletingId(null) }}
-                                className="text-xs text-red-400 hover:text-red-300 px-1.5 py-0.5 rounded border border-red-500/30 hover:border-red-400/50 transition-colors"
+                                className="text-xs text-red-400 px-1.5 py-0.5 rounded border border-red-500/30 transition-colors"
                                 disabled={deleteContrato.isPending}
-                              >
-                                Confirmar
-                              </button>
-                              <button onClick={() => setDeletingId(null)} className="text-xs text-[rgba(130,150,170,0.55)] hover:text-[rgba(180,195,210,0.75)] transition-colors px-1">
-                                Cancelar
-                              </button>
+                              >Confirmar</button>
+                              <button onClick={() => setDeletingId(null)} className="text-xs text-muted-foreground px-1">Cancelar</button>
                             </div>
                           ) : (
                             <div className="flex items-center gap-1.5">
                               <button
                                 onClick={() => updateContrato.mutate({ id: contrato.id, caso_manifesto: !contrato.caso_manifesto })}
-                                className={cn('transition-colors p-0.5 rounded', contrato.caso_manifesto ? 'text-amber-400' : 'text-[rgba(100,120,140,0.40)] hover:text-amber-400')}
+                                className={cn('transition-colors p-0.5 rounded', contrato.caso_manifesto ? 'text-amber-400' : 'text-fg4 hover:text-amber-400')}
                                 title={contrato.caso_manifesto ? 'Remover Caso Manifesto' : 'Marcar como Caso Manifesto'}
                               >
                                 <Shield className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => setDeletingId(contrato.id)}
-                                className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-0.5 rounded"
-                                title="Excluir contrato"
+                                className="text-fg4 hover:text-red-400 transition-colors p-0.5 rounded"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -246,19 +380,17 @@ export function ClienteDetailPage() {
                       </div>
                     </div>
 
-                    {/* Financial row */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Valor Total</p>
+                        <p className="text-xs text-muted-foreground mb-0.5">Valor Total</p>
                         <p className="text-sm font-bold text-foreground">{contrato.valor_total ? formatCurrency(contrato.valor_total) : '—'}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Valor Mensal</p>
+                        <p className="text-xs text-muted-foreground mb-0.5">Valor Mensal</p>
                         <p className="text-sm font-medium text-fg2">{contrato.valor_mensal ? formatCurrency(contrato.valor_mensal) : '—'}</p>
                       </div>
                     </div>
 
-                    {/* Timeline */}
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>{formatDate(contrato.data_inicio)} → {formatDate(contrato.data_fim)}</span>
@@ -274,25 +406,24 @@ export function ClienteDetailPage() {
                       <Progress value={progress} className={cn('h-1.5', isExpiring && '[&>div]:bg-orange-500')} />
                     </div>
 
-                    {/* Notes */}
                     {(contrato.observacoes_demanda || contrato.observacoes_vp || contrato.notas) && (
-                      <div className="pt-2 border-t border-[rgba(255,255,255,0.05)] space-y-2">
+                      <div className="pt-2 border-t space-y-2">
                         {contrato.observacoes_demanda && (
                           <div>
-                            <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Obs. Demandas</p>
-                            <p className="text-sm text-[rgba(190,205,220,0.75)] leading-relaxed">{contrato.observacoes_demanda}</p>
+                            <p className="text-xs text-muted-foreground mb-0.5">Obs. Demandas</p>
+                            <p className="text-sm text-fg2 leading-relaxed">{contrato.observacoes_demanda}</p>
                           </div>
                         )}
                         {contrato.observacoes_vp && (
                           <div>
-                            <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Obs. Vice-Presidência</p>
-                            <p className="text-sm text-[rgba(190,205,220,0.75)] leading-relaxed">{contrato.observacoes_vp}</p>
+                            <p className="text-xs text-muted-foreground mb-0.5">Obs. Vice-Presidência</p>
+                            <p className="text-sm text-fg2 leading-relaxed">{contrato.observacoes_vp}</p>
                           </div>
                         )}
                         {!contrato.observacoes_demanda && !contrato.observacoes_vp && contrato.notas && (
                           <div>
-                            <p className="text-xs text-[rgba(130,150,170,0.55)] mb-0.5">Observações</p>
-                            <p className="text-sm text-[rgba(190,205,220,0.75)] leading-relaxed whitespace-pre-line">{contrato.notas}</p>
+                            <p className="text-xs text-muted-foreground mb-0.5">Observações</p>
+                            <p className="text-sm text-fg2 leading-relaxed whitespace-pre-line">{contrato.notas}</p>
                           </div>
                         )}
                       </div>
@@ -308,6 +439,7 @@ export function ClienteDetailPage() {
           )}
         </TabsContent>
 
+        {/* ── Indicações ── */}
         <TabsContent value="indicacoes">
           <div className="space-y-2">
             {indicacoes.map(ind => (
@@ -329,6 +461,7 @@ export function ClienteDetailPage() {
           </div>
         </TabsContent>
 
+        {/* ── Oportunidades ── */}
         <TabsContent value="oportunidades">
           <div className="space-y-2">
             {oportunidades.map(op => {
@@ -354,6 +487,8 @@ export function ClienteDetailPage() {
             {!oportunidades.length && <div className="text-center text-fg4 py-8">Nenhuma oportunidade identificada.</div>}
           </div>
         </TabsContent>
+
+        {/* ── Histórico ── */}
         <TabsContent value="historico">
           <Card>
             <CardContent className="p-5">

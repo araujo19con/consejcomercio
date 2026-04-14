@@ -336,10 +336,10 @@ export function OportunidadesPage() {
                             {deletingId === op.id ? (
                               <div className="flex items-center gap-1">
                                 <button onClick={() => { deleteOportunidade.mutate(op.id); setDeletingId(null) }} className="text-[10px] text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">ok</button>
-                                <button onClick={() => setDeletingId(null)} className="text-[10px] text-[rgba(130,150,170,0.55)] px-1">x</button>
+                                <button onClick={() => setDeletingId(null)} className="text-[10px] text-muted-foreground px-1">x</button>
                               </div>
                             ) : (
-                              <button onClick={() => setDeletingId(op.id)} className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-0.5 shrink-0" title="Excluir">
+                              <button onClick={() => setDeletingId(op.id)} className="text-fg4 hover:text-red-400 transition-colors p-0.5 shrink-0" title="Excluir">
                                 <Trash2 className="w-3 h-3" />
                               </button>
                             )}
