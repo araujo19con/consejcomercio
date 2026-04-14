@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useOportunidades, useCreateOportunidade, useUpdateOportunidade } from '@/hooks/useOportunidades'
+import { useOportunidades, useCreateOportunidade, useUpdateOportunidade, useDeleteOportunidade } from '@/hooks/useOportunidades'
 import { useCreateContrato } from '@/hooks/useContratos'
 import { useClientes } from '@/hooks/useClientes'
 import { Card, CardContent } from '@/components/ui/card'
@@ -7,7 +7,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { OPORTUNIDADE_STATUS, OPORTUNIDADE_TIPOS, CONTRACT_TYPES, PRICING_MODELS, SERVICE_AREAS, RM_STATUS_OPTIONS } from '@/lib/constants'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { TrendingUp, RefreshCw, ArrowUpRight, Save, Plus } from 'lucide-react'
+import { TrendingUp, RefreshCw, ArrowUpRight, Save, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Oportunidade } from '@/types'
 import { toast } from 'sonner'
@@ -263,8 +263,10 @@ function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
 export function OportunidadesPage() {
   const { data: oportunidades, isLoading } = useOportunidades()
   const updateOportunidade = useUpdateOportunidade()
+  const deleteOportunidade = useDeleteOportunidade()
   const [convertendo, setConvertendo] = useState<Oportunidade | null>(null)
   const [showNova, setShowNova] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   function handleStatusChange(op: Oportunidade, newStatus: string) {
     if (newStatus === 'convertida') {
@@ -322,15 +324,25 @@ export function OportunidadesPage() {
                           <p className="text-sm font-medium text-[rgba(230,235,240,0.92)] leading-tight">{op.titulo}</p>
                           <p className="text-xs text-[rgba(130,150,170,0.65)] mt-0.5">{op.cliente?.nome}</p>
                           {op.data_alerta && <p className="text-xs text-orange-600 mt-1">Alerta: {formatDate(op.data_alerta)}</p>}
-                          <div className="mt-2">
+                          <div className="mt-2 flex items-center gap-1.5">
                             <Select value={op.status} onValueChange={v => handleStatusChange(op, v)}>
-                              <SelectTrigger className="h-6 text-xs w-full">
+                              <SelectTrigger className="h-6 text-xs flex-1">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
                                 {OPORTUNIDADE_STATUS.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
+                            {deletingId === op.id ? (
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => { deleteOportunidade.mutate(op.id); setDeletingId(null) }} className="text-[10px] text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">ok</button>
+                                <button onClick={() => setDeletingId(null)} className="text-[10px] text-[rgba(130,150,170,0.55)] px-1">x</button>
+                              </div>
+                            ) : (
+                              <button onClick={() => setDeletingId(op.id)} className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-0.5 shrink-0" title="Excluir">
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
                           </div>
                         </CardContent>
                       </Card>

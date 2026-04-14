@@ -48,3 +48,18 @@ export function useUpdateParceiro() {
     },
   })
 }
+
+export function useDeleteParceiro() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('parceiros').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.parceiros.all })
+      toast.success('Parceiro excluído!')
+    },
+    onError: () => toast.error('Erro ao excluir parceiro'),
+  })
+}

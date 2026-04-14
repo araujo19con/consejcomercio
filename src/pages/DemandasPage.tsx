@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useDemandas, useCreateDemanda, useUpdateDemanda } from '@/hooks/useDemandas'
+import { useDemandas, useCreateDemanda, useUpdateDemanda, useDeleteDemanda } from '@/hooks/useDemandas'
 import { useContratos } from '@/hooks/useContratos'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { DEMANDA_TIPOS, SERVICE_AREAS } from '@/lib/constants'
 import { formatDate, formatCurrency } from '@/lib/utils'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const DEMANDA_STATUS = [
@@ -26,7 +26,9 @@ export function DemandasPage() {
   const { data: contratos } = useContratos()
   const createDemanda = useCreateDemanda()
   const updateDemanda = useUpdateDemanda()
+  const deleteDemanda = useDeleteDemanda()
   const [search, setSearch] = useState('')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState('todos')
   const [showNew, setShowNew] = useState(false)
 
@@ -121,6 +123,16 @@ export function DemandasPage() {
                           {DEMANDA_STATUS.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
                         </SelectContent>
                       </Select>
+                      {deletingId === demanda.id ? (
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => { deleteDemanda.mutate(demanda.id); setDeletingId(null) }} className="text-xs text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">ok</button>
+                          <button onClick={() => setDeletingId(null)} className="text-xs text-[rgba(130,150,170,0.55)] px-1">x</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => setDeletingId(demanda.id)} className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-1 rounded" title="Excluir">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </CardContent>

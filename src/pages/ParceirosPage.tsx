@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParceiros, useCreateParceiro, useUpdateParceiro } from '@/hooks/useParceiros'
+import { useParceiros, useCreateParceiro, useUpdateParceiro, useDeleteParceiro } from '@/hooks/useParceiros'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { PARCEIRO_TIPOS } from '@/lib/constants'
-import { Plus, Handshake, Globe, Pencil } from 'lucide-react'
+import { Plus, Handshake, Globe, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Parceiro } from '@/types'
 
@@ -67,8 +67,10 @@ export function ParceirosPage() {
   const { data: parceiros, isLoading } = useParceiros()
   const createParceiro = useCreateParceiro()
   const updateParceiro = useUpdateParceiro()
+  const deleteParceiro = useDeleteParceiro()
   const [showNew, setShowNew] = useState(false)
   const [editParceiro, setEditParceiro] = useState<Parceiro | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const newForm = useParceiroForm()
   const editForm = useParceiroForm()
 
@@ -134,7 +136,7 @@ export function ParceirosPage() {
                         <p className="text-xs text-[rgba(130,150,170,0.65)]">{tipoInfo?.label}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       {statusInfo && (
                         <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', statusInfo.color)}>
                           {statusInfo.label}
@@ -143,6 +145,16 @@ export function ParceirosPage() {
                       <button onClick={() => handleEdit(parceiro)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-[rgba(100,120,140,0.55)]">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
+                      {deletingId === parceiro.id ? (
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => { deleteParceiro.mutate(parceiro.id); setDeletingId(null) }} className="text-xs text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">ok</button>
+                          <button onClick={() => setDeletingId(null)} className="text-xs text-[rgba(130,150,170,0.55)] px-1">x</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => setDeletingId(parceiro.id)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors" title="Excluir">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                   {parceiro.contato_nome && <p className="text-xs text-[rgba(150,165,180,0.70)] mt-2">Contato: {parceiro.contato_nome}</p>}

@@ -48,3 +48,18 @@ export function useUpdateDemanda() {
     },
   })
 }
+
+export function useDeleteDemanda() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('demandas').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.demandas.all })
+      toast.success('Demanda excluída!')
+    },
+    onError: () => toast.error('Erro ao excluir demanda'),
+  })
+}

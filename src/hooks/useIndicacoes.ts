@@ -48,3 +48,18 @@ export function useUpdateIndicacao() {
     },
   })
 }
+
+export function useDeleteIndicacao() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('indicacoes').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.indicacoes.all })
+      toast.success('Indicação excluída!')
+    },
+    onError: () => toast.error('Erro ao excluir indicação'),
+  })
+}

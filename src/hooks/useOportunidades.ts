@@ -48,3 +48,18 @@ export function useUpdateOportunidade() {
     },
   })
 }
+
+export function useDeleteOportunidade() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('oportunidades').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.oportunidades.all })
+      toast.success('Oportunidade excluída!')
+    },
+    onError: () => toast.error('Erro ao excluir oportunidade'),
+  })
+}

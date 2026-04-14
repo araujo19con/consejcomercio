@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useIndicacoes, useCreateIndicacao, useUpdateIndicacao } from '@/hooks/useIndicacoes'
+import { useIndicacoes, useCreateIndicacao, useUpdateIndicacao, useDeleteIndicacao } from '@/hooks/useIndicacoes'
 import { useCreateLead } from '@/hooks/useLeads'
 import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@/lib/query-keys'
@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { INDICACAO_STATUS, REWARD_TYPES } from '@/lib/constants'
 import { formatDate } from '@/lib/utils'
-import { Plus, Gift, User, Handshake } from 'lucide-react'
+import { Plus, Gift, User, Handshake, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Indicacao } from '@/types'
 import { supabase } from '@/lib/supabase'
@@ -52,9 +52,11 @@ export function IndicacoesPage() {
   const { data: parceiros } = useParceiros()
   const createIndicacao = useCreateIndicacao()
   const updateIndicacao = useUpdateIndicacao()
+  const deleteIndicacao = useDeleteIndicacao()
   const createLead = useCreateLead()
   const qc = useQueryClient()
   const [showNew, setShowNew] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [indicanteType, setIndicanteType] = useState<'cliente' | 'parceiro'>('cliente')
   const [indicanteClienteId, setIndicanteClienteId] = useState('')
   const [indicanteParceiroId, setIndicanteParceiroId] = useState('')
@@ -156,6 +158,16 @@ export function IndicacoesPage() {
                           {INDICACAO_STATUS.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
                         </SelectContent>
                       </Select>
+                      {deletingId === ind.id ? (
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => { deleteIndicacao.mutate(ind.id); setDeletingId(null) }} className="text-xs text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">ok</button>
+                          <button onClick={() => setDeletingId(null)} className="text-xs text-[rgba(130,150,170,0.55)] px-1">x</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => setDeletingId(ind.id)} className="text-[rgba(100,120,140,0.40)] hover:text-red-400 transition-colors p-1 rounded" title="Excluir">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </CardContent>
