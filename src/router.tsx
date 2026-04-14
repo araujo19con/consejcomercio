@@ -23,6 +23,7 @@ import { MapaPage } from '@/pages/MapaPage'
 import { ImportarPage } from '@/pages/ImportarPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { PosJuniorsPage } from '@/pages/PosJuniorsPage'
+import { ProspeccaoPage } from '@/pages/ProspeccaoPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
       { path: 'mapa', element: <MapaPage /> },
       { path: 'leads', element: <LeadsPage /> },
       { path: 'leads/:id', element: <LeadDetailPage /> },
+      { path: 'prospeccao', element: <ProspeccaoPage /> },
       { path: 'diagnosticos', element: <DiagnosticosPage /> },
       { path: 'clientes', element: <ClientesPage /> },
       { path: 'clientes/:id', element: <ClienteDetailPage /> },
