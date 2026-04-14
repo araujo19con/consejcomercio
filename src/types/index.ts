@@ -180,6 +180,20 @@ export interface Oportunidade {
   cliente?: Cliente
 }
 
+export interface ServicoConfig {
+  id: string
+  nome: string
+  tipo: 'simples' | 'complexa'
+  valor: number
+}
+
+export interface Configuracoes {
+  id: string
+  alerta_renovacao_dias: number
+  servicos: ServicoConfig[]
+  updated_at: string
+}
+
 export interface AuditLog {
   id: string
   tabela: string

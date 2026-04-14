@@ -41,5 +41,6 @@ export const QUERY_KEYS = {
     all: ['pos_juniors'] as const,
     byId: (id: string) => ['pos_juniors', id] as const,
   },
+  configuracoes: ['configuracoes'] as const,
   dashboard: ['dashboard'] as const,
 }
