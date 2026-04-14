@@ -136,6 +136,29 @@ const STATUS_TABS = [
   { value: 'encerrado',   label: 'Encerrados' },
 ]
 
+// ─── Tipo de serviço filter ───────────────────────────────────────────────────
+
+type TipoServico = 'todos' | 'assessoria' | 'consultoria' | 'ambos' | 'sem_contrato'
+
+const TIPO_TABS: { value: TipoServico; label: string }[] = [
+  { value: 'todos',         label: 'Todos' },
+  { value: 'assessoria',    label: 'Assessoria' },
+  { value: 'consultoria',   label: 'Consultoria' },
+  { value: 'ambos',         label: 'Assessoria + Consultoria' },
+  { value: 'sem_contrato',  label: 'Sem contrato ativo' },
+]
+
+function getTipoServico(cliente: Cliente): TipoServico {
+  const ativos = cliente.contratos?.filter(c => c.status === 'ativo') || []
+  if (ativos.length === 0) return 'sem_contrato'
+  const hasAss  = ativos.some(c => c.tipo === 'assessoria')
+  const hasCons = ativos.some(c => c.tipo === 'consultoria')
+  if (hasAss && hasCons) return 'ambos'
+  if (hasAss)  return 'assessoria'
+  if (hasCons) return 'consultoria'
+  return 'sem_contrato'
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function ClientesPage() {
@@ -146,13 +169,15 @@ export function ClientesPage() {
 
   const [search, setSearch]             = useState('')
   const [statusFilter, setStatusFilter] = useState('todos')
+  const [tipoFilter, setTipoFilter]     = useState<TipoServico>('todos')
   const [showNew, setShowNew]           = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   const filtered = clientes?.filter(c => {
     const matchSearch = !search || c.nome.toLowerCase().includes(search.toLowerCase()) || c.empresa.toLowerCase().includes(search.toLowerCase())
     const matchStatus = statusFilter === 'todos' || c.status === statusFilter
-    return matchSearch && matchStatus
+    const matchTipo   = tipoFilter === 'todos' || getTipoServico(c) === tipoFilter
+    return matchSearch && matchStatus && matchTipo
   }) || []
 
   function handleDelete(e: React.MouseEvent, id: string) {
@@ -182,40 +207,68 @@ export function ClientesPage() {
       </div>
 
       {/* ── Filters ── */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
-          <Input
-            placeholder="Buscar por nome ou empresa…"
-            className="pl-8 h-9 text-sm"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+      <div className="space-y-2">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
+            <Input
+              placeholder="Buscar por nome ou empresa…"
+              className="pl-8 h-9 text-sm"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Status pill tabs */}
+          <div className="flex items-center gap-1 bg-[rgba(255,255,255,0.04)] p-1 rounded-lg flex-wrap">
+            {STATUS_TABS.map(tab => {
+              const count = tab.value === 'todos'
+                ? (clientes?.length ?? 0)
+                : (clientes?.filter(c => c.status === tab.value).length ?? 0)
+              const isActive = statusFilter === tab.value
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => setStatusFilter(tab.value)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5',
+                    isActive ? 'bg-white text-[rgba(230,235,240,0.92)] shadow-sm' : 'text-[rgba(130,150,170,0.65)] hover:text-[rgba(215,225,235,0.85)]'
+                  )}
+                >
+                  {tab.label}
+                  <span className={cn(
+                    'text-[10px] px-1.5 py-0.5 rounded-full font-semibold tabular-nums',
+                    isActive ? 'text-white' : 'bg-[rgba(255,255,255,0.07)] text-[rgba(130,150,170,0.65)]'
+                  )} style={isActive ? { backgroundColor: '#0089ac' } : {}}>
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
-        {/* Pill tabs — brand-consistent */}
-        <div className="flex items-center gap-1 bg-[rgba(255,255,255,0.04)] p-1 rounded-lg">
-          {STATUS_TABS.map(tab => {
+        {/* Tipo de serviço filter */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.55)]">Tipo:</span>
+          {TIPO_TABS.map(tab => {
             const count = tab.value === 'todos'
               ? (clientes?.length ?? 0)
-              : (clientes?.filter(c => c.status === tab.value).length ?? 0)
-            const isActive = statusFilter === tab.value
+              : (clientes?.filter(c => getTipoServico(c) === tab.value).length ?? 0)
+            const isActive = tipoFilter === tab.value
+            const accentColor = tab.value === 'assessoria' ? '#06b6d4' : tab.value === 'consultoria' ? '#8b5cf6' : tab.value === 'ambos' ? '#10b981' : tab.value === 'sem_contrato' ? '#6b7280' : '#0089ac'
             return (
               <button
                 key={tab.value}
-                onClick={() => setStatusFilter(tab.value)}
-                className={cn(
-                  'px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5',
-                  isActive ? 'bg-white text-[rgba(230,235,240,0.92)] shadow-sm' : 'text-[rgba(130,150,170,0.65)] hover:text-[rgba(215,225,235,0.85)]'
-                )}
+                onClick={() => setTipoFilter(tab.value)}
+                className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 border"
+                style={isActive
+                  ? { backgroundColor: `${accentColor}22`, borderColor: `${accentColor}55`, color: accentColor }
+                  : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }
+                }
               >
                 {tab.label}
-                <span className={cn(
-                  'text-[10px] px-1.5 py-0.5 rounded-full font-semibold tabular-nums',
-                  isActive ? 'text-white' : 'bg-[rgba(255,255,255,0.07)] text-[rgba(130,150,170,0.65)]'
-                )} style={isActive ? { backgroundColor: '#0089ac' } : {}}>
-                  {count}
-                </span>
+                <span className="tabular-nums text-[10px]">{count}</span>
               </button>
             )
           })}

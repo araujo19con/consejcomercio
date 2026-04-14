@@ -33,5 +33,11 @@ CREATE TABLE IF NOT EXISTS pos_juniors (
 -- RLS for pos_juniors (same pattern as other tables)
 ALTER TABLE pos_juniors ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "pos_juniors_auth" ON pos_juniors
-  FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'pos_juniors' AND policyname = 'pos_juniors_auth'
+  ) THEN
+    EXECUTE 'CREATE POLICY pos_juniors_auth ON pos_juniors FOR ALL TO authenticated USING (true) WITH CHECK (true)';
+  END IF;
+END$$;

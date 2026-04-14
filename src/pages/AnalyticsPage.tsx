@@ -554,38 +554,54 @@ export function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6 items-center">
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={metrics.byLossReason} layout="vertical" margin={{ left: 0 }}>
-                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 10, fill: 'rgba(150,165,180,0.60)' }} />
-                  <YAxis type="category" dataKey="reason" tick={{ fontSize: 10, fill: 'rgba(150,165,180,0.60)' }} width={160} />
-                  <Tooltip
-                    formatter={(v) => [`${v} lead${Number(v) !== 1 ? 's' : ''}`, 'Perdidos']}
-                    contentStyle={{ background: '#0d1929', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.90)', borderRadius: 8 }}
-                  />
-                  <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                    {metrics.byLossReason.map((_, i) => (
-                      <Cell key={i} fill={i === 0 ? '#ef4444' : i === 1 ? '#f97316' : '#f59e0b'} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-              <div className="space-y-2">
-                <p className="text-xs text-[rgba(100,120,140,0.55)] uppercase tracking-wide mb-3">Distribuição</p>
-                {metrics.byLossReason.map((r, i) => (
-                  <div key={r.reason} className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: i === 0 ? '#ef4444' : i === 1 ? '#f97316' : '#f59e0b' }} />
-                      <span className="text-xs text-[rgba(150,165,180,0.70)] truncate">{r.reason}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-sm font-bold text-[rgba(215,225,235,0.85)]">{r.count}</span>
-                      <span className="text-xs text-[rgba(100,120,140,0.45)]">({pct(r.count, metrics.lost.length)}%)</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {/* header row */}
+            <div className="grid gap-x-3 mb-1 px-2" style={{ gridTemplateColumns: '24px 1fr 80px 40px' }}>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)]">#</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)]">Motivo</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)] text-right">Ocorr.</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-[rgba(100,120,140,0.45)] text-right">%</span>
             </div>
+            <div className="space-y-1">
+              {metrics.byLossReason.slice(0, 8).map((r, i) => {
+                const barColors = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22d3ee', '#a78bfa', '#f472b6', '#38bdf8']
+                const color = barColors[i] ?? '#6b7280'
+                const maxCount = metrics.byLossReason[0]?.count ?? 1
+                const barPct = Math.round((r.count / maxCount) * 100)
+                return (
+                  <div key={r.reason} title={r.reason}
+                    className="grid gap-x-3 items-center rounded-lg px-2 py-2 transition-colors hover:bg-white/5 cursor-default"
+                    style={{ gridTemplateColumns: '24px 1fr 80px 40px' }}
+                  >
+                    {/* rank */}
+                    <span className="text-xs font-bold tabular-nums" style={{ color: 'rgba(100,120,140,0.45)' }}>{i + 1}</span>
+
+                    {/* reason + bar */}
+                    <div className="min-w-0">
+                      <p className="text-xs text-[rgba(215,225,235,0.85)] truncate leading-snug">{r.reason}</p>
+                      <div className="mt-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <div className="h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: color, opacity: 0.7 }} />
+                      </div>
+                    </div>
+
+                    {/* count */}
+                    <div className="text-right">
+                      <span className="text-xs font-bold tabular-nums" style={{ color }}>{r.count}</span>
+                      <span className="text-[10px] text-[rgba(100,120,140,0.45)] ml-0.5">
+                        {r.count === 1 ? 'lead' : 'leads'}
+                      </span>
+                    </div>
+
+                    {/* pct */}
+                    <span className="text-xs text-[rgba(130,150,170,0.60)] tabular-nums text-right">{pct(r.count, metrics.lost.length)}%</span>
+                  </div>
+                )
+              })}
+            </div>
+            {metrics.byLossReason.length > 8 && (
+              <p className="text-[10px] text-[rgba(100,120,140,0.45)] mt-3 px-2">
+                +{metrics.byLossReason.length - 8} outros motivos não exibidos
+              </p>
+            )}
           </CardContent>
         </Card>
       )}

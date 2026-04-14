@@ -10,7 +10,7 @@ export function useClientes() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('clientes')
-        .select('*, contratos(*), indicado_por_cliente:indicado_por_cliente_id(id,nome,empresa)')
+        .select('*, contratos(*)')
         .order('created_at', { ascending: false })
       if (error) throw error
       return data as Cliente[]
@@ -24,7 +24,7 @@ export function useCliente(id: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('clientes')
-        .select('*, contratos(*), indicado_por_cliente:indicado_por_cliente_id(id,nome,empresa)')
+        .select('*, contratos(*)')
         .eq('id', id)
         .single()
       if (error) throw error
