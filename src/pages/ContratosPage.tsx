@@ -3,6 +3,7 @@ import { useContratos, useUpdateContrato, useDeleteContrato } from '@/hooks/useC
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { SearchInput } from '@/components/ui/search-input'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Progress } from '@/components/ui/progress'
@@ -379,10 +380,7 @@ export function ContratosPage() {
       <div className="space-y-2 mb-5">
         {/* Row 1: search + tipo + status */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
-            <Input placeholder="Buscar por cliente..." className="pl-8 w-56" value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
+          <SearchInput value={search} onChange={setSearch} placeholder="Buscar por cliente…" className="w-56" />
 
           {/* Tipo */}
           <div className="flex items-center gap-1">

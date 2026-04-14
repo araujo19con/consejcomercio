@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { DEMANDA_TIPOS, SERVICE_AREAS } from '@/lib/constants'
 import { formatDate, formatCurrency } from '@/lib/utils'
-import { Plus, Search, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
+import { SearchInput } from '@/components/ui/search-input'
 import { cn } from '@/lib/utils'
 
 const DEMANDA_STATUS = [
@@ -79,10 +80,7 @@ export function DemandasPage() {
       </div>
 
       <div className="flex gap-3 mb-5">
-        <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-[rgba(100,120,140,0.55)]" />
-          <Input placeholder="Buscar demanda..." className="pl-8" value={search} onChange={e => setSearch(e.target.value)} />
-        </div>
+        <SearchInput value={search} onChange={setSearch} placeholder="Buscar demanda…" className="max-w-xs flex-1" />
         <div className="flex gap-1.5">
           {['todos', ...DEMANDA_STATUS.map(s => s.value)].map(s => (
             <Button key={s} size="sm" variant={statusFilter === s ? 'default' : 'outline'}

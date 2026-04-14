@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useLeads } from '@/hooks/useLeads'
 import { KanbanBoard } from '@/components/leads/KanbanBoard'
-import { Input } from '@/components/ui/input'
 import { LEAD_SOURCES, SEGMENTS } from '@/lib/constants'
-import { Search, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { SearchInput } from '@/components/ui/search-input'
 
 export function LeadsPage() {
   const { data: leads, isLoading } = useLeads()
@@ -56,15 +56,7 @@ export function LeadsPage() {
         {/* Filter bar */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-2.5 top-[7px] w-3.5 h-3.5 text-[rgba(100,120,140,0.55)]" />
-            <Input
-              placeholder="Buscar lead…"
-              className="pl-8 h-8 text-xs w-48"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
+          <SearchInput value={search} onChange={setSearch} placeholder="Buscar lead…" className="w-48" />
 
           {/* Origem */}
           <select

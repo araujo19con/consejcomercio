@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 const TEAM_COLORS = [
   'bg-blue-500', 'bg-violet-500', 'bg-teal-500', 'bg-orange-500',
-  'bg-pink-500', 'bg-[rgba(0,137,172,0.10)]0', 'bg-green-500', 'bg-red-500',
+  'bg-pink-500', 'bg-cyan-600', 'bg-green-500', 'bg-red-500',
 ]
 
 function ParticipanteAvatar({ email, perfilByEmail, index }: {
@@ -23,7 +23,7 @@ function ParticipanteAvatar({ email, perfilByEmail, index }: {
   return (
     <div
       title={`${nome} <${email}>`}
-      className={`w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-[9px] font-bold shrink-0 cursor-default ${perfil?.foto_url ? '' : color}`}
+      className={`w-6 h-6 rounded-full border-2 border-[rgba(10,22,40,0.85)] flex items-center justify-center text-white text-[9px] font-bold shrink-0 cursor-default ${perfil?.foto_url ? '' : color}`}
       style={perfil?.foto_url ? { backgroundImage: `url(${perfil.foto_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
     >
       {!perfil?.foto_url && initials}
