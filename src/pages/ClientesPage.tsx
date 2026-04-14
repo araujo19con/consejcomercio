@@ -660,7 +660,7 @@ export function ClientesPage() {
                       </button>
                       <button
                         onClick={e => { e.stopPropagation(); setDeleteConfirm(null) }}
-                        className="text-xs px-2.5 py-1 rounded-md border border-slate-300 text-[rgba(150,165,180,0.70)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-md border border text-[rgba(150,165,180,0.70)] hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                       >
                         Cancelar
                       </button>

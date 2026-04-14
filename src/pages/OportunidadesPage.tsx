@@ -103,7 +103,7 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
               <div key={label}>
                 <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">{label}</label>
                 <select value={value} onChange={e => setter(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  className="form-control">
                   {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
@@ -118,14 +118,14 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
               <div key={label}>
                 <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">{label}</label>
                 <input type={type ?? 'text'} value={value} onChange={e => setter(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="form-control" />
               </div>
             ))}
 
             <div>
               <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Status RM</label>
               <select value={rmStatus} onChange={e => setRmStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="form-control">
                 {RM_STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
@@ -156,12 +156,12 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
           <div>
             <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Notas</label>
             <textarea value={notas} onChange={e => setNotas(e.target.value)} rows={3}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+              className="form-control resize-none" />
           </div>
         </div>
 
         <div className="flex gap-3 px-6 py-4 border-t shrink-0">
-          <button onClick={onClose} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background">
+          <button onClick={onClose} className="flex-1 px-4 py-2 border rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background">
             Cancelar
           </button>
           <button onClick={handleSave} disabled={isPending}
@@ -212,7 +212,7 @@ function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
           <div>
             <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Cliente *</label>
             <select value={clienteId} onChange={e => setClienteId(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="form-control">
               <option value="">Selecione o cliente</option>
               {clientes.map(c => <option key={c.id} value={c.id}>{c.nome} — {c.empresa}</option>)}
             </select>
@@ -220,35 +220,35 @@ function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
           <div>
             <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Tipo</label>
             <select value={tipo} onChange={e => setTipo(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="form-control">
               {OPORTUNIDADE_TIPOS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
             </select>
           </div>
           <div>
             <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Título *</label>
             <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex: Renovação de contrato anual"
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="form-control" />
           </div>
           <div>
             <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Descrição</label>
             <textarea value={descricao} onChange={e => setDescricao(e.target.value)} rows={2}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+              className="form-control resize-none" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Valor Estimado (R$)</label>
               <input type="number" value={valorEstimado} onChange={e => setValorEstimado(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="form-control" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Data de Alerta</label>
               <input type="date" value={dataAlerta} onChange={e => setDataAlerta(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="form-control" />
             </div>
           </div>
         </div>
         <div className="flex gap-3 px-6 py-4 border-t">
-          <button onClick={onClose} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background">Cancelar</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2 border rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background">Cancelar</button>
           <button onClick={handleSave} disabled={create.isPending || !clienteId || !titulo}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm text-white font-medium disabled:opacity-50"
             style={{ backgroundColor: '#0089ac' }}>

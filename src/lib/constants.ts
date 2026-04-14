@@ -27,7 +27,7 @@ export const STAGE_COLORS: Record<string, string> = {
   educar_lead:               'bg-violet-100 text-violet-700 border-violet-200',
   proposta_comercial:        'bg-amber-100 text-amber-700 border-amber-200',
   negociacao:                'bg-orange-100 text-orange-700 border-orange-200',
-  stand_by:                  'bg-slate-100 text-slate-700 border-slate-200',
+  stand_by:                  'bg-[rgba(255,255,255,0.06)] text-[rgba(150,165,180,0.70)] border-[rgba(255,255,255,0.10)]',
   ganho_assessoria:          'bg-green-100 text-green-700 border-green-200',
   ganho_consultoria:         'bg-emerald-100 text-emerald-700 border-emerald-200',
   perdido:                   'bg-red-100 text-red-700 border-red-200',
@@ -133,7 +133,7 @@ export const REWARD_TYPES = [
 
 // Indicacao status
 export const INDICACAO_STATUS = [
-  { value: 'pendente', label: 'Pendente', color: 'bg-slate-100 text-slate-600' },
+  { value: 'pendente', label: 'Pendente', color: 'bg-[rgba(255,255,255,0.06)] text-[rgba(130,150,170,0.65)]' },
   { value: 'contactado', label: 'Contactado', color: 'bg-blue-100 text-blue-700' },
   { value: 'em_negociacao', label: 'Em Negociação', color: 'bg-amber-100 text-amber-700' },
   { value: 'convertido', label: 'Convertido', color: 'bg-green-100 text-green-700' },
@@ -144,16 +144,16 @@ export const INDICACAO_STATUS = [
 export const CLIENT_STATUS_OPTIONS = [
   { value: 'ativo', label: 'Ativo', color: 'bg-green-100 text-green-700' },
   { value: 'em_renovacao', label: 'Em Renovação', color: 'bg-amber-100 text-amber-700' },
-  { value: 'encerrado', label: 'Encerrado', color: 'bg-slate-100 text-slate-600' },
+  { value: 'encerrado', label: 'Encerrado', color: 'bg-[rgba(255,255,255,0.06)] text-[rgba(130,150,170,0.65)]' },
 ]
 
 // RM status
 export const RM_STATUS_OPTIONS = [
-  { value: 'verificar', label: 'Verificar', color: 'text-red-600 bg-red-50 border-red-200' },
+  { value: 'verificar', label: 'Verificar', color: 'text-red-400 bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.25)]' },
   { value: 'possivel', label: 'Possível', color: 'text-green-700 bg-green-50 border-green-200' },
-  { value: 'em_andamento', label: 'Em Andamento', color: 'text-amber-700 bg-amber-50 border-amber-200' },
+  { value: 'em_andamento', label: 'Em Andamento', color: 'text-amber-400 bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.25)]' },
   { value: 'registrado', label: 'Registrado', color: 'text-blue-700 bg-blue-50 border-blue-200' },
-  { value: 'nao_aplicavel', label: 'Não se aplica', color: 'text-slate-500 bg-slate-50 border-slate-200' },
+  { value: 'nao_aplicavel', label: 'Não se aplica', color: 'text-[rgba(150,165,180,0.65)] bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]' },
 ]
 
 // Oportunidade types
@@ -164,7 +164,7 @@ export const OPORTUNIDADE_TIPOS = [
 ]
 
 export const OPORTUNIDADE_STATUS = [
-  { value: 'identificada', label: 'Identificada', color: 'bg-slate-100 text-slate-700' },
+  { value: 'identificada', label: 'Identificada', color: 'bg-[rgba(255,255,255,0.06)] text-[rgba(150,165,180,0.70)]' },
   { value: 'abordada', label: 'Abordada', color: 'bg-blue-100 text-blue-700' },
   { value: 'em_proposta', label: 'Em Proposta', color: 'bg-amber-100 text-amber-700' },
   { value: 'convertida', label: 'Convertida', color: 'bg-green-100 text-green-700' },

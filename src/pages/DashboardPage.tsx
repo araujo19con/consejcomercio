@@ -378,7 +378,7 @@ export function DashboardPage() {
               {stagnantLeads.slice(0, 6).map(l => {
                 const days = differenceInDays(new Date(), new Date(l.updated_at))
                 const stageLabel = PIPELINE_STAGES.find(s => s.id === l.status)?.label ?? l.status
-                const stageCss = STAGE_COLORS[l.status] ?? 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)] border-slate-200'
+                const stageCss = STAGE_COLORS[l.status] ?? 'bg-[rgba(255,255,255,0.04)] text-[rgba(150,165,180,0.70)]'
                 return (
                   <div
                     key={l.id}

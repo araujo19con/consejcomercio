@@ -105,7 +105,7 @@ export function PerfilPage() {
       </div>
 
       {/* Avatar + info */}
-      <div className="bg-card rounded-2xl border border-slate-200 p-6">
+      <div className="bg-card rounded-2xl border p-6">
         <div className="flex items-center gap-6 mb-6">
           {/* Avatar */}
           <div className="relative">
@@ -145,7 +145,7 @@ export function PerfilPage() {
                 value={nome}
                 onChange={e => setNome(e.target.value)}
                 placeholder="Seu nome completo"
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-control"
               />
             </div>
             <div>
@@ -154,7 +154,7 @@ export function PerfilPage() {
                 value={cargo}
                 onChange={e => setCargo(e.target.value)}
                 placeholder="Ex: Assessor Jurídico"
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-control"
               />
             </div>
           </div>
@@ -166,7 +166,7 @@ export function PerfilPage() {
               onChange={e => setBio(e.target.value)}
               rows={3}
               placeholder="Uma breve descrição sobre você..."
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="form-control resize-none"
             />
           </div>
 
@@ -175,7 +175,7 @@ export function PerfilPage() {
             <input
               value={userEmail}
               disabled
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-background text-[rgba(100,120,140,0.55)] cursor-not-allowed"
+              className="w-full px-3 py-2 border rounded-lg text-sm bg-background text-[rgba(100,120,140,0.55)] cursor-not-allowed"
             />
           </div>
 

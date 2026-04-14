@@ -435,7 +435,7 @@ export function MensagensPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">
 
         {/* ── Config Panel ── */}
-        <div className="bg-card border border-slate-200 rounded-2xl p-5 space-y-5 shadow-sm">
+        <div className="bg-card border rounded-2xl p-5 space-y-5 shadow-sm">
 
           {/* Contact info */}
           <div>
@@ -485,7 +485,7 @@ export function MensagensPage() {
                     'flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border text-xs font-medium transition-all',
                     channel === ch.id
                       ? 'border-cyan-500 bg-cyan-50 text-cyan-700'
-                      : 'border-slate-200 text-[rgba(130,150,170,0.65)] hover:border-slate-300 hover:bg-background'
+                      : 'text-[rgba(130,150,170,0.65)] hover:border hover:bg-background'
                   )}
                 >
                   <ch.icon className="w-4 h-4" />
@@ -530,7 +530,7 @@ export function MensagensPage() {
                     'flex items-center gap-1.5 px-2.5 py-2 rounded-lg border text-xs font-medium transition-all text-left',
                     sector === sec.id
                       ? 'border-cyan-500 bg-cyan-50 text-cyan-700'
-                      : 'border-slate-200 text-[rgba(150,165,180,0.70)] hover:border-slate-300 hover:bg-background'
+                      : 'text-[rgba(150,165,180,0.70)] hover:border hover:bg-background'
                   )}
                 >
                   <span>{sec.emoji}</span>
@@ -552,18 +552,18 @@ export function MensagensPage() {
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background text-[rgba(150,165,180,0.70)]" style={{ border: '1px solid rgba(255,255,255,0.10)' }}>
               {sectorInfo.emoji} {sectorInfo.label}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 bg-background text-[rgba(150,165,180,0.70)] capitalize">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold border bg-background text-[rgba(150,165,180,0.70)] capitalize">
               {channel === 'whatsapp' ? '📱 WhatsApp' : channel === 'email' ? '📧 E-mail' : '💼 LinkedIn'}
             </span>
             {messages.length > 1 && (
-              <span className="px-3 py-1 rounded-full text-xs font-medium border border-slate-200 bg-background text-[rgba(100,120,140,0.55)]">
+              <span className="px-3 py-1 rounded-full text-xs font-medium border bg-background text-[rgba(100,120,140,0.55)]">
                 Variação {varIdx + 1} de {messages.length}
               </span>
             )}
           </div>
 
           {/* Message card */}
-          <div className="bg-card border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-card border rounded-2xl shadow-sm overflow-hidden">
 
             {/* Email subject */}
             {channel === 'email' && currentMsg?.subject && (
@@ -620,7 +620,7 @@ export function MensagensPage() {
           </div>
 
           {/* Tip */}
-          <div className="flex items-start gap-2.5 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="flex items-start gap-2.5 p-4 bg-[rgba(245,158,11,0.10)] border border-[rgba(245,158,11,0.20)] rounded-xl">
             <span className="text-lg leading-none">💡</span>
             <div className="text-xs text-amber-800 leading-relaxed">
               <strong>Dica:</strong> Personalize sempre com detalhes específicos do cliente — mencionar o nome da empresa, um dado recente ou uma dor real aumenta muito a taxa de resposta. As mensagens geradas são um ponto de partida, não um roteiro fixo!

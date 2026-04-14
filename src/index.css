@@ -32,6 +32,39 @@
   }
 }
 
+@layer components {
+  /* Dark-theme native <input>, <select>, <textarea> used in modals/forms */
+  .form-control {
+    @apply w-full px-3 py-2 rounded-lg text-sm outline-none;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--input));
+    color: hsl(var(--foreground));
+    transition: box-shadow 0.15s;
+  }
+  .form-control:focus {
+    box-shadow: 0 0 0 1px hsl(var(--ring) / 0.6);
+  }
+  .form-control option {
+    background: hsl(var(--popover));
+    color: hsl(var(--foreground));
+  }
+  /* Compact variant for inline selects (px-2 py-2) */
+  .form-control-sm {
+    @apply px-2 py-2 rounded-lg text-sm outline-none;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--input));
+    color: hsl(var(--foreground));
+    transition: box-shadow 0.15s;
+  }
+  .form-control-sm:focus {
+    box-shadow: 0 0 0 1px hsl(var(--ring) / 0.6);
+  }
+  .form-control-sm option {
+    background: hsl(var(--popover));
+    color: hsl(var(--foreground));
+  }
+}
+
 @layer base {
   * {
     border-color: hsl(var(--border));

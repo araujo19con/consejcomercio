@@ -69,7 +69,7 @@ function RelatorioContratoModal({ contrato, onClose }: { contrato: Contrato; onC
 
         <div className="space-y-4 py-2">
           {/* Preview */}
-          <div className="bg-background rounded-lg p-4 text-xs text-[rgba(215,225,235,0.85)] space-y-1 font-mono border border-slate-200 max-h-52 overflow-y-auto">
+          <div className="bg-background rounded-lg p-4 text-xs text-[rgba(215,225,235,0.85)] space-y-1 font-mono border max-h-52 overflow-y-auto">
             <p className="font-bold text-[rgba(130,150,170,0.65)] mb-2 not-italic font-sans text-[10px] uppercase tracking-wider">Prévia do relatório</p>
             <p className="font-semibold">Cliente: {contrato.cliente?.nome}</p>
             <p>Empresa: {contrato.cliente?.empresa}</p>
@@ -252,7 +252,7 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
                 <div key={label}>
                   <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">{label}</label>
                   <select value={value} onChange={e => setter(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="form-control">
                     {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </div>
@@ -266,20 +266,20 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
                 <div key={label}>
                   <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">{label}</label>
                   <input type={type ?? 'text'} value={value} onChange={e => setter(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="form-control" />
                 </div>
               ))}
               <div>
                 <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Status RM</label>
                 <select value={rmStatus} onChange={e => setRmStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  className="form-control">
                   {RM_STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
               <div className="col-span-2">
                 <label className="block text-xs font-medium text-[rgba(130,150,170,0.65)] mb-1">Notas</label>
                 <textarea value={notas} onChange={e => setNotas(e.target.value)} rows={3}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+                  className="form-control resize-none" />
               </div>
             </div>
           )}

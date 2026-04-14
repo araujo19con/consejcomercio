@@ -77,7 +77,7 @@ export function ConfiguracoesPage() {
                     <select
                       value={s.tipo}
                       onChange={e => setServicos(prev => prev.map(sv => sv.id === s.id ? { ...sv, tipo: e.target.value as 'simples' | 'complexa' } : sv))}
-                      className="px-2 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="form-control-sm"
                     >
                       <option value="simples">Simples</option>
                       <option value="complexa">Complexa</option>
@@ -94,7 +94,7 @@ export function ConfiguracoesPage() {
                     </div>
                     <button
                       onClick={() => setServicos(prev => prev.filter(sv => sv.id !== s.id))}
-                      className="p-2 rounded-lg hover:bg-red-50 text-[rgba(100,120,140,0.55)] hover:text-red-500"
+                      className="p-2 rounded-lg hover:bg-red-500/10 text-[rgba(100,120,140,0.55)] hover:text-red-500"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -116,7 +116,7 @@ export function ConfiguracoesPage() {
                 <select
                   value={novoTipo}
                   onChange={e => setNovoTipo(e.target.value as 'simples' | 'complexa')}
-                  className="px-2 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="form-control-sm"
                 >
                   <option value="simples">Simples</option>
                   <option value="complexa">Complexa</option>

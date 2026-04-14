@@ -112,7 +112,7 @@ function SuggestionCard({
         </div>
       )}
 
-      <p className="text-xs text-[rgba(100,120,140,0.55)] italic line-clamp-2 border-l-2 border-slate-200 pl-2">
+      <p className="text-xs text-[rgba(100,120,140,0.55)] italic line-clamp-2 border-l-2 pl-2">
         "{formatSlackText(suggestion.rawText).slice(0, 120)}"
       </p>
 
@@ -127,7 +127,7 @@ function SuggestionCard({
           </button>
           <button
             onClick={() => onDismiss(suggestion.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[rgba(130,150,170,0.65)] border border-slate-200 hover:bg-background"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-[rgba(130,150,170,0.65)] border hover:bg-background"
           >
             <X className="w-3 h-3" />Ignorar
           </button>
@@ -163,7 +163,7 @@ function MessageCard({ msg }: { msg: SlackMessage }) {
   const classification = classifyMessage(msg.text)
   const date = tsToDate(msg.ts)
   return (
-    <div className="bg-card border border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+    <div className="bg-card border rounded-lg p-4 hover:shadow-sm transition-shadow">
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm text-[rgba(230,235,240,0.92)] whitespace-pre-wrap break-words flex-1">
           {formatSlackText(msg.text) || <span className="italic text-[rgba(100,120,140,0.55)]">[mensagem sem texto]</span>}
@@ -455,11 +455,11 @@ export function SlackPage() {
 
       {/* Channel selector */}
       {showSelector && (
-        <div className="bg-card border border-slate-200 rounded-xl p-4 space-y-3">
+        <div className="bg-card border rounded-xl p-4 space-y-3">
           <h2 className="font-semibold text-[rgba(230,235,240,0.92)]">Selecionar canais para monitorar</h2>
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Buscar canal..."
-            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="form-control" />
           {isLoading && <p className="text-sm text-[rgba(100,120,140,0.55)]">Carregando canais...</p>}
           <div className="max-h-64 overflow-y-auto space-y-1">
             {filteredAll.map(ch => (

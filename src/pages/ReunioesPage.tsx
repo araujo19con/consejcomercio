@@ -69,7 +69,7 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit, perfilByEmail 
 }) {
   const dt = new Date(reuniao.data_hora)
   return (
-    <div className="bg-card rounded-xl border border-slate-200 p-3 shadow-sm hover:shadow transition-shadow">
+    <div className="bg-card rounded-xl border p-3 shadow-sm hover:shadow transition-shadow">
       <div className="flex items-start justify-between gap-2 mb-2">
         <p className="text-sm font-semibold text-[rgba(230,235,240,0.92)] leading-tight">{reuniao.titulo}</p>
         <StatusBadge status={reuniao.status} />
@@ -163,13 +163,13 @@ export function ReunioesPage() {
 
       {/* Week nav */}
       <div className="flex items-center gap-3">
-        <button onClick={prevWeek} className="p-1.5 rounded-lg border border-slate-200 hover:bg-background">
+        <button onClick={prevWeek} className="p-1.5 rounded-lg border hover:bg-background">
           <ChevronLeft className="w-4 h-4 text-[rgba(130,150,170,0.65)]" />
         </button>
-        <button onClick={goToday} className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm hover:bg-background text-[rgba(150,165,180,0.70)]">
+        <button onClick={goToday} className="px-3 py-1.5 rounded-lg border text-sm hover:bg-background text-[rgba(150,165,180,0.70)]">
           Hoje
         </button>
-        <button onClick={nextWeek} className="p-1.5 rounded-lg border border-slate-200 hover:bg-background">
+        <button onClick={nextWeek} className="p-1.5 rounded-lg border hover:bg-background">
           <ChevronRight className="w-4 h-4 text-[rgba(130,150,170,0.65)]" />
         </button>
         <span className="text-sm font-medium text-[rgba(215,225,235,0.85)]">{weekRange}</span>

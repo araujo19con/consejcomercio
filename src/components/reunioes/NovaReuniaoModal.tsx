@@ -171,7 +171,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
               value={titulo}
               onChange={e => setTitulo(e.target.value)}
               placeholder="Ex: Reunião com cliente XYZ"
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-control"
             />
           </div>
 
@@ -184,7 +184,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
                 type="datetime-local"
                 value={dataHora}
                 onChange={e => setDataHora(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-control"
               />
             </div>
             <div>
@@ -194,7 +194,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
               <select
                 value={duracao}
                 onChange={e => setDuracao(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-control"
               >
                 {[30, 45, 60, 90, 120].map(d => (
                   <option key={d} value={d}>{d} min</option>
@@ -211,7 +211,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
               value={local}
               onChange={e => setLocal(e.target.value)}
               placeholder="Sala, endereço ou online"
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-control"
             />
           </div>
 
@@ -223,7 +223,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
               value={linkVideo}
               onChange={e => setLinkVideo(e.target.value)}
               placeholder="https://meet.google.com/..."
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-control"
             />
           </div>
 
@@ -243,7 +243,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
                 Selecionar membros da equipe
               </button>
               {showParticipantPicker && (
-                <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 mb-2 max-h-48 overflow-y-auto">
+                <div className="border rounded-lg divide-y divide-border mb-2 max-h-48 overflow-y-auto">
                   {teamMembers.map(m => {
                     const checked = participantes.split(',').map(s => s.trim()).includes(m.email)
                     return (
@@ -277,7 +277,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
               value={participantes}
               onChange={e => setParticipantes(e.target.value)}
               placeholder="email@exemplo.com, outro@empresa.com"
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-control"
             />
             <p className="text-xs text-[rgba(100,120,140,0.55)] mt-1">Os participantes receberão convite ao criar no Google Calendar</p>
           </div>
@@ -288,7 +288,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
               value={descricao}
               onChange={e => setDescricao(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="form-control resize-none"
             />
           </div>
 
@@ -309,7 +309,7 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background"
+              className="flex-1 px-4 py-2 border rounded-lg text-sm text-[rgba(150,165,180,0.70)] hover:bg-background"
             >
               Cancelar
             </button>

@@ -144,7 +144,7 @@ export function IndicacoesPage() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {ind.status === 'convertido' && !ind.recompensa_entregue && (
-                        <Button size="sm" variant="outline" className="h-7 text-xs border-amber-200 text-amber-700 hover:bg-amber-50"
+                        <Button size="sm" variant="outline" className="h-7 text-xs border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
                           onClick={() => updateIndicacao.mutate({ id: ind.id, recompensa_entregue: true, data_recompensa: new Date().toISOString() })}>
                           <Gift className="w-3 h-3 mr-1" /> Recompensa entregue
                         </Button>

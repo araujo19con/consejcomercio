@@ -14,9 +14,9 @@ import { useUpdateContrato } from '@/hooks/useContratos'
 import { CONTRACT_TYPES, PRICING_MODELS, CLIENT_STATUS_OPTIONS, RM_STATUS_OPTIONS, OPORTUNIDADE_STATUS, SERVICE_AREAS } from '@/lib/constants'
 
 const CONTRACT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  ativo:     { label: 'Ativo',     color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-  encerrado: { label: 'Encerrado', color: 'text-slate-500 bg-slate-50 border-slate-200' },
-  suspenso:  { label: 'Suspenso',  color: 'text-amber-600 bg-amber-50 border-amber-200' },
+  ativo:     { label: 'Ativo',     color: 'text-emerald-400 bg-[rgba(16,185,129,0.12)] border-[rgba(16,185,129,0.25)]' },
+  encerrado: { label: 'Encerrado', color: 'text-[rgba(150,165,180,0.65)] bg-[rgba(255,255,255,0.04)]' },
+  suspenso:  { label: 'Suspenso',  color: 'text-amber-400 bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.25)]' },
 }
 import { formatDate, formatCurrency, getContractProgress, getDaysUntilExpiry } from '@/lib/utils'
 import { cn } from '@/lib/utils'

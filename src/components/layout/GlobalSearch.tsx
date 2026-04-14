@@ -229,13 +229,13 @@ export function GlobalSearch() {
         {/* Footer hints */}
         <div className="px-4 py-2.5 border-t border-slate-100 bg-background flex items-center gap-4">
           <span className="text-xs text-[rgba(100,120,140,0.55)] flex items-center gap-1">
-            <kbd className="bg-card border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">↑↓</kbd> navegar
+            <kbd className="bg-card border rounded px-1 py-0.5 font-mono text-[10px]">↑↓</kbd> navegar
           </span>
           <span className="text-xs text-[rgba(100,120,140,0.55)] flex items-center gap-1">
-            <kbd className="bg-card border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">Enter</kbd> abrir
+            <kbd className="bg-card border rounded px-1 py-0.5 font-mono text-[10px]">Enter</kbd> abrir
           </span>
           <span className="text-xs text-[rgba(100,120,140,0.55)] flex items-center gap-1">
-            <kbd className="bg-card border border-slate-200 rounded px-1 py-0.5 font-mono text-[10px]">Esc</kbd> fechar
+            <kbd className="bg-card border rounded px-1 py-0.5 font-mono text-[10px]">Esc</kbd> fechar
           </span>
         </div>
       </div>

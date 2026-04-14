@@ -246,7 +246,7 @@ export function AnalyticsPage() {
           value={`${metrics.winRate}%`}
           sub={`${metrics.won.length} fechados / ${metrics.closed} qualificados`}
           icon={Target}
-          accent="bg-emerald-50 text-emerald-600"
+          accent="bg-[rgba(16,185,129,0.12)] text-emerald-400"
           alert={metrics.closed > 5 && metrics.winRate < 30}
         />
         <StatCard
@@ -261,7 +261,7 @@ export function AnalyticsPage() {
           value={metrics.avgTicket !== null ? formatCurrency(metrics.avgTicket) : '—'}
           sub="Contratos ativos com valor"
           icon={DollarSign}
-          accent="bg-amber-50 text-amber-600"
+          accent="bg-[rgba(245,158,11,0.12)] text-amber-400"
         />
         <StatCard
           label="Leads (últimos 30d)"
