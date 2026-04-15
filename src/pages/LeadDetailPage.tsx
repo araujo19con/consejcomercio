@@ -125,15 +125,16 @@ export function LeadDetailPage() {
                 <div className="space-y-1.5">
                   <Label>Responsável</Label>
                   <Select
-                    value={editing.responsavel_id || ''}
+                    value={editing.responsavel_id || '__none__'}
                     onValueChange={v => {
-                      const p = perfis.find(p => p.id === v)
-                      setEditing(prev => ({ ...prev, responsavel_id: v || null, responsavel: p?.nome ?? null }))
+                      const realId = v === '__none__' ? '' : v
+                      const p = perfis.find(p => p.id === realId)
+                      setEditing(prev => ({ ...prev, responsavel_id: realId || null, responsavel: p?.nome ?? null }))
                     }}
                   >
                     <SelectTrigger><SelectValue placeholder="Membro da equipe" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Sem responsável</SelectItem>
+                      <SelectItem value="__none__">Sem responsável</SelectItem>
                       {perfis.map(p => (
                         <SelectItem key={p.id} value={p.id}>
                           {p.nome}{p.cargo ? ` — ${p.cargo}` : ''}

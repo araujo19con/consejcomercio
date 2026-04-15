@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import {
   Phone, Mail, Copy, Check, ExternalLink, X, Target, Users, PhoneCall,
   MessageCircle, Search, Building2, MapPin, Briefcase, Plus, List, Layers,
+  ShieldCheck, ShieldAlert, ShieldQuestion, AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
@@ -260,18 +261,30 @@ function ServiceCard({ servico, leads }: { servico: ServicoConfig; leads: Lead[]
   )
 }
 
+// ─── RM status helpers ────────────────────────────────────────────────────────
+
+type RmStatusLocal = 'nao_verificado' | 'sem_marca' | 'em_andamento' | 'registrado'
+
+const RM_STATUS_INFO: Record<RmStatusLocal, { label: string; icon: React.ReactNode; color: string; border: string }> = {
+  nao_verificado: { label: 'Não verificado', icon: <ShieldQuestion className="w-4 h-4" />, color: 'rgba(148,163,184,0.6)', border: 'rgba(148,163,184,0.2)' },
+  sem_marca:      { label: 'Sem registro',   icon: <ShieldAlert className="w-4 h-4" />,   color: '#f87171',                 border: 'rgba(239,68,68,0.3)' },
+  em_andamento:   { label: 'Em andamento',   icon: <AlertCircle className="w-4 h-4" />,   color: '#fbbf24',                 border: 'rgba(245,158,11,0.3)' },
+  registrado:     { label: 'Registrado',     icon: <ShieldCheck className="w-4 h-4" />,   color: '#34d399',                 border: 'rgba(16,185,129,0.3)' },
+}
+
 // ─── CnpjProspectForm ─────────────────────────────────────────────────────────
 
 function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
-  const [cnpjInput, setCnpjInput] = useState('')
-  const [state, setState] = useState<CnpjState>({ status: 'idle' })
+  const [cnpjInput, setCnpjInput]   = useState('')
+  const [state, setState]           = useState<CnpjState>({ status: 'idle' })
   const [nomeContato, setNomeContato] = useState('')
-  const [telefone, setTelefone] = useState('')
-  const [segmento, setSegmento] = useState('')
-  const [origem, setOrigem] = useState('outro')
-  const [servicoNome, setServicoNome] = useState('')
-  const { data: config } = useConfiguracoes()
-  const createLead = useCreateLead()
+  const [telefone, setTelefone]     = useState('')
+  const [segmento, setSegmento]     = useState('')
+  const [origem, setOrigem]         = useState('outro')
+  const [servicosIds, setServicosIds] = useState<string[]>([])   // multi-select
+  const [rmStatus, setRmStatus]     = useState<RmStatusLocal>('nao_verificado')
+  const { data: config }            = useConfiguracoes()
+  const createLead                  = useCreateLead()
 
   function handleCnpjChange(e: React.ChangeEvent<HTMLInputElement>) {
     setCnpjInput(formatCNPJ(e.target.value))
@@ -280,6 +293,8 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
   async function handleLookup() {
     if (cleanCNPJ(cnpjInput).length !== 14) return
     setState({ status: 'loading' })
+    setServicosIds([])
+    setRmStatus('nao_verificado')
     try {
       const data = await lookupCnpj(cnpjInput)
       if (data.situacao_cadastral !== 2) {
@@ -295,9 +310,16 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
     }
   }
 
+  function toggleServico(id: string) {
+    setServicosIds(prev => prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id])
+  }
+
   function handleCreate() {
     if (state.status !== 'success') return
     const d = state.data
+    const rmNote = rmStatus !== 'nao_verificado'
+      ? `\nRegistro de Marca (INPI): ${RM_STATUS_INFO[rmStatus].label}`
+      : ''
     createLead.mutate({
       nome: nomeContato || d.razao_social,
       empresa: d.nome_fantasia || d.razao_social,
@@ -307,8 +329,8 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
       segmento: segmento || 'outro',
       origem: origem as string,
       status: 'classificacao',
-      servicos_interesse: servicoNome ? [servicoNome] : [],
-      notas: `Prospectado via CNPJ\nCNPJ: ${d.cnpj}\nCNAE: ${d.cnae_fiscal} — ${d.descricao_cnae_fiscal ?? ''}\nMunicípio: ${d.municipio ?? ''} / ${d.uf ?? ''}\nPorte: ${d.porte ?? ''}`,
+      servicos_interesse: servicosIds,
+      notas: `Prospectado via CNPJ\nCNPJ: ${d.cnpj}\nCNAE: ${d.cnae_fiscal} — ${d.descricao_cnae_fiscal ?? ''}\nMunicípio: ${d.municipio ?? ''} / ${d.uf ?? ''}\nPorte: ${d.porte ?? ''}${rmNote}`,
       responsavel: null,
       responsavel_id: null,
       referido_por_cliente_id: null,
@@ -323,16 +345,24 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
         setNomeContato('')
         setTelefone('')
         setSegmento('')
-        setServicoNome('')
+        setServicosIds([])
+        setRmStatus('nao_verificado')
         onCreated()
       },
     })
   }
 
   const data: CnpjData | undefined = state.status === 'success' ? state.data : undefined
+  const activeServicos = (config?.servicos ?? []).filter(s => s.ativo !== false)
+
+  // Build INPI search URL using company name (most reliable)
+  const inpiUrl = data
+    ? `https://busca.inpi.gov.br/pePI/servlet/MarcasServletController?Action=BasicSearch&TipoMarca=M&Titulares=${encodeURIComponent(data.nome_fantasia || data.razao_social)}`
+    : '#'
 
   return (
     <div className="max-w-2xl space-y-5">
+      {/* CNPJ input */}
       <div>
         <Label>CNPJ da empresa</Label>
         <div className="flex gap-2 mt-1.5">
@@ -396,6 +426,55 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
             </CardContent>
           </Card>
 
+          {/* ── Registro de Marca (INPI) ────────────────────────────────── */}
+          <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <ShieldQuestion className="w-4 h-4" style={{ color: '#6bd0e7' }} />
+                <p className="text-sm font-semibold text-foreground">Registro de Marca (INPI)</p>
+              </div>
+              <a
+                href={inpiUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg hover:bg-[rgba(255,255,255,0.07)] transition-colors"
+                style={{ color: '#6bd0e7', border: '1px solid rgba(107,208,231,0.25)' }}
+              >
+                <ExternalLink className="w-3 h-3" />
+                Verificar no INPI
+              </a>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Clique em "Verificar no INPI" para buscar marcas registradas por{' '}
+              <strong className="text-fg2">{data.nome_fantasia || data.razao_social}</strong>.
+              Depois registre o status abaixo.
+            </p>
+            {/* Status manual picker */}
+            <div className="flex flex-wrap gap-2">
+              {(Object.entries(RM_STATUS_INFO) as [RmStatusLocal, typeof RM_STATUS_INFO[RmStatusLocal]][]).map(([key, cfg]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setRmStatus(key)}
+                  className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg transition-all"
+                  style={{
+                    color: rmStatus === key ? cfg.color : 'rgba(255,255,255,0.40)',
+                    background: rmStatus === key ? `color-mix(in srgb, ${cfg.color} 12%, transparent)` : 'transparent',
+                    border: `1px solid ${rmStatus === key ? cfg.border : 'rgba(255,255,255,0.08)'}`,
+                  }}
+                >
+                  {cfg.icon}
+                  {cfg.label}
+                </button>
+              ))}
+            </div>
+            {rmStatus === 'sem_marca' && (
+              <p className="text-xs px-3 py-2 rounded-lg" style={{ background: 'rgba(239,68,68,0.08)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.20)' }}>
+                💡 Oportunidade: empresa sem marca registrada é um lead qualificado para o serviço de Registro de Marca no INPI.
+              </p>
+            )}
+          </div>
+
           {/* Lead fields */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -419,14 +498,38 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
                 {LEAD_SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
-            <div className="space-y-1.5 col-span-2">
-              <Label>Serviço de interesse</Label>
-              <select value={servicoNome} onChange={e => setServicoNome(e.target.value)} className="form-control-sm w-full">
-                <option value="">Não definido</option>
-                {(config?.servicos ?? []).filter(s => s.ativo !== false).map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
-              </select>
-            </div>
           </div>
+
+          {/* Multi-service selection */}
+          {activeServicos.length > 0 && (
+            <div className="space-y-2">
+              <Label>Serviços de interesse <span className="text-fg4 font-normal text-xs">(selecione quantos quiser)</span></Label>
+              <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                {activeServicos.map(s => {
+                  const sel = servicosIds.includes(s.id)
+                  return (
+                    <label key={s.id} className="flex items-start gap-2 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={sel}
+                        onChange={() => toggleServico(s.id)}
+                        className="mt-0.5 rounded accent-primary shrink-0"
+                      />
+                      <span className="text-xs leading-tight">
+                        <span className={`font-medium transition-colors ${sel ? 'text-foreground' : 'text-fg2 group-hover:text-foreground'}`}>{s.nome}</span>
+                        <span className="block text-fg4">{formatCurrency(s.valor)}</span>
+                      </span>
+                    </label>
+                  )
+                })}
+              </div>
+              {servicosIds.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {servicosIds.length} serviço{servicosIds.length > 1 ? 's' : ''} selecionado{servicosIds.length > 1 ? 's' : ''}
+                </p>
+              )}
+            </div>
+          )}
 
           <Button
             onClick={handleCreate}
