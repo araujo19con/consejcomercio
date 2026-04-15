@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { Sidebar } from './Sidebar'
 import { GlobalSearch } from './GlobalSearch'
@@ -7,8 +8,9 @@ import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard'
 import { Toaster } from 'sonner'
 
 export function AppLayout() {
-  const navigate  = useNavigate()
-  const location  = useLocation()
+  const navigate      = useNavigate()
+  const location      = useLocation()
+  const queryClient   = useQueryClient()
   const [checking, setChecking] = useState(true)
 
   useEffect(() => {
@@ -18,11 +20,16 @@ export function AppLayout() {
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) navigate('/login', { replace: true })
+      if (event === 'SIGNED_OUT' || !session) {
+        // Clear the entire React Query cache so the next user never
+        // sees stale data (profile, leads, etc.) from the previous session.
+        queryClient.clear()
+        navigate('/login', { replace: true })
+      }
     })
 
     return () => subscription.unsubscribe()
-  }, [navigate])
+  }, [navigate, queryClient])
 
   if (checking) {
     return (

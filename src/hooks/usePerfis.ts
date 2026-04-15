@@ -27,7 +27,11 @@ export function usePerfis() {
 
 export function useMeuPerfil() {
   return useQuery<Perfil | null>({
+    // staleTime:0 + gcTime:0 ensures no cross-session cache bleed:
+    // each mount fetches fresh data for whoever is currently logged in.
     queryKey: ['perfil-meu'],
+    staleTime: 0,
+    gcTime: 0,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return null
