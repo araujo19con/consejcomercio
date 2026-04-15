@@ -333,28 +333,39 @@ export function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {metrics.funnelCounts.map((stage, i) => {
+              {(() => {
+                const STAGE_COLOR_MAP: Record<string, string> = {
+                  classificacao:             '#64748b',
+                  levantamento_oportunidade: '#8b5cf6',
+                  educar_lead:               '#3b82f6',
+                  proposta_comercial:        '#f59e0b',
+                  negociacao:                '#f97316',
+                  stand_by:                  '#10b981',
+                  ganho_assessoria:          '#ef4444',
+                  ganho_consultoria:         '#06b6d4',
+                  perdido:                   '#6b7280',
+                  cancelado:                 '#9ca3af',
+                }
                 const max = Math.max(...metrics.funnelCounts.map(s => s.count), 1)
-                const widthPct = Math.round((stage.count / max) * 100)
-                const pctTotal = pct(stage.count, leads.length)
-                const stageColors = [
-                  'bg-slate-400', 'bg-violet-500', 'bg-blue-500',
-                  'bg-amber-500', 'bg-orange-500', 'bg-emerald-500', 'bg-red-400',
-                ]
-                return (
-                  <div key={stage.id} className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground w-36 shrink-0 truncate">{stage.label}</span>
-                    <div className="flex-1 bg-[rgba(255,255,255,0.04)] rounded-full h-5 relative overflow-hidden">
-                      <div
-                        className={cn('h-full rounded-full transition-all', stageColors[i])}
-                        style={{ width: `${widthPct}%` }}
-                      />
+                return metrics.funnelCounts.map(stage => {
+                  const widthPct = Math.round((stage.count / max) * 100)
+                  const pctTotal = pct(stage.count, leads.length)
+                  const barColor = STAGE_COLOR_MAP[stage.id] ?? '#4b5563'
+                  return (
+                    <div key={stage.id} className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground w-36 shrink-0 truncate">{stage.label}</span>
+                      <div className="flex-1 bg-[rgba(255,255,255,0.04)] rounded-full h-5 relative overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${widthPct}%`, backgroundColor: barColor }}
+                        />
+                      </div>
+                      <span className="text-sm font-bold text-fg2 w-6 text-right">{stage.count}</span>
+                      <span className="text-xs text-fg4 w-8 text-right">{pctTotal}%</span>
                     </div>
-                    <span className="text-sm font-bold text-fg2 w-6 text-right">{stage.count}</span>
-                    <span className="text-xs text-fg4 w-8 text-right">{pctTotal}%</span>
-                  </div>
-                )
-              })}
+                  )
+                })
+              })()}
             </div>
           </CardContent>
         </Card>
@@ -382,11 +393,14 @@ export function AnalyticsPage() {
                 <Tooltip contentStyle={{ background: "#0d1929", border: "1px solid rgba(255,255,255,0.10)", color: "rgba(220,230,240,0.90)", borderRadius: 8 }} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="flex justify-center gap-4 mt-1">
+            <div className="flex flex-col gap-1.5 mt-3 px-1">
               {metrics.winLossPie.map((d, i) => (
-                <div key={d.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ['#10b981', '#ef4444', '#94a3b8'][i] }} />
-                  {d.name} ({d.value})
+                <div key={d.name} className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: ['#10b981', '#ef4444', '#94a3b8'][i] }} />
+                    <span className="truncate">{d.name}</span>
+                  </div>
+                  <span className="font-medium text-fg2 shrink-0">{d.value}</span>
                 </div>
               ))}
             </div>
