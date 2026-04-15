@@ -31,8 +31,20 @@ export function useMeuPerfil() {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return null
+
       const { data } = await supabase.from('perfis').select('*').eq('id', user.id).maybeSingle()
-      return data ?? null
+      if (data) return data
+
+      // No profile row yet (new user, trigger not fired or backfill pending).
+      // Auto-create a minimal row so every user always has their own profile.
+      const emailPrefix = (user.email ?? 'usuario').split('@')[0]
+      const defaultName = emailPrefix.replace(/[._-]/g, ' ')
+      const { data: created } = await supabase
+        .from('perfis')
+        .insert({ id: user.id, email: user.email ?? '', nome: defaultName })
+        .select()
+        .single()
+      return created ?? null
     },
   })
 }

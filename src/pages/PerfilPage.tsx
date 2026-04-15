@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Camera, Save, Award, Calendar, Users, FileText, Trophy, Star, Target, Stethoscope } from 'lucide-react'
+import { Camera, Save, Award, Calendar, Users, FileText, Trophy, Star, Target, Stethoscope, UserCircle2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useMeuPerfil, useSalvarPerfil, useUploadAvatar } from '@/hooks/usePerfis'
 import { useLeads } from '@/hooks/useLeads'
