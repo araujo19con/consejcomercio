@@ -21,20 +21,37 @@ export const DEFAULT_METAS: MetasConfig = {
 }
 
 export const DEFAULT_SERVICOS: ServicoConfig[] = [
+  // ── Modalidades (sem área fixa — cobrem qualquer área do Direito) ─────────
   {
-    id: 'assessoria_societaria',
-    nome: 'Assessoria Societária',
-    descricao: 'Elaboração e atualização de Contrato Social, Estatuto, documentação de governança e formalização empresarial',
-    categoria: 'societario',
+    id: 'assessoria_societaria',   // ID mantido para compatibilidade com dados existentes
+    nome: 'Assessoria Jurídica',
+    descricao: 'Suporte jurídico contínuo em qualquer área do Direito. A área de cobertura (civil, trabalhista, contratual, digital, PI etc.) é definida conforme as necessidades do cliente e registrada no contrato.',
+    categoria: 'outro',
     tipo: 'complexa',
     valor: 1200,
-    area_direito: 'civil',
-    segmentos_icp: ['empresa_junior', 'startup', 'empresa_gestao'],
-    investimento_icp: ['500_2k', '2k_5k'],
-    cross_sells: ['revisao_contratos', 'documentacao_trabalhista'],
+    area_direito: undefined,       // sem área fixa — cobre todas as áreas
+    segmentos_icp: ['empresa_junior', 'startup', 'empresa_senior', 'empresa_gestao', 'empresa_design', 'escritorio_arquitetura'],
+    investimento_icp: ['500_2k', '2k_5k', '5k_10k'],
+    cross_sells: ['revisao_contratos', 'documentacao_trabalhista', 'adequacao_lgpd', 'registro_marca'],
     up_sells: ['consultoria_empresarial'],
     ativo: true,
   },
+  {
+    id: 'consultoria_empresarial', // ID mantido para compatibilidade com dados existentes
+    nome: 'Consultoria Jurídica',
+    descricao: 'Consultoria pontual em qualquer área do Direito. O cliente apresenta uma demanda específica e definimos juntos a área de atuação, o escopo e os honorários.',
+    categoria: 'outro',
+    tipo: 'simples',
+    valor: 800,
+    area_direito: undefined,       // sem área fixa — cobre todas as áreas
+    segmentos_icp: ['empresa_junior', 'startup', 'empresa_senior', 'empresa_gestao', 'empresa_design', 'escritorio_arquitetura'],
+    investimento_icp: ['ate_500', '500_2k', '2k_5k', '5k_10k', 'acima_10k'],
+    cross_sells: ['revisao_contratos', 'documentacao_trabalhista', 'adequacao_lgpd', 'registro_marca'],
+    up_sells: ['assessoria_societaria'],
+    ativo: true,
+  },
+
+  // ── Serviços específicos (área do Direito definida) ───────────────────────
   {
     id: 'acordo_socios',
     nome: 'Acordo de Sócios',
@@ -59,8 +76,8 @@ export const DEFAULT_SERVICOS: ServicoConfig[] = [
     area_direito: 'contratos',
     segmentos_icp: ['empresa_junior', 'empresa_design', 'escritorio_arquitetura', 'startup'],
     investimento_icp: ['500_2k', '2k_5k'],
-    cross_sells: ['gestao_inadimplencia', 'assessoria_societaria'],
-    up_sells: ['consultoria_empresarial'],
+    cross_sells: ['gestao_inadimplencia'],
+    up_sells: ['assessoria_societaria'],
     ativo: true,
   },
   {
@@ -74,7 +91,7 @@ export const DEFAULT_SERVICOS: ServicoConfig[] = [
     segmentos_icp: ['empresa_junior', 'empresa_design', 'escritorio_arquitetura'],
     investimento_icp: ['ate_500', '500_2k'],
     cross_sells: ['revisao_contratos'],
-    up_sells: [],
+    up_sells: ['assessoria_societaria'],
     ativo: true,
   },
   {
@@ -88,7 +105,7 @@ export const DEFAULT_SERVICOS: ServicoConfig[] = [
     segmentos_icp: ['startup', 'empresa_gestao', 'empresa_senior'],
     investimento_icp: ['500_2k', '2k_5k'],
     cross_sells: ['registro_marca'],
-    up_sells: [],
+    up_sells: ['assessoria_societaria'],
     ativo: true,
   },
   {
@@ -102,7 +119,7 @@ export const DEFAULT_SERVICOS: ServicoConfig[] = [
     segmentos_icp: ['empresa_junior', 'startup', 'empresa_design', 'escritorio_arquitetura'],
     investimento_icp: ['500_2k', '2k_5k'],
     cross_sells: ['adequacao_lgpd'],
-    up_sells: [],
+    up_sells: ['assessoria_societaria'],
     ativo: true,
   },
   {
@@ -115,22 +132,8 @@ export const DEFAULT_SERVICOS: ServicoConfig[] = [
     area_direito: 'trabalhista',
     segmentos_icp: ['startup', 'empresa_gestao', 'empresa_senior'],
     investimento_icp: ['500_2k', '2k_5k'],
-    cross_sells: ['assessoria_societaria'],
-    up_sells: ['consultoria_empresarial'],
-    ativo: true,
-  },
-  {
-    id: 'consultoria_empresarial',
-    nome: 'Consultoria Empresarial',
-    descricao: 'Consultoria jurídica estratégica para tomada de decisão, reestruturação societária e planejamento de crescimento',
-    categoria: 'societario',
-    tipo: 'complexa',
-    valor: 2500,
-    area_direito: 'empresarial',
-    segmentos_icp: ['startup', 'empresa_senior', 'empresa_gestao'],
-    investimento_icp: ['2k_5k', '5k_10k', 'acima_10k'],
-    cross_sells: ['revisao_contratos', 'documentacao_trabalhista', 'adequacao_lgpd'],
-    up_sells: [],
+    cross_sells: [],
+    up_sells: ['assessoria_societaria'],
     ativo: true,
   },
 ]

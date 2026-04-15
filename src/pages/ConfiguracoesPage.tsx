@@ -135,7 +135,7 @@ function EditServicoModal({ servico, allServicos, open, onClose, onSave }: EditM
               <Select value={form.area_direito || '__none__'} onValueChange={v => setForm(p => ({ ...p, area_direito: v === '__none__' ? undefined : v }))}>
                 <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">Não mapeado</SelectItem>
+                  <SelectItem value="__none__">Todas as áreas (assessoria/consultoria)</SelectItem>
                   {SERVICE_AREAS.map(a => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
                 </SelectContent>
               </Select>
