@@ -1,6 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import type { Lead } from '@/types'
+import type { Perfil } from '@/hooks/usePerfis'
 import { LeadCard } from './LeadCard'
 import { cn } from '@/lib/utils'
 
@@ -21,9 +22,10 @@ type Props = {
   stageId: string
   label: string
   leads: Lead[]
+  perfis?: Perfil[]
 }
 
-export function KanbanColumn({ stageId, label, leads }: Props) {
+export function KanbanColumn({ stageId, label, leads, perfis = [] }: Props) {
   const { setNodeRef, isOver } = useDroppable({ id: stageId })
 
   return (
@@ -49,7 +51,7 @@ export function KanbanColumn({ stageId, label, leads }: Props) {
       <div className="flex-1 overflow-y-auto px-2 pb-2 min-h-[200px]">
         <SortableContext items={leads.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {leads.map(lead => (
-            <LeadCard key={lead.id} lead={lead} stageId={stageId} />
+            <LeadCard key={lead.id} lead={lead} stageId={stageId} perfis={perfis} />
           ))}
         </SortableContext>
       </div>

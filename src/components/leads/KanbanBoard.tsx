@@ -8,6 +8,7 @@ import { LostReasonModal } from './LostReasonModal'
 import { ConvertToClientModal } from './ConvertToClientModal'
 import { NewLeadModal } from './NewLeadModal'
 import { useUpdateLeadStatus } from '@/hooks/useLeads'
+import { usePerfis } from '@/hooks/usePerfis'
 import { Button } from '@/components/ui/button'
 import { Plus, Eye, EyeOff, X } from 'lucide-react'
 import type { Lead } from '@/types'
@@ -15,6 +16,7 @@ import type { Lead } from '@/types'
 type Props = { leads: Lead[] }
 
 export function KanbanBoard({ leads }: Props) {
+  const { data: perfis = [] } = usePerfis()
   const [activeCard, setActiveCard] = useState<Lead | null>(null)
   const [showNewLead, setShowNewLead] = useState(false)
   const [lostLead, setLostLead] = useState<{ id: string; status: string } | null>(null)
@@ -106,11 +108,12 @@ export function KanbanBoard({ leads }: Props) {
               stageId={stage.id}
               label={stage.label}
               leads={leadsByStage[stage.id] || []}
+              perfis={perfis}
             />
           ))}
         </div>
         <DragOverlay>
-          {activeCard && <LeadCard lead={activeCard} isDragging />}
+          {activeCard && <LeadCard lead={activeCard} isDragging perfis={perfis} />}
         </DragOverlay>
       </DndContext>
 

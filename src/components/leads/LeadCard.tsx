@@ -1,12 +1,15 @@
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useNavigate } from 'react-router-dom'
 import { differenceInDays } from 'date-fns'
 import type { Lead } from '@/types'
+import type { Perfil } from '@/hooks/usePerfis'
 import { LEAD_SOURCE_LABELS } from '@/lib/constants'
 import { formatRelative } from '@/lib/utils'
 import { cn } from '@/lib/utils'
-import { Calendar, User, MessageCircle, Clock } from 'lucide-react'
+import { Calendar, MessageCircle, Clock, UserRoundPlus, Check } from 'lucide-react'
+import { useUpdateLead } from '@/hooks/useLeads'
 
 const SEGMENT_COLORS: Record<string, { bg: string; color: string }> = {
   empresa_junior:        { bg: 'rgba(139,92,246,0.15)',  color: '#c4b5fd' },
@@ -66,28 +69,91 @@ const STAGNANT_DAYS: Record<string, number> = {
   stand_by:                  14,
 }
 
-type Props = { lead: Lead; isDragging?: boolean; stageId?: string }
+// ─── Avatar helpers ────────────────────────────────────────────────────────────
 
-export function LeadCard({ lead, isDragging = false, stageId }: Props) {
-  const navigate = useNavigate()
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortDragging } = useSortable({ id: lead.id })
+function getInitials(nome: string): string {
+  const parts = nome.trim().split(/\s+/)
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return nome.slice(0, 2).toUpperCase()
+}
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
+const AVATAR_PALETTE = [
+  { bg: 'rgba(139,92,246,0.28)', fg: '#c4b5fd' },
+  { bg: 'rgba(59,130,246,0.28)',  fg: '#93c5fd' },
+  { bg: 'rgba(16,185,129,0.28)', fg: '#6ee7b7' },
+  { bg: 'rgba(245,158,11,0.28)', fg: '#fbbf24' },
+  { bg: 'rgba(6,182,212,0.28)',   fg: '#67e8f9' },
+  { bg: 'rgba(236,72,153,0.28)', fg: '#f9a8d4' },
+  { bg: 'rgba(239,68,68,0.28)',   fg: '#fca5a5' },
+]
+
+function avatarColor(nome: string) {
+  let h = 0
+  for (const c of nome) h = (h * 31 + c.charCodeAt(0)) & 0xffff
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length]
+}
+
+// ─── Shared mini avatar ────────────────────────────────────────────────────────
+
+function MemberAvatar({ perfil, size = 22 }: { perfil: Perfil; size?: number }) {
+  const col = avatarColor(perfil.nome)
+  return (
+    <div
+      className="rounded-full overflow-hidden flex items-center justify-center shrink-0 font-bold"
+      style={{
+        width: size,
+        height: size,
+        fontSize: Math.round(size * 0.38),
+        background: perfil.foto_url ? undefined : col.bg,
+        color: perfil.foto_url ? undefined : col.fg,
+      }}
+    >
+      {perfil.foto_url
+        ? <img src={perfil.foto_url} alt={perfil.nome} className="w-full h-full object-cover" />
+        : getInitials(perfil.nome)
+      }
+    </div>
+  )
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+type Props = { lead: Lead; isDragging?: boolean; stageId?: string; perfis?: Perfil[] }
+
+export function LeadCard({ lead, isDragging = false, stageId, perfis = [] }: Props) {
+  const navigate    = useNavigate()
+  const updateLead  = useUpdateLead()
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortDragging } =
+    useSortable({ id: lead.id })
+
+  const style = { transform: CSS.Transform.toString(transform), transition }
 
   // Stagnant check
   const daysInStage = differenceInDays(new Date(), new Date(lead.updated_at))
-  const threshold = STAGNANT_DAYS[lead.status] ?? 7
-  const isStagnant = daysInStage >= threshold && !(lead.status in { ganho_assessoria: 1, ganho_consultoria: 1, perdido: 1, cancelado: 1 })
+  const threshold   = STAGNANT_DAYS[lead.status] ?? 7
+  const isStagnant  = daysInStage >= threshold &&
+    !(lead.status in { ganho_assessoria: 1, ganho_consultoria: 1, perdido: 1, cancelado: 1 })
 
   // Message shortcut URL
   const msgStage = STAGE_TO_MSG[lead.status] ?? 'primeiro_contato'
-  const msgUrl = `/mensagens?nome=${encodeURIComponent(lead.nome)}&empresa=${encodeURIComponent(lead.empresa ?? '')}&stage=${msgStage}`
+  const msgUrl   = `/mensagens?nome=${encodeURIComponent(lead.nome)}&empresa=${encodeURIComponent(lead.empresa ?? '')}&stage=${msgStage}`
 
-  const accentColor = isStagnant ? 'rgba(249,115,22,0.90)' : (STAGE_ACCENT[stageId ?? lead.status] ?? 'var(--alpha-bg-lg)')
-  const tintBg     = isStagnant ? 'rgba(249,115,22,0.06)'  : (STAGE_TINT[stageId ?? lead.status]   ?? 'var(--alpha-bg-sm)')
+  const accentColor = isStagnant
+    ? 'rgba(249,115,22,0.90)'
+    : (STAGE_ACCENT[stageId ?? lead.status] ?? 'var(--alpha-bg-lg)')
+  const tintBg = isStagnant
+    ? 'rgba(249,115,22,0.06)'
+    : (STAGE_TINT[stageId ?? lead.status] ?? 'var(--alpha-bg-sm)')
+
+  const assignedPerfil = perfis.find(p => p.id === lead.responsavel_id) ?? null
+
+  function handleAssign(perfil: Perfil) {
+    updateLead.mutate({ id: lead.id, responsavel_id: perfil.id, responsavel: perfil.nome })
+  }
+  function handleUnassign() {
+    updateLead.mutate({ id: lead.id, responsavel_id: null, responsavel: null })
+  }
 
   return (
     <div
@@ -112,28 +178,147 @@ export function LeadCard({ lead, isDragging = false, stageId }: Props) {
         }
       }}
     >
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-1">
-        <div className="min-w-0">
+      {/* ── Header row: name / company + avatar + stagnant badge ── */}
+      <div className="flex items-start justify-between gap-1.5">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-foreground leading-tight truncate">{lead.nome}</p>
           <p className="text-xs text-muted-foreground mt-0.5 truncate">{lead.empresa}</p>
         </div>
-        {isStagnant && (
-          <div
-            title={`Parado há ${daysInStage} dias`}
-            className="shrink-0 flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-medium"
-            style={{ background: 'rgba(249,115,22,0.15)', color: '#fb923c' }}
-          >
-            <Clock className="w-2.5 h-2.5" />
-            {daysInStage}d
-          </div>
-        )}
+
+        <div className="flex items-center gap-1 shrink-0 mt-0.5">
+          {/* ── Assignee avatar / picker ── */}
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button
+                title={assignedPerfil
+                  ? `Responsável: ${assignedPerfil.nome} — clique para trocar`
+                  : 'Atribuir responsável'}
+                onPointerDown={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
+                className="rounded-full focus:outline-none hover:opacity-80 transition-opacity"
+              >
+                {assignedPerfil
+                  ? <MemberAvatar perfil={assignedPerfil} size={22} />
+                  : (
+                    <div
+                      className="rounded-full flex items-center justify-center"
+                      style={{
+                        width: 22, height: 22,
+                        background: 'var(--alpha-bg-sm)',
+                        border: '1.5px dashed var(--alpha-border-md)',
+                      }}
+                    >
+                      <UserRoundPlus style={{ width: 11, height: 11, color: 'var(--text-dim-a)' }} />
+                    </div>
+                  )
+                }
+              </button>
+            </DropdownMenu.Trigger>
+
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content
+                align="end"
+                sideOffset={5}
+                onPointerDown={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
+                style={{
+                  zIndex: 9999,
+                  minWidth: 210,
+                  background: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 10,
+                  padding: '4px',
+                  boxShadow: '0 8px 28px rgba(0,0,0,0.40)',
+                }}
+              >
+                <div
+                  className="px-2.5 pt-1.5 pb-1 text-[10px] font-semibold uppercase tracking-widest"
+                  style={{ color: 'var(--text-soft-a)' }}
+                >
+                  Responsável pelo lead
+                </div>
+
+                {perfis.length === 0 && (
+                  <div className="px-2.5 py-2 text-xs" style={{ color: 'var(--text-dim-a)' }}>
+                    Nenhum consultor cadastrado
+                  </div>
+                )}
+
+                {perfis.map(p => {
+                  const isActive = lead.responsavel_id === p.id
+                  return (
+                    <DropdownMenu.Item
+                      key={p.id}
+                      onSelect={() => handleAssign(p)}
+                      className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md cursor-pointer text-sm outline-none"
+                      style={{ color: 'hsl(var(--foreground))' }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLElement).style.background = 'hsl(var(--secondary))'
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLElement).style.background = ''
+                      }}
+                    >
+                      <MemberAvatar perfil={p} size={26} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium leading-tight truncate">{p.nome}</p>
+                        {p.cargo && (
+                          <p className="text-[10px] leading-tight truncate" style={{ color: 'var(--text-soft-a)' }}>
+                            {p.cargo}
+                          </p>
+                        )}
+                      </div>
+                      {isActive && (
+                        <Check style={{ width: 13, height: 13, color: '#6bd0e7', flexShrink: 0 }} />
+                      )}
+                    </DropdownMenu.Item>
+                  )
+                })}
+
+                {lead.responsavel_id && (
+                  <>
+                    <div style={{ height: 1, background: 'hsl(var(--border))', margin: '4px 0' }} />
+                    <DropdownMenu.Item
+                      onSelect={handleUnassign}
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md cursor-pointer text-xs outline-none"
+                      style={{ color: 'var(--text-soft-a)' }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLElement).style.background = 'hsl(var(--secondary))'
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLElement).style.background = ''
+                      }}
+                    >
+                      Remover responsável
+                    </DropdownMenu.Item>
+                  </>
+                )}
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
+
+          {/* Stagnant badge */}
+          {isStagnant && (
+            <div
+              title={`Parado há ${daysInStage} dias`}
+              className="flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-medium"
+              style={{ background: 'rgba(249,115,22,0.15)', color: '#fb923c' }}
+            >
+              <Clock className="w-2.5 h-2.5" />
+              {daysInStage}d
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* ── Tags row ── */}
       <div className="flex items-center gap-1.5 mt-2 flex-wrap">
         <span
           className="text-xs px-1.5 py-0.5 rounded-full font-medium"
-          style={SEGMENT_COLORS[lead.segmento] ? { background: SEGMENT_COLORS[lead.segmento].bg, color: SEGMENT_COLORS[lead.segmento].color } : { background: 'var(--alpha-border)', color: 'var(--text-soft-a)' }}
+          style={SEGMENT_COLORS[lead.segmento]
+            ? { background: SEGMENT_COLORS[lead.segmento].bg, color: SEGMENT_COLORS[lead.segmento].color }
+            : { background: 'var(--alpha-border)', color: 'var(--text-soft-a)' }
+          }
         >
           {lead.segmento.replace(/_/g, ' ')}
         </span>
@@ -142,24 +327,17 @@ export function LeadCard({ lead, isDragging = false, stageId }: Props) {
         </span>
       </div>
 
+      {/* ── Footer ── */}
       <div className="flex items-center justify-between mt-2">
-        {lead.data_diagnostico && (
-          <div className="flex items-center gap-1 text-xs" style={{ color: '#a78bfa' }}>
-            <Calendar className="w-3 h-3" />
-            <span>{new Date(lead.data_diagnostico).toLocaleDateString('pt-BR')}</span>
-          </div>
-        )}
-        {lead.responsavel && (
-          <div className="flex items-center gap-1 text-xs text-fg4 ml-auto">
-            <User className="w-3 h-3" />
-            <span>{lead.responsavel}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between mt-1.5">
-        <p className="text-xs text-fg4">{formatRelative(lead.created_at)}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-fg4">{formatRelative(lead.created_at)}</p>
+          {lead.data_diagnostico && (
+            <div className="flex items-center gap-1 text-xs" style={{ color: '#a78bfa' }}>
+              <Calendar className="w-3 h-3" />
+              <span>{new Date(lead.data_diagnostico).toLocaleDateString('pt-BR')}</span>
+            </div>
+          )}
+        </div>
 
         {/* Quick message button */}
         <button
@@ -168,8 +346,14 @@ export function LeadCard({ lead, isDragging = false, stageId }: Props) {
           onClick={e => { e.stopPropagation(); navigate(msgUrl) }}
           className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded transition-colors"
           style={{ color: 'var(--text-soft-a)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#6bd0e7'; (e.currentTarget as HTMLElement).style.background = 'rgba(0,137,172,0.12)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-soft-a)'; (e.currentTarget as HTMLElement).style.background = '' }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.color = '#6bd0e7'
+            ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,137,172,0.12)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.color = 'var(--text-soft-a)'
+            ;(e.currentTarget as HTMLElement).style.background = ''
+          }}
         >
           <MessageCircle className="w-3 h-3" />
           mensagem
