@@ -31,7 +31,7 @@ const STAGES: { id: Stage; label: string; colorVal: string; bgVal: string }[] = 
 
 // Setores espelham as categorias do catálogo de serviços (ServicoCategoria)
 const SECTORS: { id: Sector; label: string; emoji: string }[] = [
-  { id: 'geral',         label: 'Geral / Assessoria',          emoji: '⚖️'  },
+  { id: 'geral',         label: 'Geral / Consultoria',         emoji: '⚖️'  },
   { id: 'societario',    label: 'Societário / Acordo Sócios',  emoji: '🤝'  },
   { id: 'contratual',    label: 'Contratos / Inadimplência',   emoji: '📝'  },
   { id: 'digital_lgpd',  label: 'Digital / LGPD',              emoji: '🔐'  },
@@ -59,8 +59,8 @@ const TEMPLATES: Templates = {
   primeiro_contato: {
     whatsapp: {
       geral: [
-        { body: `Oi, {{nome}}, tudo certo?\n\nAqui é o(a) {{responsavel}}, da CONSEJ. A gente acompanha negócios em crescimento como a {{empresa}} e ajuda a dar os próximos passos sem burocratizar o jurídico.\n\nRola trocar uma ideia rápida essa semana? Tenho um diagnóstico gratuito que costuma render bastante insight — são uns 30 minutos, sem compromisso.` },
-        { body: `{{nome}}, tudo bem? 👋\n\n{{responsavel}} aqui, da CONSEJ. Vi a {{empresa}} e fiquei curioso(a) sobre o momento de vocês — a gente ajuda negócios a estruturar o jurídico enquanto eles crescem, não depois do problema acontecer.\n\nTopa uma conversa de 20 min pra eu entender o contexto e te mostrar onde dá pra destravar?` },
+        { body: `Oi, {{nome}}, tudo certo?\n\nAqui é o(a) {{responsavel}}, da CONSEJ — somos uma empresa júnior de consultoria jurídica. A gente ajuda negócios em crescimento a estruturar o jurídico de forma prática, sem custo de escritório tradicional.\n\nRola trocar uma ideia rápida essa semana? Tenho um diagnóstico gratuito de 30 min que costuma render bastante — sem compromisso.` },
+        { body: `{{nome}}, tudo bem? 👋\n\n{{responsavel}} aqui, da CONSEJ. A gente é uma EJ de consultoria jurídica — ajudamos negócios a resolver contratos, societário, LGPD, marca e trabalhista antes de virar problema. Custo acessível, entrega séria.\n\nVi a {{empresa}} e fiquei curioso(a) sobre o momento de vocês. Topa 20 min pra eu entender o contexto?` },
       ],
       societario: [
         { body: `Oi, {{nome}}! {{responsavel}} aqui, da CONSEJ.\n\nUma coisa que a gente vê muito em negócios como a {{empresa}}: sócios que começaram no boca-a-boca e hoje estão tomando decisões grandes sem um acordo formal. Quando vira conflito, vira caro.\n\nAcordo de sócios resolve isso em 1–2 semanas. Bora marcar 20 min pra eu te explicar como a gente estrutura?` },
@@ -86,8 +86,8 @@ const TEMPLATES: Templates = {
     email: {
       geral: [
         {
-          subject: `Segurança jurídica pra {{empresa}} — sem virar burocracia`,
-          body: `Oi, {{nome}},\n\nAqui é o(a) {{responsavel}}, da CONSEJ.\n\nA gente trabalha com negócios em crescimento — startups, empresas juniores, escritórios criativos, empresas de gestão — e o que a gente mais ouve é "precisamos organizar o jurídico, mas não queremos virar uma empresa engessada". É exatamente esse o ponto da CONSEJ: estruturar sem burocratizar.\n\nPor isso queria te propor uma conversa curta (30 min, sem custo) pra entender o momento da {{empresa}} e, se fizer sentido, desenhar um diagnóstico do que vale a pena cuidar agora e do que pode esperar.\n\nAlgum horário essa semana funcionaria pra você?\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
+          subject: `Consultoria jurídica pra {{empresa}} — sem custo de escritório tradicional`,
+          body: `Oi, {{nome}},\n\nAqui é o(a) {{responsavel}}, da CONSEJ.\n\nA CONSEJ é uma empresa júnior de consultoria jurídica — o que isso significa na prática: a gente oferece o mesmo resultado que você esperaria de um escritório jurídico, mas com agilidade, custo acessível e sem burocracia.\n\nA gente atende negócios em crescimento — startups, empresas júniores, escritórios criativos, empresas de gestão — e o que mais ouvimos é "precisamos organizar o jurídico, mas não queremos virar uma empresa engessada".\n\nPor isso queria propor uma conversa curta (30 min, sem custo) pra entender o momento da {{empresa}} e, se fizer sentido, montar um diagnóstico do que vale priorizar agora.\n\nAlgum horário essa semana funcionaria pra você?\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
       societario: [
@@ -123,10 +123,10 @@ const TEMPLATES: Templates = {
     },
     linkedin: {
       geral: [
-        { body: `Oi, {{nome}}! Acompanhei um pouco o que vocês estão construindo na {{empresa}} e fiquei curioso(a) pra conversar.\n\nAqui é o(a) {{responsavel}}, da CONSEJ — a gente trabalha com negócios em crescimento (startups, MEJs, escritórios criativos, empresas de gestão) ajudando a estruturar o jurídico sem burocratizar. O foco é prevenir problema, não apagar incêndio.\n\nTopa trocar uma ideia rápida? Tenho um diagnóstico gratuito de 30 min que costuma gerar vários insights mesmo pra quem já tem tudo "mais ou menos" organizado.` },
+        { body: `Oi, {{nome}}! Acompanhei o que vocês estão construindo na {{empresa}} e fiquei curioso(a).\n\nAqui é o(a) {{responsavel}}, da CONSEJ — somos uma empresa júnior de consultoria jurídica. Trabalhamos com negócios em crescimento (startups, MEJs, escritórios criativos, empresas de gestão) ajudando a organizar contratos, societário, LGPD, marca e trabalhista com custo acessível e sem burocracia de escritório tradicional.\n\nTopa trocar uma ideia rápida? Tenho um diagnóstico gratuito de 30 min que costuma valer muito — mesmo pra quem já tem tudo "mais ou menos" organizado.` },
       ],
       societario: [
-        { body: `Oi, {{nome}}! Vi o trabalho de vocês à frente da {{empresa}} e fiquei com vontade de conversar.\n\nSou {{responsavel}}, da CONSEJ. A gente ajuda negócios a estruturar a parte societária — contrato social, acordo de sócios, governança — antes que vire conflito. É o tipo de coisa que parece que pode esperar… até não poder mais.\n\nRolaria uma conversa curta essa semana? Se preferir, consigo te mandar um material curto sobre acordo de sócios antes, sem compromisso.` },
+        { body: `Oi, {{nome}}! Vi o trabalho de vocês à frente da {{empresa}} e fiquei com vontade de conversar.\n\nSou {{responsavel}}, da CONSEJ — uma empresa júnior de consultoria jurídica. A gente ajuda negócios a estruturar a parte societária (contrato social, acordo de sócios, governança) antes que vire conflito. É o tipo de coisa que parece que pode esperar… até não poder mais.\n\nRolaria uma conversa curta essa semana? Se preferir, consigo te mandar um material sobre acordo de sócios antes, sem compromisso.` },
       ],
       contratual: [
         { body: `Oi, {{nome}}! Acompanhei o que vocês estão construindo na {{empresa}} e fiquei impressionado(a).\n\nAqui é o(a) {{responsavel}}, da CONSEJ. Trabalho com estruturação de contratos e cobrança para empresas em crescimento — basicamente, deixar o time comercial rodando sem medo de assinar, e deixar o financeiro com um processo claro quando alguém atrasa.\n\nTopa trocar uma ideia? Não é reunião de venda, é conversa mesmo — quero entender o momento de vocês.` },
@@ -466,7 +466,7 @@ export function MensagensPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-foreground">Mensagens de Abordagem</h1>
-          <p className="text-sm text-muted-foreground">Templates no tom da CONSEJ — fale como pessoa, não como empresa. Adapte sempre com um detalhe real do lead.</p>
+          <p className="text-sm text-muted-foreground">Templates no tom da CONSEJ — empresa júnior de consultoria jurídica. Consultores, não advogados. Adapte sempre com um detalhe real do lead.</p>
         </div>
       </div>
 
@@ -662,7 +662,7 @@ export function MensagensPage() {
             <span className="text-lg leading-none">💡</span>
             <div className="text-xs text-amber-800 leading-relaxed space-y-1.5">
               <p><strong>Regra de ouro CONSEJ:</strong> se essa mensagem funcionaria pra qualquer outra empresa, ela ainda não tá personalizada o suficiente.</p>
-              <p>Antes de enviar, adapte com ao menos <strong>1 detalhe real</strong>: um post recente, um produto, uma expansão, o nicho específico. Fale como pessoa — "eu" e "a gente", nunca "nós" ou "nossa equipe". E nada de "prezado/a" no WhatsApp.</p>
+              <p>Antes de enviar, adapte com ao menos <strong>1 detalhe real</strong> do lead. Fale como pessoa — "eu" e "a gente", nunca "nós" ou "nossa equipe". Nada de "prezado/a" no WhatsApp. E lembre: somos uma <strong>empresa júnior de consultoria jurídica</strong>, não um escritório de advocacia — não usamos "advogado(a)", e sim "consultor(a)".</p>
             </div>
           </div>
 
