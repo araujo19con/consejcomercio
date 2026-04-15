@@ -71,7 +71,7 @@ const CLASSIFY_MAP: [MessageClassification, RegExp][] = [
   ['indicacao',
     /\b(indicou|foi indicado|veio por indicação|indicação de|indicou o|indicou a|recomendou|trouxe um contato|me mandou contato|indicou para nós|indicado pelo|indicada pela)\b/i],
   ['lead',
-    /\b(novo contato|novo lead|novo cliente|conheci|prospecção|prospectei|interessado em|quer contratar|procurando advogado|precisa de advogado|precisa de assessoria|precisa de consultoria|busca(ndo)? (advogado|assessoria|consultoria)|potencial cliente|primeira consulta|diagnóstico gratuito|me indicaram|ele quer contratar|ela quer contratar)\b/i],
+    /\b(novo contato|novo lead|novo cliente|conheci|prospecção|prospectei|interessado em|quer contratar|quer fazer (um|uma)|procurando advogado|precisa de (advogado|assessoria|consultoria)|busca(ndo)? (advogado|assessoria|consultoria)|potencial cliente|primeira consulta|diagnóstico gratuito|me indicaram|ele quer contratar|ela quer contratar|entrou em contato|fez contato|assumir o contato|assumir o lead|contato com o lead|registro de marca|processo (trabalhista|civil|criminal)|inventário|divórcio|assessoria jurídica|consultoria jurídica|cliente em potencial|para fazer (um|uma)|para contratar|pode assumir|pode atender|quem (pode|vai) (assumir|atender))\b/i],
   ['demanda',
     /\b(demanda|solicitação do cliente|pedido do cliente|cliente pediu|cliente solicitou|prazo urgente|atividade pendente|tarefa para o cliente|entrega de (contrato|documento|parecer)|precisam de nós)\b/i],
   ['oportunidade',

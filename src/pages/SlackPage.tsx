@@ -13,6 +13,7 @@ import {
 } from '@/lib/slack'
 import { detectSuggestions, type Suggestion, type ReuniaoSuggestion, type LeadSuggestion, type OportunidadeSuggestion, type IndicacaoSuggestion } from '@/lib/slack-suggestions'
 import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
+import { NewLeadModal } from '@/components/leads/NewLeadModal'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 
@@ -88,9 +89,15 @@ function SuggestionCard({
       )}
 
       {suggestion.type === 'lead' && (
-        <div className="text-sm text-muted-foreground">
-          {(suggestion as LeadSuggestion).email && <p>📧 {(suggestion as LeadSuggestion).email}</p>}
+        <div className="text-sm text-muted-foreground space-y-0.5">
+          {(suggestion as LeadSuggestion).nome && (
+            <p className="font-medium text-fg2">👤 {(suggestion as LeadSuggestion).nome}</p>
+          )}
+          {(suggestion as LeadSuggestion).empresa && (
+            <p>🏢 {(suggestion as LeadSuggestion).empresa}</p>
+          )}
           {(suggestion as LeadSuggestion).telefone && <p>📱 {(suggestion as LeadSuggestion).telefone}</p>}
+          {(suggestion as LeadSuggestion).email && <p>📧 {(suggestion as LeadSuggestion).email}</p>}
         </div>
       )}
 
@@ -298,6 +305,7 @@ export function SlackPage() {
   const [showSelector, setShowSelector] = useState(false)
   const [search, setSearch] = useState('')
   const [reuniaoModal, setReuniaoModal] = useState<{ open: boolean; suggestionId?: string; prefill?: Parameters<typeof NovaReuniaoModal>[0]['prefill'] }>({ open: false })
+  const [leadModal, setLeadModal] = useState<{ open: boolean; suggestionId?: string; prefill?: { nome?: string; empresa?: string; telefone?: string; email?: string; origem?: string; notas?: string } }>({ open: false })
 
   const { data: allChannels, isLoading, error } = useQuery<SlackChannel[]>({
     queryKey: ['slack-channels'],
@@ -339,18 +347,18 @@ export function SlackPage() {
       })
     } else if (suggestion.type === 'lead') {
       const l = suggestion as LeadSuggestion
-      try {
-        await supabase.from('leads').insert([{
-          nome: l.nome ?? 'Lead do Slack',
-          email: l.email,
+      setLeadModal({
+        open: true,
+        suggestionId: suggestion.id,
+        prefill: {
+          nome:     l.nome,
+          empresa:  l.empresa,
           telefone: l.telefone,
-          origem: 'slack',
-          status: 'novo',
-          notas: `Detectado no canal #${l.channelName}\n\n"${l.rawText.slice(0, 300)}"`,
-        }])
-        toast.success('Lead criado com sucesso!')
-        markConfirmed(suggestion.id)
-      } catch { toast.error('Erro ao criar lead') }
+          email:    l.email,
+          origem:   'slack',
+          notas:    l.notas ?? `Detectado no canal #${l.channelName}\n\n"${l.rawText.slice(0, 400)}"`,
+        },
+      })
     } else if (suggestion.type === 'oportunidade') {
       const o = suggestion as OportunidadeSuggestion
       try {
@@ -425,15 +433,15 @@ export function SlackPage() {
 
       {/* Suggestions panel */}
       {allSuggestions.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3">
+        <div className="rounded-2xl p-4 space-y-3" style={{ background: 'rgba(0,137,172,0.06)', border: '1px solid rgba(0,137,172,0.25)' }}>
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-600" />
-            <h2 className="font-semibold text-amber-900">
+            <Sparkles className="w-5 h-5" style={{ color: '#6bd0e7' }} />
+            <h2 className="font-semibold text-fg2">
               {allSuggestions.filter(s => !confirmedIds.has(s.id)).length} sugestão
               {allSuggestions.filter(s => !confirmedIds.has(s.id)).length !== 1 ? 'ões' : ''} pendente
               {allSuggestions.filter(s => !confirmedIds.has(s.id)).length !== 1 ? 's' : ''}
               {allSuggestions.some(s => confirmedIds.has(s.id)) && (
-                <span className="ml-2 text-green-700 font-normal text-sm">
+                <span className="ml-2 font-normal text-sm" style={{ color: '#34d399' }}>
                   · {allSuggestions.filter(s => confirmedIds.has(s.id)).length} confirmada{allSuggestions.filter(s => confirmedIds.has(s.id)).length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -506,6 +514,16 @@ export function SlackPage() {
           setReuniaoModal({ open: false })
         }}
         prefill={reuniaoModal.prefill}
+      />
+
+      {/* Novo Lead Modal (Slack) */}
+      <NewLeadModal
+        open={leadModal.open}
+        prefill={leadModal.prefill}
+        onClose={() => {
+          if (leadModal.suggestionId) markConfirmed(leadModal.suggestionId)
+          setLeadModal({ open: false })
+        }}
       />
     </div>
   )

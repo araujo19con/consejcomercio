@@ -32,10 +32,38 @@ type FormData = z.infer<typeof schema>
 type Props = {
   open: boolean
   onClose: () => void
+  prefill?: {
+    nome?: string
+    empresa?: string
+    telefone?: string
+    email?: string
+    origem?: string
+    notas?: string
+  }
 }
 
-export function NewLeadModal({ open, onClose }: Props) {
+export function NewLeadModal({ open, onClose, prefill }: Props) {
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) })
+
+  // Pre-fill form when opening with Slack-detected data
+  useEffect(() => {
+    if (open && prefill) {
+      reset({
+        nome:     prefill.nome     ?? '',
+        empresa:  prefill.empresa  ?? '',
+        telefone: prefill.telefone ?? '',
+        email:    prefill.email    ?? '',
+        origem:   prefill.origem   ?? '',
+        notas:    prefill.notas    ?? '',
+        segmento: '',
+        estado:   '',
+        responsavel: '',
+      })
+      if (prefill.origem) setValue('origem', prefill.origem, { shouldValidate: false })
+    }
+    if (!open) reset()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
   const [referenteClienteId, setReferenteClienteId] = useState('')
   const [referenteParceiroId, setReferenteParceiroId] = useState('')
 

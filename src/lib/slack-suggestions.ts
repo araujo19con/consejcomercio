@@ -25,6 +25,7 @@ export interface LeadSuggestion extends BaseSuggestion {
   empresa?: string
   telefone?: string
   email?: string
+  notas?: string
 }
 
 export interface OportunidadeSuggestion extends BaseSuggestion {
@@ -55,9 +56,56 @@ const LINK_PATTERN = /https?:\/\/[^\s]+(?:zoom|meet\.google|teams|calendly)[^\s]
 
 const INDICACAO_KEYWORDS = /\b(indicou|foi indicado|veio por indicação|indicação de|indicou o|indicou a|recomendou|trouxe um contato|me mandou contato|indicou para nós|indicado pelo|indicada pela)\b/i
 
-const LEAD_KEYWORDS = /\b(novo contato|novo lead|novo cliente|conheci|prospecção|prospectei|interessado em|quer contratar|procurando advogado|precisa de (advogado|assessoria|consultoria)|busca(ndo)? (advogado|assessoria|consultoria)|potencial cliente|primeira consulta|diagnóstico gratuito|me indicaram|ele quer contratar|ela quer contratar)\b/i
+const LEAD_KEYWORDS = /\b(
+  novo contato|novo lead|novo cliente|conheci|prospecção|prospectei|
+  interessado em|quer contratar|quer fazer (um|uma)|quer nossos serviços|
+  procurando advogado|precisa de (advogado|assessoria|consultoria)|
+  busca(ndo)? (advogado|assessoria|consultoria)|
+  potencial cliente|primeira consulta|diagnóstico gratuito|
+  me indicaram|ele quer contratar|ela quer contratar|
+  entrou em contato|entrou contato|fez contato|
+  assumir o contato|assumir o lead|assumir esse contato|
+  contato com o lead|quem (pode|vai|fica) (com|assumir)|
+  registro de marca|propriedade intelectual|
+  processo (trabalhista|civil|criminal|judicial)|
+  inventário|divórcio|contrato social|ltda|mei|
+  assessoria jurídica|consultoria jurídica|
+  me passou o contato|passou o contato|mandou contato|
+  para fazer (um|uma)|para contratar|para solicitar|
+  cliente em potencial|potencial negócio|
+  entrar em contato|pode atender|pode assumir
+)\b/xi
 const PHONE_PATTERN = /(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\s?)?\d{4}[-.\s]?\d{4}/
 const EMAIL_PATTERN = /\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b/
+
+// Extrai nome próprio: "representante X", "contato X", "(o|a) X entrou|X de"
+const NOME_PATTERNS = [
+  /representante\s+([A-ZÁÉÍÓÚÂÊÔÀÃÕÇ][a-záéíóúâêôàãõç]+(?:\s+[A-ZÁÉÍÓÚÂÊÔÀÃÕÇ][a-záéíóúâêôàãõç]+)?)/,
+  /contato\s+([A-ZÁÉÍÓÚÂÊÔÀÃÕÇ][a-záéíóúâêôàãõç]+)/,
+  /(?:o|a)\s+([A-ZÁÉÍÓÚÂÊÔÀÃÕÇ][a-záéíóúâêôàãõç]+)\s+(?:entrou|fez|quer|precisa|está)/,
+]
+// Extrai empresa: "empresa chamada X", "empresa X", "da empresa X", "da X"
+const EMPRESA_PATTERNS = [
+  /empresa\s+chamada\s+([A-ZÁÉÍÓÚÂÊÔÀÃÕÇ][A-Za-záéíóúâêôàãõç\s&]+?)(?:\s+entrou|\s+fez|\s+quer|[.,!?]|$)/,
+  /empresa\s+([A-ZÁÉÍÓÚÂÊÔÀÃÕÇ][A-Za-záéíóúâêôàãõç\s&]+?)(?:\s+entrou|\s+fez|\s+quer|[.,!?]|$)/,
+  /da\s+([A-ZÁÉÍÓÚÂÊÔÀÃÕÇ][A-Za-záéíóúâêôàãõç\s&]+?)\s+entrou/,
+]
+
+function extractNome(text: string): string | undefined {
+  for (const p of NOME_PATTERNS) {
+    const m = text.match(p)
+    if (m?.[1]) return m[1].trim()
+  }
+  return undefined
+}
+
+function extractEmpresa(text: string): string | undefined {
+  for (const p of EMPRESA_PATTERNS) {
+    const m = text.match(p)
+    if (m?.[1]) return m[1].trim()
+  }
+  return undefined
+}
 
 const OPORTUNIDADE_KEYWORDS = /\b(proposta|fechar contrato|assinar|orçamento|orcamento|negociação|negociando|valor de r\$|honorários|honorarios|fechamento|pipeline)\b/i
 const VALOR_PATTERN = /R\$\s*(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)/i
@@ -187,12 +235,15 @@ export function detectSuggestions(
     }
 
     // ── Lead ──
-    if (LEAD_KEYWORDS.test(text)) {
-      const phoneMatch = text.match(PHONE_PATTERN)
-      const emailMatch = text.match(EMAIL_PATTERN)
-      const phone = phoneMatch?.[0]
-      const email = emailMatch?.[0]
+    // Detecta se é lead: keyword match OU (telefone + contexto de pessoa/serviço)
+    const phoneMatch = text.match(PHONE_PATTERN)
+    const emailMatch = text.match(EMAIL_PATTERN)
+    const phone = phoneMatch?.[0]
+    const email = emailMatch?.[0]
+    const hasContactInfo = !!(phone || email)
+    const isLead = LEAD_KEYWORDS.test(text) || (hasContactInfo && /\b(número|contato|empresa|representante|cliente|atender|assumir|assessoria|marca|processo|contratar|serviço)\b/i.test(text))
 
+    if (isLead) {
       // Deduplica por email ou telefone
       if (email && seenEmails.has(email)) continue
       if (phone && seenPhones.has(phone)) continue
@@ -204,11 +255,17 @@ export function detectSuggestions(
       if (phone) seenPhones.add(phone)
       if (!email && !phone) seenEmails.add(textKey)
 
+      const nome = extractNome(text)
+      const empresa = extractEmpresa(text)
+
       suggestions.push({
         ...base,
         type: 'lead',
+        nome,
+        empresa,
         email,
         telefone: phone,
+        notas: `Detectado no canal #${channelName}\n\n"${text.slice(0, 400)}"`,
       } as LeadSuggestion)
       continue
     }
