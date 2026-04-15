@@ -1,9 +1,12 @@
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, AlertTriangle, Target, Lightbulb, RotateCcw } from 'lucide-react'
+import { CheckCircle2, AlertTriangle, Target, Lightbulb, RotateCcw, Tag } from 'lucide-react'
 import type { AnaliseIA } from '@/hooks/useAnalyzeDiagnostico'
+import type { ServicoConfig } from '@/types'
+import { formatCurrency } from '@/lib/utils'
 
 type Props = {
   analise: AnaliseIA
+  catalogo?: ServicoConfig[]
   onRedo: () => void
 }
 
@@ -13,7 +16,16 @@ const PRIORIDADE_CONFIG: Record<string, { label: string; bg: string; color: stri
   baixa: { label: 'Prioridade Baixa', bg: 'rgba(59,130,246,0.15)', color: '#93c5fd', border: 'rgba(59,130,246,0.30)' },
 }
 
-export function DiagnosticResult({ analise, onRedo }: Props) {
+const CATEGORIA_LABELS: Record<string, string> = {
+  societario: 'Societário',
+  contratual: 'Contratual',
+  digital: 'Digital',
+  trabalhista: 'Trabalhista',
+  pi: 'Prop. Intelectual',
+  outro: 'Outro',
+}
+
+export function DiagnosticResult({ analise, catalogo = [], onRedo }: Props) {
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -66,6 +78,7 @@ export function DiagnosticResult({ analise, onRedo }: Props) {
         <div className="space-y-3">
           {analise.servicos_recomendados.map((s, i) => {
             const cfg = PRIORIDADE_CONFIG[s.prioridade] ?? PRIORIDADE_CONFIG.baixa
+            const catalogItem = s.servico_id ? catalogo.find(c => c.id === s.servico_id) : undefined
             return (
               <div key={i} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                 <div className="flex-1 min-w-0">
@@ -74,8 +87,26 @@ export function DiagnosticResult({ analise, onRedo }: Props) {
                     <span className="text-xs px-2 py-0.5 rounded-full border font-medium" style={{ background: cfg.bg, color: cfg.color, borderColor: cfg.border }}>
                       {cfg.label}
                     </span>
+                    {catalogItem && (
+                      <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(0,137,172,0.15)', color: '#6bd0e7', border: '1px solid rgba(0,137,172,0.25)' }}>
+                        {formatCurrency(catalogItem.valor)}
+                      </span>
+                    )}
+                    {catalogItem && (
+                      <span className="text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <Tag className="w-2.5 h-2.5" />
+                        {CATEGORIA_LABELS[catalogItem.categoria] ?? catalogItem.categoria}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground">{s.justificativa}</p>
+                  {catalogItem?.descricao ? (
+                    <p className="text-xs text-muted-foreground mb-1">{catalogItem.descricao}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">{s.justificativa}</p>
+                  )}
+                  {catalogItem && (
+                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.30)' }}>{s.justificativa}</p>
+                  )}
                 </div>
               </div>
             )

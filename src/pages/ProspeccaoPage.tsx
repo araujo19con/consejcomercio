@@ -48,16 +48,18 @@ function calcScore(lead: Lead): number {
 
 function calcServiceScore(lead: Lead, servico: ServicoConfig): number {
   let s = calcScore(lead)
+  // ICP match from catalog fields
+  if (servico.segmentos_icp?.length && servico.segmentos_icp.includes(lead.segmento)) s += 15
+  if (servico.investimento_icp?.length && lead.investimento_estimado &&
+      servico.investimento_icp.includes(lead.investimento_estimado)) s += 12
+  // Complexity bonus/penalty
   if (servico.tipo === 'complexa') {
-    if (lead.investimento_estimado === 'acima_10k') s += 20
-    else if (lead.investimento_estimado === '5k_10k') s += 10
-    else s -= 5
-    if (['startup', 'empresa_senior', 'empresa_gestao'].includes(lead.segmento)) s += 10
-  } else {
-    if (['500_2k', '2k_5k'].includes(lead.investimento_estimado ?? '')) s += 12
-    if (['empresa_junior', 'escritorio_arquitetura', 'empresa_design'].includes(lead.segmento)) s += 10
+    if (lead.investimento_estimado === 'acima_10k') s += 10
+    else if (!['5k_10k', 'acima_10k'].includes(lead.investimento_estimado ?? '')) s -= 5
   }
+  // Explicit interest match by service ID or name
   if (lead.servicos_interesse?.some(si =>
+    si === servico.id ||
     si.toLowerCase().includes(servico.nome.toLowerCase()) ||
     servico.nome.toLowerCase().includes(si.toLowerCase())
   )) s += 25
@@ -188,14 +190,18 @@ function LeadRow({ lead, score, servico }: { lead: Lead; score: number; servico?
 
 // ─── ServiceCard ──────────────────────────────────────────────────────────────
 
+const SEGMENT_LABELS: Record<string, string> = {
+  empresa_junior: 'EJ', empresa_senior: 'Empresa Sênior', startup: 'Startup',
+  escritorio_arquitetura: 'Arq.', empresa_design: 'Design', empresa_gestao: 'Gestão', outro: 'Outro',
+}
+
 function getServiceICP(servico: ServicoConfig): string {
-  const n = servico.nome.toLowerCase()
-  if (n.includes('marca') || n.includes('brand')) return 'Startups, e-commerce, empresas com produto ou identidade visual única'
-  if (n.includes('trabalhist') || n.includes('clt')) return 'Empresas com funcionários CLT, médias empresas em crescimento'
-  if (n.includes('contrato') || n.includes('societár')) return 'Empresas em formalização, expansão ou com parceiros'
-  if (n.includes('consultoria') || n.includes('empresarial')) return 'Empresas juniores, startups e negócios em fase de crescimento'
-  if (n.includes('inventário') || n.includes('herança')) return 'Pessoas físicas com processos de sucessão familiar'
-  if (n.includes('assessoria')) return 'Clientes recorrentes buscando suporte jurídico preventivo'
+  // Prefer catalog description if available
+  if (servico.descricao) return servico.descricao
+  // Fallback: build from segmentos_icp
+  if (servico.segmentos_icp?.length) {
+    return servico.segmentos_icp.map(s => SEGMENT_LABELS[s] ?? s).join(', ')
+  }
   if (servico.tipo === 'complexa') return 'Startups e empresas sênior com demandas recorrentes e ticket elevado'
   return 'Pequenas empresas e EJs com necessidades jurídicas pontuais'
 }
@@ -230,7 +236,7 @@ function ServiceCard({ servico, leads }: { servico: ServicoConfig; leads: Lead[]
             </span>
             <span className="text-xs text-muted-foreground">{formatCurrency(servico.valor)}</span>
           </div>
-          <p className="text-xs text-fg4 truncate">ICP: {icp}</p>
+          <p className="text-xs text-fg4 truncate" title={icp}>{icp}</p>
         </div>
         <div className="shrink-0 text-right">
           <p className="text-2xl font-bold text-foreground">{scored.length}</p>
@@ -417,7 +423,7 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
               <Label>Serviço de interesse</Label>
               <select value={servicoNome} onChange={e => setServicoNome(e.target.value)} className="form-control-sm w-full">
                 <option value="">Não definido</option>
-                {(config?.servicos ?? []).map(s => <option key={s.id} value={s.nome}>{s.nome}</option>)}
+                {(config?.servicos ?? []).filter(s => s.ativo !== false).map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
               </select>
             </div>
           </div>

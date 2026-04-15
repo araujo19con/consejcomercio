@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { useSaveDiagnostico } from '@/hooks/useDiagnostico'
 import { useAnalyzeDiagnostico } from '@/hooks/useAnalyzeDiagnostico'
+import { useConfiguracoes } from '@/hooks/useConfiguracoes'
 import { DiagnosticResult } from './DiagnosticResult'
 import type { Diagnostico } from '@/types'
 import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react'
@@ -21,6 +22,7 @@ type Props = {
 export function DiagnosticForm({ leadId, existingAnswers }: Props) {
   const save = useSaveDiagnostico()
   const analyze = useAnalyzeDiagnostico()
+  const { data: config } = useConfiguracoes()
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<Partial<Diagnostico>>(existingAnswers || {})
   const [phase, setPhase] = useState<Phase>('form')
@@ -72,6 +74,7 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
     return (
       <DiagnosticResult
         analise={analyze.data}
+        catalogo={config?.servicos ?? []}
         onRedo={() => {
           setPhase('form')
           setStep(0)

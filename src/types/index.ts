@@ -181,11 +181,26 @@ export interface Oportunidade {
   cliente?: Cliente
 }
 
+export type ServicoCategoria = 'societario' | 'contratual' | 'digital' | 'trabalhista' | 'pi' | 'outro'
+
 export interface ServicoConfig {
-  id: string
+  id: string                    // slug único: 'registro_marca', 'assessoria_societaria'
   nome: string
+  descricao: string             // descrição de uma linha do serviço
+  categoria: ServicoCategoria
   tipo: 'simples' | 'complexa'
   valor: number
+  area_direito?: string         // mapeia para SERVICE_AREAS.value
+
+  // ICP — Ideal Client Profile
+  segmentos_icp: string[]       // SEGMENTS.value[] que mais se encaixam
+  investimento_icp: string[]    // BUDGET_OPTIONS.value[] compatíveis
+
+  // Cross-sell / Up-sell
+  cross_sells: string[]         // IDs de ServicoConfig que combinam bem
+  up_sells: string[]            // IDs de ServicoConfig que são upgrades
+
+  ativo: boolean
 }
 
 export interface MetasConfig {

@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { STAGE_COLORS, LEAD_SOURCE_LABELS, SEGMENTS, PIPELINE_STAGES, ESTADOS_BR } from '@/lib/constants'
 import { usePerfis } from '@/hooks/usePerfis'
+import { useConfiguracoes } from '@/hooks/useConfiguracoes'
 import { formatDate, getUFFromPhone } from '@/lib/utils'
 import { ArrowLeft, Stethoscope } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -24,6 +25,7 @@ export function LeadDetailPage() {
   const { data: leads } = useLeads()
   const updateLead = useUpdateLead()
   const { data: perfis = [] } = usePerfis()
+  const { data: config } = useConfiguracoes()
   const lead = leads?.find(l => l.id === id)
 
   const [editing, setEditing] = useState<Partial<Lead>>({})
@@ -145,6 +147,37 @@ export function LeadDetailPage() {
                   <Input type="datetime-local" value={editing.data_diagnostico ? editing.data_diagnostico.slice(0, 16) : ''} onChange={e => setEditing(p => ({ ...p, data_diagnostico: e.target.value }))} />
                 </div>
               </div>
+              {/* Serviços de interesse — multi-select do catálogo */}
+              {(config?.servicos ?? []).filter(s => s.ativo !== false).length > 0 && (
+                <div className="space-y-1.5">
+                  <Label>Serviços de Interesse</Label>
+                  <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                    {(config?.servicos ?? []).filter(s => s.ativo !== false).map(s => {
+                      const selected = (editing.servicos_interesse ?? []).includes(s.id)
+                      return (
+                        <label key={s.id} className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => {
+                              const current = editing.servicos_interesse ?? []
+                              setEditing(p => ({
+                                ...p,
+                                servicos_interesse: selected
+                                  ? current.filter(v => v !== s.id)
+                                  : [...current, s.id],
+                              }))
+                            }}
+                            className="rounded accent-primary"
+                          />
+                          <span className="text-xs text-fg2 group-hover:text-foreground transition-colors">{s.nome}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-1.5">
                 <Label>Observações</Label>
                 <Textarea value={editing.notas || ''} onChange={e => setEditing(p => ({ ...p, notas: e.target.value }))} rows={3} />
