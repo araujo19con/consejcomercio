@@ -157,9 +157,9 @@ export function NovaReuniaoModal({ open, onClose, reuniao, prefill }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-card rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 sticky top-0 z-10 bg-card border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+        <div className="flex items-center justify-between px-6 py-4 sticky top-0 z-10 bg-card border-b" style={{ borderColor: 'var(--alpha-bg-md)' }}>
           <h2 className="text-lg font-semibold text-foreground">{isEdit ? 'Editar Reunião' : 'Nova Reunião'}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-fg4">
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[var(--alpha-bg-xs)] text-fg4">
             <X className="w-5 h-5" />
           </button>
         </div>

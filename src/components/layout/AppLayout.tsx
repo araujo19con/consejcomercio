@@ -30,7 +30,7 @@ export function AppLayout() {
         <img src="/logo.png" alt="CONSEJ" className="h-12 w-auto opacity-90" />
         <div
           className="w-6 h-6 rounded-full border-2 animate-spin"
-          style={{ borderColor: 'rgba(107,208,231,0.2)', borderTopColor: 'rgba(107,208,231,0.85)' }}
+          style={{ borderColor: 'rgba(107,208,231,0.2)', borderTopColor: 'var(--cyan-hi)' }}
         />
       </div>
     )

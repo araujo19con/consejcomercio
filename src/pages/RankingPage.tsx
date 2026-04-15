@@ -85,9 +85,9 @@ function Podium({ top3 }: { top3: RankingEntry[] }) {
               style={{
                 background: isFirst
                   ? 'linear-gradient(180deg,rgba(0,137,172,0.35) 0%,rgba(0,137,172,0.12) 100%)'
-                  : 'rgba(255,255,255,0.04)',
+                  : 'var(--alpha-bg-xs)',
                 border: '1px solid',
-                borderColor: isFirst ? 'rgba(0,137,172,0.40)' : 'rgba(255,255,255,0.08)',
+                borderColor: isFirst ? 'rgba(0,137,172,0.40)' : 'var(--alpha-bg-md)',
               }}
             >
               {medals[i]}
@@ -130,7 +130,7 @@ export function RankingPage() {
           <p className="text-sm text-muted-foreground mt-0.5">Pontuação por ações e resultados no pipeline</p>
         </div>
         {/* Toggle */}
-        <div className="flex items-center gap-1 bg-[rgba(255,255,255,0.04)] p-1 rounded-lg shrink-0">
+        <div className="flex items-center gap-1 bg-[var(--alpha-bg-xs)] p-1 rounded-lg shrink-0">
           {(['mes', 'total'] as ViewMode[]).map(v => (
             <button
               key={v}
@@ -221,7 +221,7 @@ export function RankingPage() {
               <span className="text-right">Reun.</span>
               <span className="text-right">Pontos {view === 'mes' ? '(mês)' : '(total)'}</span>
             </div>
-            <div className="divide-y divide-[rgba(255,255,255,0.04)]">
+            <div className="divide-y divide-[var(--alpha-bg-xs)]">
               {sorted.map((entry, i) => {
                 const pts = view === 'mes' ? entry.pontos_mes : entry.pontos
                 const isTop = i === 0 && pts > 0
@@ -229,7 +229,7 @@ export function RankingPage() {
                   <div
                     key={entry.perfil.id}
                     className={cn(
-                      'grid items-center px-5 py-3 transition-colors hover:bg-[rgba(255,255,255,0.02)]',
+                      'grid items-center px-5 py-3 transition-colors hover:bg-[var(--alpha-bg-xs)]',
                       isTop && 'bg-[rgba(0,137,172,0.06)]'
                     )}
                     style={{ gridTemplateColumns: '28px 1fr 60px 60px 60px 60px 70px' }}
@@ -288,7 +288,7 @@ export function RankingPage() {
                       'rounded-xl p-3 border transition-colors',
                       holders.length > 0
                         ? 'border-[rgba(0,137,172,0.30)] bg-[rgba(0,137,172,0.06)]'
-                        : 'border-[rgba(255,255,255,0.06)] opacity-40'
+                        : 'border-[var(--alpha-bg-sm)] opacity-40'
                     )}
                   >
                     <div className="flex items-center gap-2 mb-1">

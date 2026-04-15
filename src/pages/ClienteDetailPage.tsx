@@ -23,7 +23,7 @@ import type { Cliente } from '@/types'
 
 const CONTRACT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
   ativo:     { label: 'Ativo',     color: 'text-emerald-400 bg-[rgba(16,185,129,0.12)] border-[rgba(16,185,129,0.25)]' },
-  encerrado: { label: 'Encerrado', color: 'text-muted-foreground bg-[rgba(255,255,255,0.04)]' },
+  encerrado: { label: 'Encerrado', color: 'text-muted-foreground bg-[var(--alpha-bg-xs)]' },
   suspenso:  { label: 'Suspenso',  color: 'text-amber-400 bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.25)]' },
 }
 

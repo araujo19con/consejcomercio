@@ -156,7 +156,7 @@ export function GlobalSearch() {
         onKeyDown={onResultKeydown}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: 'var(--alpha-bg-md)' }}>
           <Search className="w-4 h-4 text-fg4 shrink-0" />
           <input
             ref={inputRef}
@@ -165,7 +165,7 @@ export function GlobalSearch() {
             placeholder="Buscar leads, clientes, contratos, demandas…"
             className="flex-1 text-sm text-foreground placeholder-slate-400 outline-none bg-transparent"
           />
-          <kbd className="text-xs text-fg4 bg-[rgba(255,255,255,0.04)] px-1.5 py-0.5 rounded font-mono">Esc</kbd>
+          <kbd className="text-xs text-fg4 bg-[var(--alpha-bg-xs)] px-1.5 py-0.5 rounded font-mono">Esc</kbd>
         </div>
 
         {/* Results */}
@@ -188,7 +188,7 @@ export function GlobalSearch() {
             const Icon = meta.icon
             return (
               <div key={category}>
-                <div className="flex items-center gap-2 px-4 py-2 bg-background border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                <div className="flex items-center gap-2 px-4 py-2 bg-background border-b" style={{ borderColor: 'var(--alpha-bg-sm)' }}>
                   <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: meta.bgStyle }}>
                     <Icon className={cn('w-3 h-3', meta.color)} />
                   </div>

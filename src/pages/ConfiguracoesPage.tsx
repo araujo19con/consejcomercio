@@ -156,7 +156,7 @@ function EditServicoModal({ servico, allServicos, open, onClose, onSave }: EditM
           {/* Segmentos ICP */}
           <div className="space-y-2">
             <Label>Segmentos Ideais (ICP)</Label>
-            <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}>
               {SEGMENTS.map(s => (
                 <label key={s.value} className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -341,7 +341,7 @@ export function ConfiguracoesPage() {
 
             {isLoading ? (
               <div className="space-y-2">
-                {[1, 2, 3].map(i => <div key={i} className="h-12 bg-[rgba(255,255,255,0.04)] rounded-lg animate-pulse" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-12 bg-[var(--alpha-bg-xs)] rounded-lg animate-pulse" />)}
               </div>
             ) : (
               <div className="space-y-1.5">
@@ -349,7 +349,7 @@ export function ConfiguracoesPage() {
                   <div
                     key={s.id}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', opacity: s.ativo ? 1 : 0.5 }}
+                    style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)', opacity: s.ativo ? 1 : 0.5 }}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -366,7 +366,7 @@ export function ConfiguracoesPage() {
                     <span className="text-sm font-semibold text-fg2 shrink-0">{formatCurrency(s.valor)}</span>
                     <button
                       onClick={() => openEdit(s)}
-                      className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.08)] text-fg4 hover:text-fg2 transition-colors shrink-0"
+                      className="p-1.5 rounded-lg hover:bg-[var(--alpha-bg-md)] text-fg4 hover:text-fg2 transition-colors shrink-0"
                       title="Editar serviço"
                     >
                       <Pencil className="w-3.5 h-3.5" />

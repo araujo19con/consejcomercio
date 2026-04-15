@@ -119,9 +119,9 @@ export function DashboardPage() {
               <button
                 onClick={() => navigate('/leads')}
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.85)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--alpha-bg-md)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--alpha-bg-xs)')}
               >
                 <Flame className="w-3.5 h-3.5 text-orange-400" />
                 <span className="font-medium">{stagnantLeads.length} lead{stagnantLeads.length > 1 ? 's' : ''} parado{stagnantLeads.length > 1 ? 's' : ''}</span>
@@ -132,9 +132,9 @@ export function DashboardPage() {
               <button
                 onClick={() => navigate('/contratos')}
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.85)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--alpha-bg-md)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--alpha-bg-xs)')}
               >
                 <AlertCircle className="w-3.5 h-3.5 text-red-400" />
                 <span className="font-medium">{renewalsUrgent.length} contrato{renewalsUrgent.length > 1 ? 's' : ''} vence{renewalsUrgent.length > 1 ? 'm' : ''} em 15d</span>
@@ -145,9 +145,9 @@ export function DashboardPage() {
               <button
                 onClick={() => navigate('/indicacoes')}
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.85)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--alpha-bg-md)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--alpha-bg-xs)')}
               >
                 <Gift className="w-3.5 h-3.5 text-amber-400" />
                 <span className="font-medium">{recompensasPendentes} recompensa{recompensasPendentes > 1 ? 's' : ''} pendente{recompensasPendentes > 1 ? 's' : ''}</span>
@@ -158,9 +158,9 @@ export function DashboardPage() {
               <button
                 onClick={() => navigate('/clientes')}
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.85)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--alpha-bg-md)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--alpha-bg-xs)')}
               >
                 <RefreshCw className="w-3.5 h-3.5 text-violet-400" />
                 <span className="font-medium">{postConsultoriaUpsell.length} cliente{postConsultoriaUpsell.length > 1 ? 's' : ''} pós-consultoria para upsell</span>
@@ -174,7 +174,7 @@ export function DashboardPage() {
       {/* ── North Star ── */}
       <div className="rounded-2xl px-5 py-4 flex items-center justify-between gap-4 flex-wrap" style={{ background: 'linear-gradient(135deg, rgba(0,137,172,0.12) 0%, rgba(107,208,231,0.06) 100%)', border: '1px solid rgba(0,137,172,0.25)' }}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(107,208,231,0.60)' }}>North Star · Este Mês</p>
+          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--cyan-mid)' }}>North Star · Este Mês</p>
           <p className="text-3xl font-bold mt-1" style={{ color: 'rgba(107,208,231,0.95)' }}>{wonThisMonth}</p>
           <p className="text-sm mt-0.5" style={{ color: 'rgba(150,175,195,0.70)' }}>
             {wonThisMonth === 0
@@ -189,12 +189,12 @@ export function DashboardPage() {
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right">
-            <p className="text-xs text-[rgba(107,208,231,0.50)] mb-0.5">MRR ativo</p>
-            <p className="text-lg font-bold" style={{ color: 'rgba(107,208,231,0.85)' }}>{formatCurrency(mrr)}</p>
+            <p className="text-xs text-[var(--cyan-lo)] mb-0.5">MRR ativo</p>
+            <p className="text-lg font-bold" style={{ color: 'var(--cyan-hi)' }}>{formatCurrency(mrr)}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-[rgba(107,208,231,0.50)] mb-0.5">Tx. Conversão</p>
-            <p className="text-lg font-bold" style={{ color: 'rgba(107,208,231,0.85)' }}>{convRate}%</p>
+            <p className="text-xs text-[var(--cyan-lo)] mb-0.5">Tx. Conversão</p>
+            <p className="text-lg font-bold" style={{ color: 'var(--cyan-hi)' }}>{convRate}%</p>
           </div>
         </div>
       </div>
@@ -210,12 +210,12 @@ export function DashboardPage() {
           <Card key={label}>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm" style={{ color: 'rgba(130,150,170,0.65)' }}>{label}</p>
+                <p className="text-sm" style={{ color: 'var(--text-soft-a)' }}>{label}</p>
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: iconBg }}>
                   <Icon className="w-4 h-4" style={{ color: iconColor }} />
                 </div>
               </div>
-              <p className="text-2xl font-bold" style={{ color: 'rgba(230,235,240,0.95)' }}>{value}</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-strong-a)' }}>{value}</p>
             </CardContent>
           </Card>
         ))}
@@ -346,7 +346,7 @@ export function DashboardPage() {
               <BarChart data={funnelData} layout="vertical">
                 <XAxis type="number" tick={{ fontSize: 10, fill: 'rgba(150,165,180,0.60)' }} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: 'rgba(150,165,180,0.60)' }} width={90} />
-                <Tooltip contentStyle={{ background: '#0d1929', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.90)', borderRadius: 8 }} />
+                <Tooltip contentStyle={{ background: '#0d1929', border: '1px solid var(--alpha-border-md)', color: 'rgba(220,230,240,0.90)', borderRadius: 8 }} />
                 <Bar dataKey="value" fill="#0089ac" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -363,7 +363,7 @@ export function DashboardPage() {
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ background: '#0d1929', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(220,230,240,0.90)', borderRadius: 8 }} />
+                <Tooltip contentStyle={{ background: '#0d1929', border: '1px solid var(--alpha-border-md)', color: 'rgba(220,230,240,0.90)', borderRadius: 8 }} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -389,7 +389,7 @@ export function DashboardPage() {
               {stagnantLeads.slice(0, 6).map(l => {
                 const days = differenceInDays(new Date(), new Date(l.updated_at))
                 const stageLabel = PIPELINE_STAGES.find(s => s.id === l.status)?.label ?? l.status
-                const stageCss = STAGE_COLORS[l.status] ?? 'bg-[rgba(255,255,255,0.04)] text-muted-foreground'
+                const stageCss = STAGE_COLORS[l.status] ?? 'bg-[var(--alpha-bg-xs)] text-muted-foreground'
                 return (
                   <div
                     key={l.id}

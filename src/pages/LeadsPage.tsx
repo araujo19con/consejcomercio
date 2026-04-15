@@ -25,8 +25,8 @@ export function LeadsPage() {
   const hasFilter = search || origemFilter !== 'todos' || segmentoFilter !== 'todos'
 
   const selectStyle = {
-    background: 'rgba(255,255,255,0.04)',
-    borderColor: 'rgba(255,255,255,0.10)',
+    background: 'var(--alpha-bg-xs)',
+    borderColor: 'var(--alpha-border-md)',
     color: 'rgba(150,165,180,0.85)',
   }
 
@@ -90,8 +90,8 @@ export function LeadsPage() {
           {hasFilter && (
             <button
               onClick={() => { setSearch(''); setOrigemFilter('todos'); setSegmentoFilter('todos') }}
-              className="h-8 px-2.5 flex items-center gap-1 text-xs rounded-lg border transition-colors text-muted-foreground hover:text-white hover:border-[rgba(255,255,255,0.15)]"
-              style={{ borderColor: 'rgba(255,255,255,0.08)' }}
+              className="h-8 px-2.5 flex items-center gap-1 text-xs rounded-lg border transition-colors text-muted-foreground hover:text-white hover:border-[var(--alpha-bg-lg)]"
+              style={{ borderColor: 'var(--alpha-bg-md)' }}
             >
               <X className="w-3 h-3" />Limpar filtros
             </button>

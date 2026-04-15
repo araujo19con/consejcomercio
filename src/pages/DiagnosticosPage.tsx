@@ -19,7 +19,7 @@ export function DiagnosticosPage() {
 
       {pendentes.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'rgba(251,191,36,0.85)' }}>
+          <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--amber-hi)' }}>
             <Clock className="w-4 h-4" /> Pendentes ({pendentes.length})
           </h2>
           <div className="space-y-2">
@@ -27,9 +27,9 @@ export function DiagnosticosPage() {
               <Card key={lead.id} style={{ borderColor: 'rgba(245,158,11,0.30)', background: 'rgba(245,158,11,0.04)' }}>
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
-                    <p className="font-semibold" style={{ color: 'rgba(230,235,240,0.92)' }}>{lead.nome} — {lead.empresa}</p>
+                    <p className="font-semibold" style={{ color: 'var(--text-strong-a)' }}>{lead.nome} — {lead.empresa}</p>
                     {lead.data_diagnostico && (
-                      <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'rgba(251,191,36,0.75)' }}>
+                      <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'var(--amber-mid)' }}>
                         <Calendar className="w-3 h-3" /> Agendado para {formatDate(lead.data_diagnostico)}
                       </p>
                     )}
@@ -44,7 +44,7 @@ export function DiagnosticosPage() {
         </div>
       )}
 
-      <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'rgba(52,211,153,0.85)' }}>
+      <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--emerald-hi)' }}>
         <CheckCircle2 className="w-4 h-4" /> Concluídos ({withDiagnostico.length})
       </h2>
       {isLoading ? <div className="text-center text-muted-foreground py-8">Carregando...</div> : (

@@ -60,7 +60,7 @@ function SuggestionCard({
 }) {
   const date = tsToDate(suggestion.message.ts)
   return (
-    <div className="rounded-xl p-4 space-y-2" style={{ background: 'rgba(255,255,255,0.04)', borderWidth: 2, borderStyle: 'solid', borderColor: confirmed ? 'rgba(16,185,129,0.30)' : 'rgba(245,158,11,0.35)', opacity: confirmed ? 0.75 : 1 }}>
+    <div className="rounded-xl p-4 space-y-2" style={{ background: 'var(--alpha-bg-xs)', borderWidth: 2, borderStyle: 'solid', borderColor: confirmed ? 'rgba(16,185,129,0.30)' : 'rgba(245,158,11,0.35)', opacity: confirmed ? 0.75 : 1 }}>
       <div className="flex items-start justify-between gap-2">
         <TypeBadge type={suggestion.type} />
         <div className="flex items-center gap-1.5">
@@ -237,15 +237,15 @@ function ChannelMessages({
               style={isActive && cfg
                 ? { background: cfg.bg, color: cfg.color, borderColor: `${cfg.color}44` }
                 : isActive
-                ? { background: 'rgba(255,255,255,0.12)', color: '#fff', borderColor: 'rgba(255,255,255,0.20)' }
-                : { background: 'transparent', color: 'rgba(150,165,180,0.70)', borderColor: 'rgba(255,255,255,0.07)' }
+                ? { background: 'var(--alpha-bg-lg)', color: '#fff', borderColor: 'var(--text-dim-a)' }
+                : { background: 'transparent', color: 'var(--text-soft-a)', borderColor: 'var(--alpha-border)' }
               }
             >
               {f.label}
             </button>
           )
         })}
-        <button onClick={() => refetch()} className="ml-auto p-1.5 rounded-md text-fg4 hover:text-muted-foreground hover:bg-[rgba(255,255,255,0.04)]">
+        <button onClick={() => refetch()} className="ml-auto p-1.5 rounded-md text-fg4 hover:text-muted-foreground hover:bg-[var(--alpha-bg-xs)]">
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -273,16 +273,16 @@ function ChannelAccordion({ channel, onMessages }: {
 }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+    <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--alpha-border)' }}>
       <button onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-card hover:bg-[rgba(255,255,255,0.05)] transition-colors text-left">
+        className="w-full flex items-center gap-3 px-4 py-3 bg-card hover:bg-[var(--alpha-bg-sm)] transition-colors text-left">
         {channel.is_private ? <Lock className="w-4 h-4 text-fg4 shrink-0" /> : <Hash className="w-4 h-4 text-fg4 shrink-0" />}
         <span className="font-medium text-foreground flex-1">{channel.name}</span>
         {channel.num_members > 0 && <span className="text-xs text-fg4">{channel.num_members} membros</span>}
         <ChevronDown className={`w-4 h-4 text-fg4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="px-4 pb-4 bg-background border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="px-4 pb-4 bg-background border-t" style={{ borderColor: 'var(--alpha-bg-sm)' }}>
           <ChannelMessages
             channelId={channel.id}
             onMessagesLoaded={msgs => onMessages(channel.id, channel.name, msgs)}
@@ -409,7 +409,7 @@ export function SlackPage() {
           <p className="text-muted-foreground text-sm mt-0.5">Andamentos de reuniões e prospecção</p>
         </div>
         <button onClick={() => setShowSelector(v => !v)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-fg2 hover:bg-[rgba(255,255,255,0.05)]" style={{ border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.04)' }}>
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-fg2 hover:bg-[var(--alpha-bg-sm)]" style={{ border: '1px solid var(--alpha-border-md)', background: 'var(--alpha-bg-xs)' }}>
           <Settings className="w-4 h-4" />Gerenciar canais
         </button>
       </div>
@@ -421,9 +421,9 @@ export function SlackPage() {
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#fbbf24' }} />
             <div className="text-sm">
               <p className="font-semibold" style={{ color: 'rgba(251,191,36,0.90)' }}>Slack não configurado</p>
-              <p className="mt-1" style={{ color: 'rgba(251,191,36,0.75)' }}>Adicione <code className="px-1 rounded" style={{ background: 'rgba(245,158,11,0.20)', color: '#fbbf24' }}>SLACK_BOT_TOKEN</code> em Vercel → Settings → Environment Variables.</p>
+              <p className="mt-1" style={{ color: 'var(--amber-mid)' }}>Adicione <code className="px-1 rounded" style={{ background: 'rgba(245,158,11,0.20)', color: '#fbbf24' }}>SLACK_BOT_TOKEN</code> em Vercel → Settings → Environment Variables.</p>
               <a href="https://vercel.com/dashboard" target="_blank" rel="noreferrer"
-                className="inline-flex items-center gap-1 mt-2 underline" style={{ color: 'rgba(251,191,36,0.75)' }}>
+                className="inline-flex items-center gap-1 mt-2 underline" style={{ color: 'var(--amber-mid)' }}>
                 Abrir Vercel <ExternalLink className="w-3 h-3" />
               </a>
             </div>

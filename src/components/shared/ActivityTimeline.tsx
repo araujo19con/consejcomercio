@@ -69,10 +69,10 @@ export function ActivityTimeline({ tabela, registroId }: Props) {
       <div className="space-y-3 py-4">
         {[1, 2, 3].map(i => (
           <div key={i} className="flex gap-3 animate-pulse">
-            <div className="w-2 h-2 rounded-full bg-[rgba(255,255,255,0.08)] mt-1.5 shrink-0" />
+            <div className="w-2 h-2 rounded-full bg-[var(--alpha-bg-md)] mt-1.5 shrink-0" />
             <div className="flex-1 space-y-1">
-              <div className="h-3 w-32 rounded bg-[rgba(255,255,255,0.05)]" />
-              <div className="h-2.5 w-48 rounded bg-[rgba(255,255,255,0.04)]" />
+              <div className="h-3 w-32 rounded bg-[var(--alpha-bg-sm)]" />
+              <div className="h-2.5 w-48 rounded bg-[var(--alpha-bg-xs)]" />
             </div>
           </div>
         ))}
@@ -91,7 +91,7 @@ export function ActivityTimeline({ tabela, registroId }: Props) {
   return (
     <div className="relative">
       {/* Vertical line */}
-      <div className="absolute left-[5px] top-2 bottom-2 w-px bg-[rgba(255,255,255,0.06)]" />
+      <div className="absolute left-[5px] top-2 bottom-2 w-px bg-[var(--alpha-bg-sm)]" />
 
       <div className="space-y-4 pl-5">
         {logs.map((log, idx) => {

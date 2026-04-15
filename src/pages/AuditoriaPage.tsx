@@ -36,7 +36,7 @@ export function AuditoriaPage() {
                       className="text-xs px-2 py-0.5 rounded-full font-medium"
                       style={ACAO_COLORS[log.acao]
                         ? { background: ACAO_COLORS[log.acao].bg, color: ACAO_COLORS[log.acao].color }
-                        : { background: 'rgba(255,255,255,0.04)', color: 'rgba(150,165,180,0.70)' }}
+                        : { background: 'var(--alpha-bg-xs)', color: 'var(--text-soft-a)' }}
                     >
                       {log.acao}
                     </span>

@@ -100,7 +100,7 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
                     ? 'bg-indigo-600 text-white'
                     : i < step
                     ? 'bg-indigo-200 text-indigo-700'
-                    : 'bg-[rgba(255,255,255,0.04)] text-fg4'
+                    : 'bg-[var(--alpha-bg-xs)] text-fg4'
                 )}
                 title={s.title}
               >
@@ -131,7 +131,7 @@ export function DiagnosticForm({ leadId, existingAnswers }: Props) {
                       'w-full text-left px-3.5 py-2.5 rounded-lg border text-sm transition-colors',
                       answers[question.key] === option.value
                         ? 'bg-[rgba(0,137,172,0.15)] border-primary text-[#6bd0e7] font-medium'
-                        : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.10)] text-fg2 hover:border-primary/40 hover:bg-primary/10'
+                        : 'bg-[var(--alpha-bg-xs)] border-[var(--alpha-border-md)] text-fg2 hover:border-primary/40 hover:bg-primary/10'
                     )}
                   >
                     {option.label}

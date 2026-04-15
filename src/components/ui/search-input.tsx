@@ -16,7 +16,7 @@ export function SearchInput({ value, onChange, placeholder = 'Buscar…', classN
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-8 pl-8 pr-7 w-full rounded-lg text-xs bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.10)] text-fg2 placeholder:text-muted-foreground/60 outline-none focus:border-[rgba(0,137,172,0.50)] focus:ring-1 focus:ring-[rgba(0,137,172,0.30)] transition-colors"
+        className="h-8 pl-8 pr-7 w-full rounded-lg text-xs bg-[var(--alpha-bg-xs)] border border-[var(--alpha-border-md)] text-fg2 placeholder:text-muted-foreground/60 outline-none focus:border-[rgba(0,137,172,0.50)] focus:ring-1 focus:ring-[rgba(0,137,172,0.30)] transition-colors"
       />
       {value && (
         <button

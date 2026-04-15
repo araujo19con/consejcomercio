@@ -112,7 +112,7 @@ export function ConvertToClientModal({ lead, open, onClose, targetStage = 'ganho
                   className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
                     areas.includes(a.value)
                       ? 'text-white border-primary bg-primary'
-                      : 'bg-[rgba(255,255,255,0.04)] text-muted-foreground border-[rgba(255,255,255,0.10)] hover:border-primary/50'
+                      : 'bg-[var(--alpha-bg-xs)] text-muted-foreground border-[var(--alpha-border-md)] hover:border-primary/50'
                   }`}
                 >
                   {a.label}

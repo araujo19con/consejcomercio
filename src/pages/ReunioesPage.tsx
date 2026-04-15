@@ -93,8 +93,8 @@ function ReuniaoCard({ reuniao, onStatusChange, onDelete, onEdit, perfilByEmail 
           </div>
         )}
       </div>
-      <div className="flex gap-1.5 mt-2 pt-2 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <button onClick={() => onEdit(reuniao)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-muted-foreground hover:bg-[rgba(255,255,255,0.04)]">
+      <div className="flex gap-1.5 mt-2 pt-2 flex-wrap" style={{ borderTop: '1px solid var(--alpha-bg-sm)' }}>
+        <button onClick={() => onEdit(reuniao)} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs text-muted-foreground hover:bg-[var(--alpha-bg-xs)]">
           <Pencil className="w-3 h-3" />Editar
         </button>
         {reuniao.status === 'agendada' && (<>
@@ -230,7 +230,7 @@ export function ReunioesPage() {
             .map(r => {
               const dt = new Date(r.data_hora)
               return (
-                <div key={r.id} className="flex items-center gap-4 bg-card rounded-xl px-4 py-3" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div key={r.id} className="flex items-center gap-4 bg-card rounded-xl px-4 py-3" style={{ border: '1px solid var(--alpha-border)' }}>
                   <div className="text-center w-10 shrink-0">
                     <div className="text-xs text-fg4">{DIAS[dt.getDay()]}</div>
                     <div className="text-lg font-bold text-foreground">{dt.getDate()}</div>

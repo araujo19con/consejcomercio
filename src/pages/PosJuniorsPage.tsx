@@ -281,7 +281,7 @@ function PosJuniorForm({
           'flex items-center justify-between rounded-lg px-4 py-3 cursor-pointer select-none transition-colors',
           form.disponivel_mentoria
             ? 'bg-emerald-500/10 border border-emerald-500/20'
-            : 'bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.07)]'
+            : 'bg-[var(--alpha-bg-xs)] border border-[var(--alpha-border)]'
         )}
         onClick={() => onChange({ disponivel_mentoria: !form.disponivel_mentoria })}
       >
@@ -309,7 +309,7 @@ function PosJuniorForm({
         <div
           className={cn(
             'relative w-9 h-5 rounded-full transition-colors',
-            form.disponivel_mentoria ? 'bg-emerald-500' : 'bg-[rgba(255,255,255,0.10)]'
+            form.disponivel_mentoria ? 'bg-emerald-500' : 'bg-[var(--alpha-border-md)]'
           )}
         >
           <span
@@ -341,16 +341,16 @@ function CardSkeleton() {
   return (
     <div
       className="rounded-xl p-4 animate-pulse"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+      style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}
     >
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.07)] shrink-0" />
+        <div className="w-10 h-10 rounded-full bg-[var(--alpha-border)] shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-[rgba(255,255,255,0.07)] rounded w-36" />
-          <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-52" />
+          <div className="h-4 bg-[var(--alpha-border)] rounded w-36" />
+          <div className="h-3 bg-[var(--alpha-bg-xs)] rounded w-52" />
         </div>
       </div>
-      <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-24 mt-2" />
+      <div className="h-3 bg-[var(--alpha-bg-xs)] rounded w-24 mt-2" />
     </div>
   )
 }
@@ -369,7 +369,7 @@ function StatCard({
   return (
     <div
       className="rounded-xl px-4 py-3 flex items-center gap-3"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+      style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}
     >
       <div
         className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
@@ -493,7 +493,7 @@ export function PosJuniorsPage() {
           />
         </div>
 
-        <div className="flex items-center gap-1 bg-[rgba(255,255,255,0.04)] p-1 rounded-lg flex-wrap">
+        <div className="flex items-center gap-1 bg-[var(--alpha-bg-xs)] p-1 rounded-lg flex-wrap">
           {[AREA_ALL, ...AREAS].map(a => {
             const isActive = areaFilter === a.value
             return (
@@ -524,7 +524,7 @@ export function PosJuniorsPage() {
         /* Empty state */
         <div
           className="rounded-xl flex flex-col items-center justify-center py-16 gap-4"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}
+          style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}
         >
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center"
@@ -569,12 +569,12 @@ export function PosJuniorsPage() {
                   'rounded-xl p-4 transition-all group relative',
                   isConfirming
                     ? 'border border-red-500/30'
-                    : 'border border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.12)]'
+                    : 'border border-[var(--alpha-border)] hover:border-[var(--alpha-bg-lg)]'
                 )}
                 style={{
                   background: isConfirming
                     ? 'rgba(239,68,68,0.05)'
-                    : 'rgba(255,255,255,0.03)',
+                    : 'var(--alpha-bg-xs)',
                 }}
               >
                 {/* ── Card top row ── */}
@@ -605,7 +605,7 @@ export function PosJuniorsPage() {
                           Disponível p/ mentoria
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full font-medium bg-[rgba(255,255,255,0.05)] text-muted-foreground">
+                        <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full font-medium bg-[var(--alpha-bg-sm)] text-muted-foreground">
                           <span className="w-1.5 h-1.5 rounded-full bg-[rgba(100,120,140,0.40)]" />
                           Não disponível
                         </span>
@@ -625,7 +625,7 @@ export function PosJuniorsPage() {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                       <button
                         onClick={() => openEdit(pj)}
-                        className="p-1.5 rounded-lg text-fg4 hover:bg-[rgba(255,255,255,0.07)] hover:text-[rgba(200,215,230,0.80)] transition-colors"
+                        className="p-1.5 rounded-lg text-fg4 hover:bg-[var(--alpha-border)] hover:text-[rgba(200,215,230,0.80)] transition-colors"
                         title="Editar"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -657,14 +657,14 @@ export function PosJuniorsPage() {
 
                   {/* Semestre de saída */}
                   {pj.semestre_saida && (
-                    <span className="text-xs text-muted-foreground bg-[rgba(255,255,255,0.04)] px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-muted-foreground bg-[var(--alpha-bg-xs)] px-2 py-0.5 rounded-full">
                       Saída: {pj.semestre_saida}
                     </span>
                   )}
 
                   {/* Semestres na CONSEJ */}
                   {pj.anos_consej != null && (
-                    <span className="text-xs text-muted-foreground bg-[rgba(255,255,255,0.04)] px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-muted-foreground bg-[var(--alpha-bg-xs)] px-2 py-0.5 rounded-full">
                       {pj.anos_consej} sem. na CONSEJ
                     </span>
                   )}
@@ -699,7 +699,7 @@ export function PosJuniorsPage() {
                     </button>
                     <button
                       onClick={e => { e.stopPropagation(); setDeleteConfirm(null) }}
-                      className="text-xs px-2.5 py-1 rounded-md border border-[rgba(255,255,255,0.12)] text-muted-foreground hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                      className="text-xs px-2.5 py-1 rounded-md border border-[var(--alpha-bg-lg)] text-muted-foreground hover:bg-[var(--alpha-bg-xs)] transition-colors"
                     >
                       Cancelar
                     </button>

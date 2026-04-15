@@ -19,13 +19,13 @@ function OportunidadesSkeleton() {
     <div className="flex gap-4 overflow-x-auto pb-4">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="w-72 shrink-0">
-          <div className="h-5 bg-[rgba(255,255,255,0.07)] rounded w-28 mb-3 animate-pulse" />
+          <div className="h-5 bg-[var(--alpha-border)] rounded w-28 mb-3 animate-pulse" />
           <div className="space-y-2">
             {Array.from({ length: i % 2 === 0 ? 2 : 1 }).map((_, j) => (
-              <div key={j} className="bg-card rounded-xl p-3 animate-pulse space-y-2" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-                <div className="h-4 bg-[rgba(255,255,255,0.04)] rounded w-20" />
-                <div className="h-4 bg-[rgba(255,255,255,0.07)] rounded w-full" />
-                <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-24" />
+              <div key={j} className="bg-card rounded-xl p-3 animate-pulse space-y-2" style={{ border: '1px solid var(--alpha-border)' }}>
+                <div className="h-4 bg-[var(--alpha-bg-xs)] rounded w-20" />
+                <div className="h-4 bg-[var(--alpha-border)] rounded w-full" />
+                <div className="h-3 bg-[var(--alpha-bg-xs)] rounded w-24" />
               </div>
             ))}
           </div>
@@ -144,7 +144,7 @@ function NovoContratoModal({ op, onClose }: { op: Oportunidade; onClose: () => v
                     'px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors',
                     areas.includes(a.value)
                       ? 'text-white border-primary bg-primary'
-                      : 'bg-[rgba(255,255,255,0.04)] text-muted-foreground border-[rgba(255,255,255,0.10)] hover:border-primary/50'
+                      : 'bg-[var(--alpha-bg-xs)] text-muted-foreground border-[var(--alpha-border-md)] hover:border-primary/50'
                   )}
                 >
                   {a.label}
@@ -305,7 +305,7 @@ export function OportunidadesPage() {
                     {totalValor > 0 && (
                       <span className="text-[10px] text-fg4 font-medium">{formatCurrency(totalValor)}</span>
                     )}
-                    <span className="text-xs font-bold text-[rgba(200,215,225,0.70)] rounded-full px-1.5 py-0.5" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}>{items.length}</span>
+                    <span className="text-xs font-bold text-[var(--text-mid-a)] rounded-full px-1.5 py-0.5" style={{ background: 'var(--alpha-bg-sm)', border: '1px solid var(--alpha-border-md)' }}>{items.length}</span>
                   </div>
                 </div>
                 <div className="space-y-2">

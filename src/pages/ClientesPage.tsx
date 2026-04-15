@@ -95,7 +95,7 @@ function getInitials(name: string) {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getStatusColor(status: string) {
-  return CLIENT_STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-[rgba(255,255,255,0.04)] text-muted-foreground'
+  return CLIENT_STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-[var(--alpha-bg-xs)] text-muted-foreground'
 }
 
 function getSegmentLabel(value: string) {
@@ -113,16 +113,16 @@ function getNextExpiry(contratos: Contrato[] | undefined): string | null {
 
 function ClienteCardSkeleton() {
   return (
-    <div className="bg-card rounded-xl p-4 animate-pulse" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+    <div className="bg-card rounded-xl p-4 animate-pulse" style={{ border: '1px solid var(--alpha-border)' }}>
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.07)] shrink-0" />
+        <div className="w-10 h-10 rounded-full bg-[var(--alpha-border)] shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-[rgba(255,255,255,0.07)] rounded w-36" />
-          <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-52" />
+          <div className="h-4 bg-[var(--alpha-border)] rounded w-36" />
+          <div className="h-3 bg-[var(--alpha-bg-xs)] rounded w-52" />
         </div>
         <div className="space-y-1.5 text-right">
-          <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-20 ml-auto" />
-          <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-16 ml-auto" />
+          <div className="h-3 bg-[var(--alpha-bg-xs)] rounded w-20 ml-auto" />
+          <div className="h-3 bg-[var(--alpha-bg-xs)] rounded w-16 ml-auto" />
         </div>
       </div>
     </div>
@@ -143,11 +143,11 @@ const STATUS_TABS = [
 type HealthFilter = 'todos' | 'green' | 'yellow' | 'red' | 'gray'
 
 const HEALTH_FILTER_TABS: { value: HealthFilter; label: string; dot: string; text: string }[] = [
-  { value: 'todos',  label: 'Todos',           dot: '',               text: 'rgba(130,150,170,0.65)' },
+  { value: 'todos',  label: 'Todos',           dot: '',               text: 'var(--text-soft-a)' },
   { value: 'green',  label: 'Saudável',         dot: '#10b981',        text: '#34d399' },
   { value: 'yellow', label: 'Atenção',          dot: '#f59e0b',        text: '#fbbf24' },
   { value: 'red',    label: 'Crítico',          dot: '#ef4444',        text: '#f87171' },
-  { value: 'gray',   label: 'Sem contrato',     dot: '#64748b',        text: 'rgba(130,150,170,0.65)' },
+  { value: 'gray',   label: 'Sem contrato',     dot: '#64748b',        text: 'var(--text-soft-a)' },
 ]
 
 // ─── Sort options ─────────────────────────────────────────────────────────────
@@ -348,7 +348,7 @@ export function ClientesPage() {
           </div>
 
           {/* Status pill tabs */}
-          <div className="flex items-center gap-1 bg-[rgba(255,255,255,0.04)] p-1 rounded-lg flex-wrap">
+          <div className="flex items-center gap-1 bg-[var(--alpha-bg-xs)] p-1 rounded-lg flex-wrap">
             {STATUS_TABS.map(tab => {
               const count = tab.value === 'todos'
                 ? (clientes?.length ?? 0)
@@ -366,7 +366,7 @@ export function ClientesPage() {
                   {tab.label}
                   <span className={cn(
                     'text-[10px] px-1.5 py-0.5 rounded-full font-semibold tabular-nums',
-                    isActive ? 'text-white' : 'bg-[rgba(255,255,255,0.07)] text-muted-foreground'
+                    isActive ? 'text-white' : 'bg-[var(--alpha-border)] text-muted-foreground'
                   )} style={isActive ? { backgroundColor: '#0089ac' } : {}}>
                     {count}
                   </span>
@@ -392,7 +392,7 @@ export function ClientesPage() {
                 className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 border"
                 style={isActive
                   ? { backgroundColor: `${accentColor}22`, borderColor: `${accentColor}55`, color: accentColor }
-                  : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }
+                  : { backgroundColor: 'transparent', borderColor: 'var(--alpha-bg-md)', color: 'var(--text-soft-a)' }
                 }
               >
                 {tab.label}
@@ -419,7 +419,7 @@ export function ClientesPage() {
                   className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 border"
                   style={isActive
                     ? { backgroundColor: `${tab.dot}22`, borderColor: `${tab.dot}55`, color: tab.text }
-                    : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }
+                    : { backgroundColor: 'transparent', borderColor: 'var(--alpha-bg-md)', color: 'var(--text-soft-a)' }
                   }
                 >
                   {tab.value !== 'todos' && (
@@ -437,7 +437,7 @@ export function ClientesPage() {
             value={segmentoFilter}
             onChange={e => setSegmentoFilter(e.target.value)}
             className="h-7 px-2.5 text-xs rounded-lg border focus:outline-none focus:ring-1 focus:ring-[rgba(0,137,172,0.40)]"
-            style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(150,165,180,0.80)' }}
+            style={{ background: 'var(--alpha-bg-xs)', borderColor: 'var(--alpha-border-md)', color: 'var(--text-soft-a)' }}
           >
             <option value="todos">Todos os segmentos</option>
             {SEGMENTS.map(s => {
@@ -453,7 +453,7 @@ export function ClientesPage() {
               value={sortBy}
               onChange={e => setSortBy(e.target.value as ClienteSort)}
               className="h-7 px-2.5 text-xs rounded-lg border focus:outline-none focus:ring-1 focus:ring-[rgba(0,137,172,0.40)]"
-              style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(150,165,180,0.80)' }}
+              style={{ background: 'var(--alpha-bg-xs)', borderColor: 'var(--alpha-border-md)', color: 'var(--text-soft-a)' }}
             >
               {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -580,7 +580,7 @@ export function ClientesPage() {
                   ? { border: '1px solid rgba(239,68,68,0.30)', background: 'rgba(239,68,68,0.05)' }
                   : cliente.status === 'em_renovacao'
                   ? { border: `1px solid ${urgencyCfg.border}`, background: urgencyCfg.bg }
-                  : { border: '1px solid rgba(255,255,255,0.07)' }}
+                  : { border: '1px solid var(--alpha-border)' }}
                 onClick={() => { if (!isConfirming) navigate(`/clientes/${cliente.id}`) }}
               >
                 <div className="flex items-center gap-4">
@@ -660,7 +660,7 @@ export function ClientesPage() {
                       </button>
                       <button
                         onClick={e => { e.stopPropagation(); setDeleteConfirm(null) }}
-                        className="text-xs px-2.5 py-1 rounded-md border border text-muted-foreground hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-md border border text-muted-foreground hover:bg-[var(--alpha-bg-xs)] transition-colors"
                       >
                         Cancelar
                       </button>
@@ -670,7 +670,7 @@ export function ClientesPage() {
 
                 {/* ── Em Renovação actions ── */}
                 {cliente.status === 'em_renovacao' && !isConfirming && (
-                  <div className="mt-3 pt-3 flex flex-wrap items-center gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} onClick={e => e.stopPropagation()}>
+                  <div className="mt-3 pt-3 flex flex-wrap items-center gap-2" style={{ borderTop: '1px solid var(--alpha-bg-sm)' }} onClick={e => e.stopPropagation()}>
                     <span className="text-xs px-2 py-0.5 rounded-full font-medium mr-1" style={{ background: urgencyCfg.bg, color: urgencyCfg.text, border: `1px solid ${urgencyCfg.border}` }}>
                       {urgencyCfg.label} {daysLeft !== null && daysLeft >= 0 ? `— ${daysLeft}d restantes` : daysLeft !== null && daysLeft < 0 ? '— vencido' : ''}
                     </span>
@@ -706,7 +706,7 @@ export function ClientesPage() {
 
                 {/* ── Encerrado actions ── */}
                 {cliente.status === 'encerrado' && !isConfirming && (
-                  <div className="mt-3 pt-3 flex flex-wrap items-center gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} onClick={e => e.stopPropagation()}>
+                  <div className="mt-3 pt-3 flex flex-wrap items-center gap-3" style={{ borderTop: '1px solid var(--alpha-bg-sm)' }} onClick={e => e.stopPropagation()}>
                     <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
                       {daysSinceEnd !== null && (
                         <span className="flex items-center gap-1">

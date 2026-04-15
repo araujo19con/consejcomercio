@@ -152,7 +152,7 @@ export function LeadDetailPage() {
               {(config?.servicos ?? []).filter(s => s.ativo !== false).length > 0 && (
                 <div className="space-y-1.5">
                   <Label>Serviços de Interesse</Label>
-                  <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}>
                     {(config?.servicos ?? []).filter(s => s.ativo !== false).map(s => {
                       const selected = (editing.servicos_interesse ?? []).includes(s.id)
                       return (
@@ -185,7 +185,7 @@ export function LeadDetailPage() {
               </div>
               {lead.motivo_perda && (
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.20)' }}>
-                  <p className="text-xs font-medium" style={{ color: 'rgba(248,113,113,0.85)' }}>Motivo da perda:</p>
+                  <p className="text-xs font-medium" style={{ color: 'var(--red-hi)' }}>Motivo da perda:</p>
                   <p className="text-sm mt-0.5" style={{ color: 'rgba(248,113,113,0.75)' }}>{lead.motivo_perda}</p>
                 </div>
               )}

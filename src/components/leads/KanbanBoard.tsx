@@ -87,10 +87,10 @@ export function KanbanBoard({ leads }: Props) {
       {/* Drag hint — shown once, dismissible */}
       {showDragHint && (
         <div className="flex items-center justify-between rounded-xl px-4 py-2.5 mb-3" style={{ background: 'rgba(0,137,172,0.06)', border: '1px solid rgba(0,137,172,0.20)' }}>
-          <span className="text-xs" style={{ color: 'rgba(107,208,231,0.85)' }}>💡 Arraste os cards para mover um lead entre as etapas do pipeline</span>
+          <span className="text-xs" style={{ color: 'var(--cyan-hi)' }}>💡 Arraste os cards para mover um lead entre as etapas do pipeline</span>
           <button
             onClick={() => { setShowDragHint(false); localStorage.setItem('consej_kanban_hint', '1') }}
-            className="p-0.5 ml-3 shrink-0" style={{ color: 'rgba(107,208,231,0.50)' }}
+            className="p-0.5 ml-3 shrink-0" style={{ color: 'var(--cyan-lo)' }}
             aria-label="Fechar dica"
           >
             <X className="w-3.5 h-3.5" />

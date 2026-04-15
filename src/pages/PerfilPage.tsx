@@ -342,7 +342,7 @@ export function PerfilPage() {
                 { label: 'Diagnósticos', value: meusPontos.diagnosticos, color: '#a78bfa' },
                 { label: 'Reuniões', value: meusPontos.reunioes, color: '#f59e0b' },
               ].map(item => (
-                <div key={item.label} className="rounded-lg p-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <div key={item.label} className="rounded-lg p-3" style={{ background: 'var(--alpha-bg-xs)' }}>
                   <p className="text-xl font-bold" style={{ color: item.color }}>{item.value}</p>
                   <p className="text-xs text-fg4 mt-0.5">{item.label}</p>
                 </div>

@@ -546,7 +546,7 @@ export function MensagensPage() {
                   className="w-full text-left px-3 py-2 rounded-lg border text-sm font-medium transition-all"
                   style={stage === s.id
                     ? { background: s.bgVal, color: s.colorVal, borderColor: s.colorVal + '80' }
-                    : { borderColor: 'transparent', color: 'rgba(150,165,180,0.70)' }}
+                    : { borderColor: 'transparent', color: 'var(--text-soft-a)' }}
                 >
                   {s.label}
                 </button>
@@ -587,7 +587,7 @@ export function MensagensPage() {
             <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ background: stageInfo.bgVal, color: stageInfo.colorVal, borderColor: stageInfo.colorVal + '80' }}>
               {stageInfo.label}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background text-muted-foreground" style={{ border: '1px solid rgba(255,255,255,0.10)' }}>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background text-muted-foreground" style={{ border: '1px solid var(--alpha-border-md)' }}>
               {sectorInfo.emoji} {sectorInfo.label}
             </span>
             <span className="px-3 py-1 rounded-full text-xs font-semibold border bg-background text-muted-foreground capitalize">
@@ -678,7 +678,7 @@ export function MensagensPage() {
                     'w-full text-left p-4 rounded-xl border text-sm transition-all',
                     varIdx === i
                       ? 'border-[rgba(0,137,172,0.55)] bg-[rgba(0,137,172,0.08)]'
-                      : 'border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.14)] hover:bg-[rgba(255,255,255,0.06)]'
+                      : 'border-[var(--alpha-bg-md)] bg-[var(--alpha-bg-xs)] hover:border-[var(--alpha-bg-lg)] hover:bg-[var(--alpha-bg-sm)]'
                   )}
                 >
                   <div className="text-xs font-semibold text-fg4 mb-1.5">Variação {i + 1}</div>

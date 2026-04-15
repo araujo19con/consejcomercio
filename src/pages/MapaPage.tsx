@@ -18,9 +18,9 @@ const ESTADO_NOME: Record<string, string> = Object.fromEntries(
 
 // ─── Color scale ──────────────────────────────────────────────────────────────
 function stateColor(count: number, mode: FilterMode): string {
-  if (count === 0) return 'rgba(255,255,255,0.04)'
+  if (count === 0) return 'var(--alpha-bg-xs)'
   if (mode === 'clientes') {
-    if (count >= 5) return 'rgba(52,211,153,0.75)'
+    if (count >= 5) return 'var(--emerald-mid)'
     if (count >= 3) return 'rgba(52,211,153,0.55)'
     if (count >= 2) return 'rgba(52,211,153,0.38)'
     return 'rgba(52,211,153,0.22)'
@@ -30,14 +30,14 @@ function stateColor(count: number, mode: FilterMode): string {
     if (count >= 5) return 'rgba(0,137,172,0.65)'
     if (count >= 3) return 'rgba(0,137,172,0.45)'
     if (count >= 1) return 'rgba(0,137,172,0.28)'
-    return 'rgba(255,255,255,0.04)'
+    return 'var(--alpha-bg-xs)'
   }
   // todos — mix both
-  if (count >= 10) return 'rgba(107,208,231,0.80)'
-  if (count >= 6)  return 'rgba(107,208,231,0.60)'
+  if (count >= 10) return 'var(--cyan-hi)'
+  if (count >= 6)  return 'var(--cyan-mid)'
   if (count >= 3)  return 'rgba(107,208,231,0.40)'
   if (count >= 1)  return 'rgba(107,208,231,0.22)'
-  return 'rgba(255,255,255,0.04)'
+  return 'var(--alpha-bg-xs)'
 }
 
 export function MapaPage() {
@@ -139,7 +139,7 @@ export function MapaPage() {
         </div>
 
         {/* Filter pills */}
-        <div className="flex gap-1.5 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="flex gap-1.5 p-1 rounded-xl" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}>
           {([['todos', 'Todos'], ['leads', 'Leads'], ['clientes', 'Clientes']] as [FilterMode, string][]).map(([v, label]) => (
             <button
               key={v}
@@ -147,7 +147,7 @@ export function MapaPage() {
               className="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all"
               style={mode === v
                 ? { background: 'rgba(0,137,172,0.25)', color: '#6bd0e7', border: '1px solid rgba(0,137,172,0.40)' }
-                : { color: 'rgba(130,150,170,0.65)', border: '1px solid transparent' }}
+                : { color: 'var(--text-soft-a)', border: '1px solid transparent' }}
             >
               {label}
             </button>
@@ -159,10 +159,10 @@ export function MapaPage() {
           <div className="rounded-xl p-3" style={{ background: 'rgba(0,137,172,0.08)', border: '1px solid rgba(0,137,172,0.18)' }}>
             <div className="flex items-center gap-1.5 mb-1">
               <TrendingUp className="w-3.5 h-3.5" style={{ color: '#6bd0e7' }} />
-              <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'rgba(107,208,231,0.60)' }}>Leads ativos</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--cyan-mid)' }}>Leads ativos</span>
             </div>
             <p className="text-2xl font-bold" style={{ color: '#6bd0e7' }}>{totalLeads}</p>
-            <p className="text-[10px] mt-0.5" style={{ color: 'rgba(107,208,231,0.50)' }}>{totalLeadsWithEstado} mapeados</p>
+            <p className="text-[10px] mt-0.5" style={{ color: 'var(--cyan-lo)' }}>{totalLeadsWithEstado} mapeados</p>
           </div>
           <div className="rounded-xl p-3" style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.18)' }}>
             <div className="flex items-center gap-1.5 mb-1">
@@ -175,9 +175,9 @@ export function MapaPage() {
         </div>
 
         {/* Top states */}
-        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-          <div className="px-3 py-2 flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            <MapPin className="w-3.5 h-3.5" style={{ color: 'rgba(107,208,231,0.60)' }} />
+        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--alpha-border)' }}>
+          <div className="px-3 py-2 flex items-center gap-2" style={{ background: 'var(--alpha-bg-xs)', borderBottom: '1px solid var(--alpha-bg-sm)' }}>
+            <MapPin className="w-3.5 h-3.5" style={{ color: 'var(--cyan-mid)' }} />
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Estados com presença</span>
           </div>
           {topStates.length === 0 ? (
@@ -191,20 +191,20 @@ export function MapaPage() {
                   className="w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors"
                   style={{
                     background: selected === s.uf ? 'rgba(0,137,172,0.12)' : 'transparent',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    borderBottom: '1px solid var(--alpha-bg-sm)',
                   }}
-                  onMouseEnter={e => { if (selected !== s.uf) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)' }}
+                  onMouseEnter={e => { if (selected !== s.uf) (e.currentTarget as HTMLElement).style.background = 'var(--alpha-bg-xs)' }}
                   onMouseLeave={e => { if (selected !== s.uf) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                 >
                   <span className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0"
-                    style={{ background: selected === s.uf ? 'rgba(0,137,172,0.25)' : 'rgba(255,255,255,0.07)', color: selected === s.uf ? '#6bd0e7' : 'rgba(180,195,210,0.80)' }}>
+                    style={{ background: selected === s.uf ? 'rgba(0,137,172,0.25)' : 'var(--alpha-border)', color: selected === s.uf ? '#6bd0e7' : 'var(--text-soft-a)' }}>
                     {s.uf}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-fg2 truncate">{s.nome}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       {s.leads > 0 && <span className="text-[10px]" style={{ color: 'rgba(107,208,231,0.70)' }}>{s.leads} lead{s.leads > 1 ? 's' : ''}</span>}
-                      {s.clientes > 0 && <span className="text-[10px]" style={{ color: 'rgba(52,211,153,0.70)' }}>{s.clientes} cliente{s.clientes > 1 ? 's' : ''}</span>}
+                      {s.clientes > 0 && <span className="text-[10px]" style={{ color: 'var(--emerald-lo)' }}>{s.clientes} cliente{s.clientes > 1 ? 's' : ''}</span>}
                     </div>
                   </div>
                   <ChevronRight className="w-3 h-3 shrink-0" style={{ color: 'rgba(100,120,140,0.40)' }} />
@@ -221,9 +221,9 @@ export function MapaPage() {
             {selectedLeads.map(l => (
               <button key={l.id} onClick={() => navigate(`/leads/${l.id}`)}
                 className="w-full text-left px-2.5 py-2 rounded-lg transition-colors"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}
                 onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(0,137,172,0.12)'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'}>
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--alpha-bg-xs)'}>
                 <p className="text-xs font-medium text-fg2 truncate">{l.nome}</p>
                 <p className="text-[10px] text-fg4 truncate">{l.empresa}</p>
               </button>
@@ -243,21 +243,21 @@ export function MapaPage() {
       </div>
 
       {/* ─── Map panel ─── */}
-      <div className="flex-1 rounded-2xl relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex-1 rounded-2xl relative overflow-hidden" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-bg-sm)' }}>
 
         {/* Legend */}
         <div className="absolute top-3 right-3 z-10 rounded-xl px-3 py-2 text-[10px]"
-          style={{ background: 'rgba(10,22,40,0.85)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)' }}>
+          style={{ background: 'rgba(10,22,40,0.85)', border: '1px solid var(--alpha-bg-md)', backdropFilter: 'blur(8px)' }}>
           <p className="font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Legenda</p>
           <div className="space-y-1">
             {[
-              { color: 'rgba(255,255,255,0.04)', label: 'Sem dados', border: '1px solid rgba(255,255,255,0.10)' },
+              { color: 'var(--alpha-bg-xs)', label: 'Sem dados', border: '1px solid var(--alpha-border-md)' },
               { color: mode === 'clientes' ? 'rgba(52,211,153,0.22)' : 'rgba(0,137,172,0.28)', label: '1–2' },
               { color: mode === 'clientes' ? 'rgba(52,211,153,0.55)' : 'rgba(0,137,172,0.55)', label: '3–5' },
-              { color: mode === 'clientes' ? 'rgba(52,211,153,0.80)' : 'rgba(0,137,172,0.85)', label: '6+' },
+              { color: mode === 'clientes' ? 'var(--emerald-mid)' : 'rgba(0,137,172,0.85)', label: '6+' },
             ].map(item => (
               <div key={item.label} className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-sm" style={{ background: item.color, border: item.border ?? '1px solid rgba(255,255,255,0.15)' }} />
+                <div className="w-3 h-3 rounded-sm" style={{ background: item.color, border: item.border ?? '1px solid var(--alpha-bg-lg)' }} />
                 <span className="text-[rgba(130,150,170,0.70)]">{item.label}</span>
               </div>
             ))}
@@ -326,10 +326,10 @@ export function MapaPage() {
                             ? 'rgba(0,137,172,0.65)'
                             : stateColor(count, mode),
                           stroke: isSelected
-                            ? 'rgba(107,208,231,0.80)'
+                            ? 'var(--cyan-hi)'
                             : isHovered
-                            ? 'rgba(107,208,231,0.55)'
-                            : 'rgba(255,255,255,0.12)',
+                            ? 'var(--cyan-lo)'
+                            : 'var(--alpha-bg-lg)',
                           strokeWidth: isSelected ? 1.5 : isHovered ? 1 : 0.5,
                           outline: 'none',
                           cursor: 'pointer',
@@ -340,8 +340,8 @@ export function MapaPage() {
                             ? 'rgba(0,137,172,0.72)'
                             : count > 0
                             ? stateColor(count, mode).replace(')', ', 1.0)').replace('rgba', 'rgba')
-                            : 'rgba(255,255,255,0.08)',
-                          stroke: 'rgba(107,208,231,0.55)',
+                            : 'var(--alpha-bg-md)',
+                          stroke: 'var(--cyan-lo)',
                           strokeWidth: 1,
                           outline: 'none',
                           cursor: 'pointer',

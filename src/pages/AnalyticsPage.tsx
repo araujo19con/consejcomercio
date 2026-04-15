@@ -43,7 +43,7 @@ function StatCard({
             <Icon className="w-4 h-4" />
           </div>
         </div>
-        <p className="text-2xl font-bold" style={{ color: alert ? 'rgba(248,113,113,0.90)' : 'rgba(230,235,240,0.92)' }}>{value}</p>
+        <p className="text-2xl font-bold" style={{ color: alert ? 'rgba(248,113,113,0.90)' : 'var(--text-strong-a)' }}>{value}</p>
         {sub && <p className="text-xs text-fg4 mt-1">{sub}</p>}
       </CardContent>
     </Card>
@@ -239,7 +239,7 @@ export function AnalyticsPage() {
           <p className="text-sm text-muted-foreground mt-0.5">Métricas de conversão, tempo de funil e performance por canal</p>
         </div>
         {/* Period selector */}
-        <div className="flex items-center gap-1 bg-[rgba(255,255,255,0.04)] p-1 rounded-lg shrink-0">
+        <div className="flex items-center gap-1 bg-[var(--alpha-bg-xs)] p-1 rounded-lg shrink-0">
           {(Object.keys(PERIOD_LABELS) as Period[]).map(p => (
             <button
               key={p}
@@ -299,8 +299,8 @@ export function AnalyticsPage() {
               <CardContent className="p-4 flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 shrink-0" style={{ color: '#fb923c' }} />
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: 'rgba(251,191,36,0.85)' }}>{metrics.stagnant.length} lead{metrics.stagnant.length > 1 ? 's' : ''} parado{metrics.stagnant.length > 1 ? 's' : ''}</p>
-                  <p className="text-xs" style={{ color: 'rgba(251,191,36,0.65)' }}>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--amber-hi)' }}>{metrics.stagnant.length} lead{metrics.stagnant.length > 1 ? 's' : ''} parado{metrics.stagnant.length > 1 ? 's' : ''}</p>
+                  <p className="text-xs" style={{ color: 'var(--amber-lo)' }}>
                     {metrics.stagnant.length > leads.filter(l => !['ganho_assessoria','ganho_consultoria','perdido','cancelado'].includes(l.status)).length * 0.4
                       ? 'Inclui leads importados em bloco ainda não trabalhados no CRM'
                       : 'Requerem follow-up imediato'}
@@ -314,7 +314,7 @@ export function AnalyticsPage() {
               <CardContent className="p-4 flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 shrink-0" style={{ color: '#f87171' }} />
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: 'rgba(248,113,113,0.85)' }}>{metrics.expiring60.length} contrato{metrics.expiring60.length > 1 ? 's' : ''} vencendo em 60d</p>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--red-hi)' }}>{metrics.expiring60.length} contrato{metrics.expiring60.length > 1 ? 's' : ''} vencendo em 60d</p>
                   <p className="text-xs" style={{ color: 'rgba(248,113,113,0.65)' }}>Inicie conversas de renovação agora</p>
                 </div>
               </CardContent>
@@ -354,7 +354,7 @@ export function AnalyticsPage() {
                   return (
                     <div key={stage.id} className="flex items-center gap-3">
                       <span className="text-xs text-muted-foreground w-36 shrink-0 truncate">{stage.label}</span>
-                      <div className="flex-1 bg-[rgba(255,255,255,0.04)] rounded-full h-5 relative overflow-hidden">
+                      <div className="flex-1 bg-[var(--alpha-bg-xs)] rounded-full h-5 relative overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{ width: `${widthPct}%`, backgroundColor: barColor }}
@@ -390,7 +390,7 @@ export function AnalyticsPage() {
                     <Cell key={idx} fill={['#10b981', '#ef4444', '#94a3b8'][idx]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ background: "#0d1929", border: "1px solid rgba(255,255,255,0.10)", color: "rgba(220,230,240,0.90)", borderRadius: 8 }} />
+                <Tooltip contentStyle={{ background: "#0d1929", border: "1px solid var(--alpha-border-md)", color: "rgba(220,230,240,0.90)", borderRadius: 8 }} />
               </PieChart>
             </ResponsiveContainer>
             <div className="flex flex-col gap-1.5 mt-3 px-1">
@@ -449,7 +449,7 @@ export function AnalyticsPage() {
                         </span>
                       </td>
                       <td className="py-2.5 pl-4">
-                        <div className="w-24 bg-[rgba(255,255,255,0.04)] rounded-full h-1.5">
+                        <div className="w-24 bg-[var(--alpha-bg-xs)] rounded-full h-1.5">
                           <div
                             className={cn('h-full rounded-full', row.taxa >= 50 ? 'bg-emerald-500' : row.taxa >= 25 ? 'bg-amber-500' : 'bg-red-400')}
                             style={{ width: `${row.taxa}%` }}
@@ -514,7 +514,7 @@ export function AnalyticsPage() {
                     <div key={r.name} className="flex items-center gap-3">
                       <span className={cn(
                         'w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0',
-                        i === 0 ? 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]' : 'bg-[rgba(255,255,255,0.04)] text-muted-foreground'
+                        i === 0 ? 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]' : 'bg-[var(--alpha-bg-xs)] text-muted-foreground'
                       )}>{i + 1}</span>
                       <span className="text-sm text-fg2 flex-1 truncate">{r.name}</span>
                       <span className="text-xs text-fg4">{r.won}/{r.total}</span>
@@ -565,7 +565,7 @@ export function AnalyticsPage() {
                       <span className="text-sm font-bold text-fg2">{c.value}%</span>
                     </div>
                   </div>
-                  <div className="h-1.5 bg-[rgba(255,255,255,0.04)] rounded-full">
+                  <div className="h-1.5 bg-[var(--alpha-bg-xs)] rounded-full">
                     <div
                       className={cn('h-full rounded-full', c.value >= 75 ? 'bg-emerald-500' : c.value >= 50 ? 'bg-amber-400' : 'bg-red-500')}
                       style={{ width: `${Math.min(c.value, 100)}%` }}
@@ -612,7 +612,7 @@ export function AnalyticsPage() {
                     {/* reason + bar */}
                     <div className="min-w-0">
                       <p className="text-xs text-fg2 truncate leading-snug">{r.reason}</p>
-                      <div className="mt-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                      <div className="mt-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--alpha-bg-sm)' }}>
                         <div className="h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: color, opacity: 0.7 }} />
                       </div>
                     </div>

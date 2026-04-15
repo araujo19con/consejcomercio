@@ -15,7 +15,7 @@ import type { Parceiro } from '@/types'
 const PARCEIRO_STATUS = [
   { value: 'ativo', label: 'Ativo', color: 'bg-[rgba(16,185,129,0.15)] text-[#34d399]' },
   { value: 'potencial', label: 'Potencial', color: 'bg-[rgba(245,158,11,0.15)] text-[#fbbf24]' },
-  { value: 'inativo', label: 'Inativo', color: 'bg-[rgba(255,255,255,0.04)] text-muted-foreground' },
+  { value: 'inativo', label: 'Inativo', color: 'bg-[var(--alpha-bg-xs)] text-muted-foreground' },
 ]
 
 function useParceiroForm(initial?: Parceiro) {
@@ -142,7 +142,7 @@ export function ParceirosPage() {
                           {statusInfo.label}
                         </span>
                       )}
-                      <button onClick={() => handleEdit(parceiro)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-fg4">
+                      <button onClick={() => handleEdit(parceiro)} className="p-1 rounded hover:bg-[var(--alpha-bg-xs)] text-fg4">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       {deletingId === parceiro.id ? (
@@ -151,7 +151,7 @@ export function ParceirosPage() {
                           <button onClick={() => setDeletingId(null)} className="text-xs text-muted-foreground px-1">x</button>
                         </div>
                       ) : (
-                        <button onClick={() => setDeletingId(parceiro.id)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.04)] text-fg4 hover:text-red-400 transition-colors" title="Excluir">
+                        <button onClick={() => setDeletingId(parceiro.id)} className="p-1 rounded hover:bg-[var(--alpha-bg-xs)] text-fg4 hover:text-red-400 transition-colors" title="Excluir">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}

@@ -26,8 +26,8 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
       <div className="space-y-4">
         {/* Resumo */}
         <div className="rounded-xl p-4" style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.25)' }}>
-          <p className="text-sm font-semibold mb-1" style={{ color: 'rgba(52,211,153,0.85)' }}>Perfil Jurídico</p>
-          <p className="text-sm" style={{ color: 'rgba(52,211,153,0.75)' }}>{analise.resumo}</p>
+          <p className="text-sm font-semibold mb-1" style={{ color: 'var(--emerald-hi)' }}>Perfil Jurídico</p>
+          <p className="text-sm" style={{ color: 'var(--emerald-mid)' }}>{analise.resumo}</p>
           <div className="mt-3 flex items-center gap-2">
             <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(0,137,172,0.15)', color: '#6bd0e7', border: '1px solid rgba(0,137,172,0.30)' }}>
               {clusterInfo?.label}
@@ -37,7 +37,7 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
         </div>
 
         {/* Necessidades */}
-        <div className="bg-card rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="bg-card rounded-xl p-4" style={{ border: '1px solid var(--alpha-border)' }}>
           <div className="flex items-center gap-2 mb-3">
             <Target className="w-4 h-4" style={{ color: '#6bd0e7' }} />
             <h3 className="text-sm font-semibold text-foreground">Necessidades Identificadas</h3>
@@ -57,12 +57,12 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
         {/* Fraquezas */}
         <div className="rounded-xl p-4" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.25)' }}>
           <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4" style={{ color: 'rgba(251,191,36,0.85)' }} />
-            <h3 className="text-sm font-semibold" style={{ color: 'rgba(251,191,36,0.85)' }}>Vulnerabilidades Jurídicas</h3>
+            <AlertTriangle className="w-4 h-4" style={{ color: 'var(--amber-hi)' }} />
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--amber-hi)' }}>Vulnerabilidades Jurídicas</h3>
           </div>
           <ul className="space-y-2">
             {analise.fraquezas.map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'rgba(251,191,36,0.75)' }}>
+              <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--amber-mid)' }}>
                 <span className="mt-1 w-1.5 h-1.5 flex-shrink-0 rounded-full" style={{ background: '#f97316' }} />
                 {item}
               </li>
@@ -71,7 +71,7 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
         </div>
 
         {/* Serviços */}
-        <div className="bg-card rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="bg-card rounded-xl p-4" style={{ border: '1px solid var(--alpha-border)' }}>
           <div className="flex items-center gap-2 mb-3">
             <Lightbulb className="w-4 h-4" style={{ color: '#fbbf24' }} />
             <h3 className="text-sm font-semibold text-foreground">Serviços CONSEJ Recomendados</h3>
@@ -80,7 +80,7 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
             {analise.servicos_recomendados.map((s, i) => {
               const p = PRIORIDADE_CONFIG[s.prioridade] ?? PRIORIDADE_CONFIG.baixa
               return (
-                <div key={i} className="p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div key={i} className="p-3 rounded-lg" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}>
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="text-sm font-semibold text-foreground">{s.nome}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full border font-medium" style={{ background: p.bg, color: p.color, borderColor: p.border }}>
@@ -106,13 +106,13 @@ export function DiagnosticPreview({ diagnostico, analise, onRedo }: Props) {
   return (
     <Card style={{ borderColor: 'rgba(16,185,129,0.25)', background: 'rgba(16,185,129,0.06)' }}>
       <CardContent className="py-6">
-        <p className="text-sm font-semibold mb-1" style={{ color: 'rgba(52,211,153,0.85)' }}>Cluster recomendado: <strong>{clusterInfo?.label}</strong></p>
-        <p className="text-xs mb-4" style={{ color: 'rgba(52,211,153,0.70)' }}>{clusterInfo?.price}</p>
+        <p className="text-sm font-semibold mb-1" style={{ color: 'var(--emerald-hi)' }}>Cluster recomendado: <strong>{clusterInfo?.label}</strong></p>
+        <p className="text-xs mb-4" style={{ color: 'var(--emerald-lo)' }}>{clusterInfo?.price}</p>
         {rec.rationale.length > 0 && (
-          <div className="text-left rounded-lg p-3 mb-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(16,185,129,0.15)' }}>
-            <p className="text-xs font-semibold mb-2" style={{ color: 'rgba(52,211,153,0.85)' }}>Análise:</p>
+          <div className="text-left rounded-lg p-3 mb-4" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid rgba(16,185,129,0.15)' }}>
+            <p className="text-xs font-semibold mb-2" style={{ color: 'var(--emerald-hi)' }}>Análise:</p>
             {rec.rationale.map((r, i) => (
-              <p key={i} className="text-xs mb-1" style={{ color: 'rgba(52,211,153,0.75)' }}>• {r}</p>
+              <p key={i} className="text-xs mb-1" style={{ color: 'var(--emerald-mid)' }}>• {r}</p>
             ))}
           </div>
         )}

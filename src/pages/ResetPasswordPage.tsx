@@ -68,7 +68,7 @@ export function ResetPasswordPage() {
 
       <div
         className="w-full"
-        style={{ position: 'relative', zIndex: 10, maxWidth: 380, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(107,208,231,0.18)', borderRadius: 16, padding: '40px 36px 36px', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 0 0 1px rgba(0,137,172,0.08), 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)' }}
+        style={{ position: 'relative', zIndex: 10, maxWidth: 380, background: 'var(--alpha-bg-xs)', border: '1px solid rgba(107,208,231,0.18)', borderRadius: 16, padding: '40px 36px 36px', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', boxShadow: '0 0 0 1px rgba(0,137,172,0.08), 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 var(--alpha-bg-sm)' }}
       >
         <div className="flex flex-col items-center mb-7" style={{ gap: 4 }}>
           <img src="/logo.png" alt="CONSEJ" style={{ height: 52, width: 'auto', objectFit: 'contain', marginBottom: 6, filter: 'brightness(1.05)' }} />
@@ -82,8 +82,8 @@ export function ResetPasswordPage() {
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <CheckCircle2 style={{ width: 22, height: 22, color: '#34d399' }} />
             </div>
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 8 }}>Senha redefinida!</p>
-            <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', marginBottom: 24, lineHeight: 1.7 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-strong-a)', marginBottom: 8 }}>Senha redefinida!</p>
+            <p style={{ fontSize: 12, color: 'var(--cyan-mid)', marginBottom: 24, lineHeight: 1.7 }}>
               Sua senha foi atualizada com sucesso.
             </p>
             <Button
@@ -96,16 +96,16 @@ export function ResetPasswordPage() {
           </div>
         ) : !ready ? (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
-            <p style={{ fontSize: 13, color: 'rgba(107,208,231,0.65)' }}>Verificando link de recuperação...</p>
+            <p style={{ fontSize: 13, color: 'var(--cyan-mid)' }}>Verificando link de recuperação...</p>
           </div>
         ) : (
           <>
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 4 }}>Nova senha</p>
-            <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', marginBottom: 24 }}>Escolha uma nova senha para sua conta</p>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-strong-a)', marginBottom: 4 }}>Nova senha</p>
+            <p style={{ fontSize: 12, color: 'var(--cyan-mid)', marginBottom: 24 }}>Escolha uma nova senha para sua conta</p>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <Label htmlFor="new-password" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <Label htmlFor="new-password" style={{ color: 'var(--text-dim-a)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Nova senha
                 </Label>
                 <div style={{ position: 'relative', marginTop: 6 }}>
@@ -116,13 +116,13 @@ export function ResetPasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)', paddingRight: 38 }}
-                    className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
+                    style={{ background: 'var(--alpha-bg-sm)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)', paddingRight: 38 }}
+                    className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[var(--text-dim-a)]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPw(p => !p)}
-                    style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 0 }}
+                    style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim-a)', padding: 0 }}
                   >
                     {showPw ? <EyeOff style={{ width: 15, height: 15 }} /> : <Eye style={{ width: 15, height: 15 }} />}
                   </button>
@@ -130,7 +130,7 @@ export function ResetPasswordPage() {
               </div>
 
               <div>
-                <Label htmlFor="confirm-password" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <Label htmlFor="confirm-password" style={{ color: 'var(--text-dim-a)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Confirmar senha
                 </Label>
                 <Input
@@ -140,8 +140,8 @@ export function ResetPasswordPage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   required
-                  style={{ marginTop: 6, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
-                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
+                  style={{ marginTop: 6, background: 'var(--alpha-bg-sm)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)' }}
+                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[var(--text-dim-a)]"
                 />
               </div>
 

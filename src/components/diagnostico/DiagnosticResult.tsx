@@ -31,12 +31,12 @@ export function DiagnosticResult({ analise, catalogo = [], onRedo }: Props) {
       {/* Header */}
       <div className="rounded-xl p-5 text-center" style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.25)' }}>
         <CheckCircle2 className="w-10 h-10 mx-auto mb-2" style={{ color: '#34d399' }} />
-        <h2 className="text-base font-bold mb-1" style={{ color: 'rgba(52,211,153,0.90)' }}>Diagnóstico Concluído</h2>
-        <p className="text-sm" style={{ color: 'rgba(52,211,153,0.75)' }}>{analise.resumo}</p>
+        <h2 className="text-base font-bold mb-1" style={{ color: 'var(--emerald-hi)' }}>Diagnóstico Concluído</h2>
+        <p className="text-sm" style={{ color: 'var(--emerald-mid)' }}>{analise.resumo}</p>
       </div>
 
       {/* Necessidades */}
-      <div className="bg-card rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="bg-card rounded-xl p-4" style={{ border: '1px solid var(--alpha-border)' }}>
         <div className="flex items-center gap-2 mb-3">
           <Target className="w-4 h-4" style={{ color: '#6bd0e7' }} />
           <h3 className="text-sm font-semibold text-foreground">Necessidades Identificadas</h3>
@@ -56,12 +56,12 @@ export function DiagnosticResult({ analise, catalogo = [], onRedo }: Props) {
       {/* Fraquezas */}
       <div className="rounded-xl p-4" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.25)' }}>
         <div className="flex items-center gap-2 mb-3">
-          <AlertTriangle className="w-4 h-4" style={{ color: 'rgba(251,191,36,0.85)' }} />
-          <h3 className="text-sm font-semibold" style={{ color: 'rgba(251,191,36,0.85)' }}>Vulnerabilidades Jurídicas</h3>
+          <AlertTriangle className="w-4 h-4" style={{ color: 'var(--amber-hi)' }} />
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--amber-hi)' }}>Vulnerabilidades Jurídicas</h3>
         </div>
         <ul className="space-y-2">
           {analise.fraquezas.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'rgba(251,191,36,0.75)' }}>
+            <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--amber-mid)' }}>
               <span className="mt-1 w-1.5 h-1.5 flex-shrink-0 rounded-full" style={{ background: '#f97316' }} />
               {item}
             </li>
@@ -70,7 +70,7 @@ export function DiagnosticResult({ analise, catalogo = [], onRedo }: Props) {
       </div>
 
       {/* Serviços recomendados */}
-      <div className="bg-card rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="bg-card rounded-xl p-4" style={{ border: '1px solid var(--alpha-border)' }}>
         <div className="flex items-center gap-2 mb-3">
           <Lightbulb className="w-4 h-4" style={{ color: '#fbbf24' }} />
           <h3 className="text-sm font-semibold text-foreground">Serviços CONSEJ Recomendados</h3>
@@ -80,7 +80,7 @@ export function DiagnosticResult({ analise, catalogo = [], onRedo }: Props) {
             const cfg = PRIORIDADE_CONFIG[s.prioridade] ?? PRIORIDADE_CONFIG.baixa
             const catalogItem = s.servico_id ? catalogo.find(c => c.id === s.servico_id) : undefined
             return (
-              <div key={i} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div key={i} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="text-sm font-semibold text-foreground">{s.nome}</span>
@@ -93,7 +93,7 @@ export function DiagnosticResult({ analise, catalogo = [], onRedo }: Props) {
                       </span>
                     )}
                     {catalogItem && (
-                      <span className="text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <span className="text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1" style={{ background: 'var(--alpha-bg-sm)', color: 'var(--text-dim-a)', border: '1px solid var(--alpha-bg-md)' }}>
                         <Tag className="w-2.5 h-2.5" />
                         {CATEGORIA_LABELS[catalogItem.categoria] ?? catalogItem.categoria}
                       </span>
@@ -105,7 +105,7 @@ export function DiagnosticResult({ analise, catalogo = [], onRedo }: Props) {
                     <p className="text-xs text-muted-foreground">{s.justificativa}</p>
                   )}
                   {catalogItem && (
-                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.30)' }}>{s.justificativa}</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-dim-a)' }}>{s.justificativa}</p>
                   )}
                 </div>
               </div>

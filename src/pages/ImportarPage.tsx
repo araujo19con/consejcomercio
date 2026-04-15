@@ -305,7 +305,7 @@ function DropZone({ entity: _entity, label, icon: Icon, file, onFile, onClear }:
             <span className="text-sm font-medium truncate" style={{ color: 'rgba(220,230,240,0.90)' }}>
               {file.filename}
             </span>
-            <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(150,165,180,0.70)' }}>
+            <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--alpha-bg-sm)', color: 'var(--text-soft-a)' }}>
               {file.rows.length} registros
             </span>
           </div>
@@ -330,8 +330,8 @@ function DropZone({ entity: _entity, label, icon: Icon, file, onFile, onClear }:
     <div
       className="rounded-xl p-6 flex flex-col items-center gap-2 cursor-pointer transition-all"
       style={{
-        background: dragging ? 'rgba(0,137,172,0.08)' : 'rgba(255,255,255,0.03)',
-        border: `2px dashed ${dragging ? 'rgba(0,137,172,0.50)' : 'rgba(255,255,255,0.10)'}`,
+        background: dragging ? 'rgba(0,137,172,0.08)' : 'var(--alpha-bg-xs)',
+        border: `2px dashed ${dragging ? 'rgba(0,137,172,0.50)' : 'var(--alpha-border-md)'}`,
       }}
       onClick={() => inputRef.current?.click()}
       onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
@@ -343,7 +343,7 @@ function DropZone({ entity: _entity, label, icon: Icon, file, onFile, onClear }:
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
       />
       <span style={{ color: 'rgba(0,137,172,0.60)' }}><Icon className="w-6 h-6" /></span>
-      <span className="text-sm font-medium" style={{ color: 'rgba(200,215,225,0.75)' }}>{label}</span>
+      <span className="text-sm font-medium" style={{ color: 'var(--text-mid-a)' }}>{label}</span>
       <span className="text-xs" style={{ color: 'rgba(150,165,180,0.55)' }}>
         Arraste o CSV ou clique para selecionar
       </span>
@@ -359,11 +359,11 @@ function PreviewTable({ file, entity }: { file: ParsedFile; entity: EntityType }
   const sample = file.rows.slice(0, 3)
 
   return (
-    <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+    <div className="rounded-lg overflow-hidden" style={{ border: '1px solid var(--alpha-border)' }}>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}>
+            <tr style={{ borderBottom: '1px solid var(--alpha-border)', background: 'var(--alpha-bg-xs)' }}>
               {shownFields.map(f => (
                 <th key={f} className="px-3 py-2 text-left font-semibold tracking-wider uppercase" style={{ color: 'rgba(150,165,180,0.60)' }}>
                   {f.replace(/_/g, ' ')}
@@ -373,9 +373,9 @@ function PreviewTable({ file, entity }: { file: ParsedFile; entity: EntityType }
           </thead>
           <tbody>
             {sample.map((row, i) => (
-              <tr key={i} style={{ borderBottom: i < sample.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+              <tr key={i} style={{ borderBottom: i < sample.length - 1 ? '1px solid var(--alpha-bg-sm)' : 'none' }}>
                 {shownFields.map(f => (
-                  <td key={f} className="px-3 py-2 truncate max-w-[140px]" style={{ color: 'rgba(200,215,225,0.80)' }}>
+                  <td key={f} className="px-3 py-2 truncate max-w-[140px]" style={{ color: 'var(--text-mid-a)' }}>
                     {g(row, file.columnMap[f])}
                   </td>
                 ))}
@@ -385,7 +385,7 @@ function PreviewTable({ file, entity }: { file: ParsedFile; entity: EntityType }
         </table>
       </div>
       {file.rows.length > 3 && (
-        <div className="px-3 py-1.5 text-xs" style={{ color: 'rgba(150,165,180,0.55)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="px-3 py-1.5 text-xs" style={{ color: 'rgba(150,165,180,0.55)', borderTop: '1px solid var(--alpha-bg-sm)' }}>
           + {file.rows.length - 3} registros adicionais
         </div>
       )}
@@ -506,10 +506,10 @@ export function ImportarPage() {
   if (step === 'upload') return (
     <div className="p-6 max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold mb-1" style={{ color: 'rgba(230,235,240,0.92)' }}>
+        <h1 className="text-xl font-semibold mb-1" style={{ color: 'var(--text-strong-a)' }}>
           Importar do Pipefy
         </h1>
-        <p className="text-sm" style={{ color: 'rgba(150,165,180,0.70)' }}>
+        <p className="text-sm" style={{ color: 'var(--text-soft-a)' }}>
           Exporte seus cards do Pipefy como CSV e faça upload abaixo. Os dados são detectados automaticamente.
         </p>
       </div>
@@ -519,8 +519,8 @@ export function ImportarPage() {
         <p className="font-medium mb-2" style={{ color: 'rgba(107,208,231,0.90)' }}>Como exportar do Pipefy:</p>
         <ol className="space-y-1 list-decimal list-inside" style={{ color: 'rgba(150,165,180,0.75)' }}>
           <li>Abra o Pipe no Pipefy</li>
-          <li>Clique em <strong style={{ color: 'rgba(200,215,225,0.80)' }}>⋮ (menu)</strong> no topo direito</li>
-          <li>Selecione <strong style={{ color: 'rgba(200,215,225,0.80)' }}>Export cards</strong> → <strong style={{ color: 'rgba(200,215,225,0.80)' }}>CSV</strong></li>
+          <li>Clique em <strong style={{ color: 'var(--text-mid-a)' }}>⋮ (menu)</strong> no topo direito</li>
+          <li>Selecione <strong style={{ color: 'var(--text-mid-a)' }}>Export cards</strong> → <strong style={{ color: 'var(--text-mid-a)' }}>CSV</strong></li>
           <li>Repita para cada tipo de dado abaixo</li>
         </ol>
       </div>
@@ -547,10 +547,10 @@ export function ImportarPage() {
   if (step === 'preview') return (
     <div className="p-6 max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold mb-1" style={{ color: 'rgba(230,235,240,0.92)' }}>
+        <h1 className="text-xl font-semibold mb-1" style={{ color: 'var(--text-strong-a)' }}>
           Revisão dos dados
         </h1>
-        <p className="text-sm" style={{ color: 'rgba(150,165,180,0.70)' }}>
+        <p className="text-sm" style={{ color: 'var(--text-soft-a)' }}>
           Confira os dados que serão importados antes de confirmar.
         </p>
       </div>
@@ -597,7 +597,7 @@ export function ImportarPage() {
         <button
           onClick={() => setStep('upload')}
           className="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(200,215,225,0.80)', border: '1px solid rgba(255,255,255,0.10)' }}
+          style={{ background: 'var(--alpha-bg-sm)', color: 'var(--text-mid-a)', border: '1px solid var(--alpha-border-md)' }}
         >
           Voltar
         </button>
@@ -624,7 +624,7 @@ export function ImportarPage() {
         {progress.label}
       </p>
       {progress.total > 0 && (
-        <div className="w-64 rounded-full overflow-hidden h-1.5" style={{ background: 'rgba(255,255,255,0.08)' }}>
+        <div className="w-64 rounded-full overflow-hidden h-1.5" style={{ background: 'var(--alpha-bg-md)' }}>
           <div
             className="h-full rounded-full transition-all"
             style={{ width: `${Math.round((progress.current / progress.total) * 100)}%`, background: '#0089ac' }}
@@ -649,10 +649,10 @@ export function ImportarPage() {
             <CheckCircle2 className="w-5 h-5" style={{ color: '#34d399' }} />
           </div>
           <div>
-            <h1 className="text-xl font-semibold" style={{ color: 'rgba(230,235,240,0.92)' }}>
+            <h1 className="text-xl font-semibold" style={{ color: 'var(--text-strong-a)' }}>
               Importação concluída
             </h1>
-            <p className="text-sm" style={{ color: 'rgba(150,165,180,0.70)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-soft-a)' }}>
               {totalOk} registros importados{totalErr > 0 ? `, ${totalErr} erros` : ''}
             </p>
           </div>
@@ -665,9 +665,9 @@ export function ImportarPage() {
             { label: 'Clientes',  icon: Users,        data: result.clientes },
             { label: 'Contratos', icon: FileText,     data: result.contratos },
           ].map(({ label, icon: Icon, data }) => (
-            <div key={label} className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <Icon className="w-4 h-4 mb-2" style={{ color: 'rgba(107,208,231,0.60)' }} />
-              <div className="text-2xl font-bold mb-0.5" style={{ color: 'rgba(230,235,240,0.92)' }}>{data.ok}</div>
+            <div key={label} className="rounded-xl p-4" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}>
+              <Icon className="w-4 h-4 mb-2" style={{ color: 'var(--cyan-mid)' }} />
+              <div className="text-2xl font-bold mb-0.5" style={{ color: 'var(--text-strong-a)' }}>{data.ok}</div>
               <div className="text-xs" style={{ color: 'rgba(150,165,180,0.65)' }}>{label} importados</div>
               {data.err > 0 && (
                 <div className="text-xs mt-1" style={{ color: '#f87171' }}>{data.err} erros</div>
@@ -685,7 +685,7 @@ export function ImportarPage() {
             </div>
             <div className="space-y-1 max-h-40 overflow-y-auto">
               {result.log.map((line, i) => (
-                <p key={i} className="text-xs font-mono" style={{ color: 'rgba(248,113,113,0.80)' }}>{line}</p>
+                <p key={i} className="text-xs font-mono" style={{ color: 'var(--red-hi)' }}>{line}</p>
               ))}
             </div>
           </div>
@@ -714,7 +714,7 @@ export function ImportarPage() {
           <button
             onClick={() => { setStep('upload'); setLeadsFile(null); setClientesFile(null); setContratosFile(null); setResult(null) }}
             className="px-3 py-2 rounded-lg text-sm transition-colors"
-            style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(200,215,225,0.75)', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ background: 'var(--alpha-bg-sm)', color: 'var(--text-mid-a)', border: '1px solid var(--alpha-bg-md)' }}
           >
             Nova importação
           </button>

@@ -223,7 +223,7 @@ function ServiceCard({ servico, leads }: { servico: ServicoConfig; leads: Lead[]
     <div className="bg-card border rounded-xl overflow-hidden transition-all">
       <button
         onClick={() => setExpanded(v => !v)}
-        className="w-full px-5 py-4 flex items-center gap-4 hover:bg-[rgba(255,255,255,0.03)] transition-colors text-left"
+        className="w-full px-5 py-4 flex items-center gap-4 hover:bg-[var(--alpha-bg-xs)] transition-colors text-left"
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
@@ -247,7 +247,7 @@ function ServiceCard({ servico, leads }: { servico: ServicoConfig; leads: Lead[]
       </button>
 
       {expanded && (
-        <div className="border-t px-5 pb-4 space-y-1.5 pt-3" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="border-t px-5 pb-4 space-y-1.5 pt-3" style={{ borderColor: 'var(--alpha-bg-sm)' }}>
           {scored.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">Nenhum lead qualificado para este serviço.</p>
           ) : (
@@ -416,7 +416,7 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
                 </div>
               </div>
               {data.qsa && data.qsa.length > 0 && (
-                <div className="border-t pt-2 mt-2" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                <div className="border-t pt-2 mt-2" style={{ borderColor: 'var(--alpha-bg-sm)' }}>
                   <p className="text-xs font-medium text-fg4 mb-1">Quadro societário</p>
                   {data.qsa.slice(0, 3).map((s, i) => (
                     <p key={i} className="text-xs text-muted-foreground">{s.nome_socio} <span className="text-fg4">— {s.qual_socio_descricao}</span></p>
@@ -427,7 +427,7 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
           </Card>
 
           {/* ── Registro de Marca (INPI) ────────────────────────────────── */}
-          <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="rounded-xl p-4 space-y-3" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-bg-md)' }}>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <ShieldQuestion className="w-4 h-4" style={{ color: '#6bd0e7' }} />
@@ -437,7 +437,7 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
                 href={inpiUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg hover:bg-[rgba(255,255,255,0.07)] transition-colors"
+                className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg hover:bg-[var(--alpha-border)] transition-colors"
                 style={{ color: '#6bd0e7', border: '1px solid rgba(107,208,231,0.25)' }}
               >
                 <ExternalLink className="w-3 h-3" />
@@ -458,9 +458,9 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
                   onClick={() => setRmStatus(key)}
                   className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg transition-all"
                   style={{
-                    color: rmStatus === key ? cfg.color : 'rgba(255,255,255,0.40)',
+                    color: rmStatus === key ? cfg.color : 'var(--text-dim-a)',
                     background: rmStatus === key ? `color-mix(in srgb, ${cfg.color} 12%, transparent)` : 'transparent',
-                    border: `1px solid ${rmStatus === key ? cfg.border : 'rgba(255,255,255,0.08)'}`,
+                    border: `1px solid ${rmStatus === key ? cfg.border : 'var(--alpha-bg-md)'}`,
                   }}
                 >
                   {cfg.icon}
@@ -504,7 +504,7 @@ function CnpjProspectForm({ onCreated }: { onCreated: () => void }) {
           {activeServicos.length > 0 && (
             <div className="space-y-2">
               <Label>Serviços de interesse <span className="text-fg4 font-normal text-xs">(selecione quantos quiser)</span></Label>
-              <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div className="grid grid-cols-2 gap-1.5 p-3 rounded-lg" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}>
                 {activeServicos.map(s => {
                   const sel = servicosIds.includes(s.id)
                   return (

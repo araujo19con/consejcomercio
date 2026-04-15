@@ -169,7 +169,7 @@ export function NewLeadModal({ open, onClose, prefill }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Estado (UF) <span style={{ color: 'rgba(107,208,231,0.60)', fontSize: 10 }}>detectado pelo DDD</span></Label>
+            <Label>Estado (UF) <span style={{ color: 'var(--cyan-mid)', fontSize: 10 }}>detectado pelo DDD</span></Label>
             <Select value={estado || undefined} onValueChange={(v) => setValue('estado', v)}>
               <SelectTrigger><SelectValue placeholder="Selecione ou detectado pelo DDD" /></SelectTrigger>
               <SelectContent>

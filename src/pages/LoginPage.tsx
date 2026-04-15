@@ -84,13 +84,13 @@ export function LoginPage() {
           position: 'relative',
           zIndex: 10,
           maxWidth: 380,
-          background: 'rgba(255,255,255,0.04)',
+          background: 'var(--alpha-bg-xs)',
           border: '1px solid rgba(107,208,231,0.18)',
           borderRadius: 16,
           padding: '40px 36px 36px',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: '0 0 0 1px rgba(0,137,172,0.08), 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
+          boxShadow: '0 0 0 1px rgba(0,137,172,0.08), 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 var(--alpha-bg-sm)',
         }}
       >
         {/* Logo area */}
@@ -110,32 +110,32 @@ export function LoginPage() {
 
         {mode === 'login' && (
           <>
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 4 }}>Entrar</p>
-            <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', marginBottom: 24 }}>Acesso restrito à equipe CONSEJ</p>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-strong-a)', marginBottom: 4 }}>Entrar</p>
+            <p style={{ fontSize: 12, color: 'var(--cyan-mid)', marginBottom: 24 }}>Acesso restrito à equipe CONSEJ</p>
 
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <Label htmlFor="email" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <Label htmlFor="email" style={{ color: 'var(--text-dim-a)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Email
                 </Label>
                 <Input
                   id="email" type="email" placeholder="seu@email.com"
                   value={email} onChange={(e) => setEmail(e.target.value)} required
-                  style={{ marginTop: 6, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
-                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
+                  style={{ marginTop: 6, background: 'var(--alpha-bg-sm)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)' }}
+                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[var(--text-dim-a)]"
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <Label htmlFor="password" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <Label htmlFor="password" style={{ color: 'var(--text-dim-a)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Senha
                   </Label>
                   <button
                     type="button"
                     onClick={() => setMode('forgot')}
-                    style={{ fontSize: 11, color: 'rgba(107,208,231,0.55)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    style={{ fontSize: 11, color: 'var(--cyan-lo)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     onMouseEnter={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.9)')}
-                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.55)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--cyan-lo)')}
                   >
                     Esqueci minha senha
                   </button>
@@ -143,8 +143,8 @@ export function LoginPage() {
                 <Input
                   id="password" type="password" placeholder="••••••••"
                   value={password} onChange={(e) => setPassword(e.target.value)} required
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
-                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
+                  style={{ background: 'var(--alpha-bg-sm)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)' }}
+                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[var(--text-dim-a)]"
                 />
               </div>
               <Button
@@ -157,7 +157,7 @@ export function LoginPage() {
               </Button>
             </form>
 
-            <p className="text-center mt-5" style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', lineHeight: 1.6 }}>
+            <p className="text-center mt-5" style={{ fontSize: 11, color: 'var(--text-dim-a)', lineHeight: 1.6 }}>
               Acesso apenas para membros da equipe.<br />
               Contate o administrador para criar sua conta.
             </p>
@@ -169,26 +169,26 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => setMode('login')}
-              style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(107,208,231,0.55)', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 20 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--cyan-lo)', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 20 }}
               onMouseEnter={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.9)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.55)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--cyan-lo)')}
             >
               <ArrowLeft style={{ width: 13, height: 13 }} /> Voltar ao login
             </button>
 
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 4 }}>Recuperar senha</p>
-            <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', marginBottom: 24 }}>Enviaremos um link de redefinição para seu e-mail</p>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-strong-a)', marginBottom: 4 }}>Recuperar senha</p>
+            <p style={{ fontSize: 12, color: 'var(--cyan-mid)', marginBottom: 24 }}>Enviaremos um link de redefinição para seu e-mail</p>
 
             <form onSubmit={handleForgot} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <Label htmlFor="email-forgot" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <Label htmlFor="email-forgot" style={{ color: 'var(--text-dim-a)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Email
                 </Label>
                 <Input
                   id="email-forgot" type="email" placeholder="seu@email.com"
                   value={email} onChange={(e) => setEmail(e.target.value)} required
-                  style={{ marginTop: 6, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
-                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[rgba(255,255,255,0.25)]"
+                  style={{ marginTop: 6, background: 'var(--alpha-bg-sm)', border: '1px solid var(--alpha-border-md)', color: 'var(--text-strong-a)' }}
+                  className="focus:border-[rgba(0,137,172,0.6)] focus:bg-[rgba(0,137,172,0.06)] placeholder:text-[var(--text-dim-a)]"
                 />
               </div>
               <Button
@@ -208,8 +208,8 @@ export function LoginPage() {
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(0,137,172,0.15)', border: '1px solid rgba(0,137,172,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <span style={{ fontSize: 22 }}>✉</span>
             </div>
-            <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 8 }}>E-mail enviado!</p>
-            <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.65)', lineHeight: 1.7, marginBottom: 24 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-strong-a)', marginBottom: 8 }}>E-mail enviado!</p>
+            <p style={{ fontSize: 12, color: 'var(--cyan-mid)', lineHeight: 1.7, marginBottom: 24 }}>
               Verifique sua caixa de entrada em<br />
               <span style={{ color: 'rgba(107,208,231,0.9)', fontWeight: 500 }}>{email}</span><br />
               e clique no link para redefinir sua senha.
@@ -217,9 +217,9 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => { setMode('login'); setEmail('') }}
-              style={{ fontSize: 12, color: 'rgba(107,208,231,0.55)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+              style={{ fontSize: 12, color: 'var(--cyan-lo)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.9)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.55)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--cyan-lo)')}
             >
               Voltar ao login
             </button>

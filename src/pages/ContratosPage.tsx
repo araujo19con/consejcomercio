@@ -211,7 +211,7 @@ function ContratoModal({ contrato, onClose }: { contrato: Contrato; onClose: () 
                 <Save className="w-3.5 h-3.5" />{update.isPending ? 'Salvando...' : 'Salvar'}
               </button>
             )}
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-fg4"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[var(--alpha-bg-xs)] text-fg4"><X className="w-5 h-5" /></button>
           </div>
         </div>
 
@@ -391,7 +391,7 @@ export function ContratosPage() {
               return (
                 <button key={tab.value} onClick={() => setTipoFilter(tab.value)}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border"
-                  style={isActive ? { backgroundColor: `${tab.activeColor}22`, borderColor: `${tab.activeColor}55`, color: tab.activeColor } : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }}
+                  style={isActive ? { backgroundColor: `${tab.activeColor}22`, borderColor: `${tab.activeColor}55`, color: tab.activeColor } : { backgroundColor: 'transparent', borderColor: 'var(--alpha-bg-md)', color: 'var(--text-soft-a)' }}
                 >
                   {tab.label} <span className="tabular-nums text-[10px]">{count}</span>
                 </button>
@@ -408,7 +408,7 @@ export function ContratosPage() {
               return (
                 <button key={tab.value} onClick={() => setStatusFilter(tab.value)}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border"
-                  style={isActive ? { backgroundColor: `${tab.activeColor}22`, borderColor: `${tab.activeColor}55`, color: tab.activeColor } : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }}
+                  style={isActive ? { backgroundColor: `${tab.activeColor}22`, borderColor: `${tab.activeColor}55`, color: tab.activeColor } : { backgroundColor: 'transparent', borderColor: 'var(--alpha-bg-md)', color: 'var(--text-soft-a)' }}
                 >
                   {tab.label} <span className="tabular-nums text-[10px]">{count}</span>
                 </button>
@@ -428,7 +428,7 @@ export function ContratosPage() {
             return (
               <button key={tab.value} onClick={() => setRmFilter(tab.value)}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all border"
-                style={isActive ? { backgroundColor: `${accentColor}22`, borderColor: `${accentColor}55`, color: accentColor } : { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(130,150,170,0.65)' }}
+                style={isActive ? { backgroundColor: `${accentColor}22`, borderColor: `${accentColor}55`, color: accentColor } : { backgroundColor: 'transparent', borderColor: 'var(--alpha-bg-md)', color: 'var(--text-soft-a)' }}
               >
                 {tab.label} <span className="tabular-nums text-[10px]">{count}</span>
               </button>
@@ -442,7 +442,7 @@ export function ContratosPage() {
               value={sortBy}
               onChange={e => setSortBy(e.target.value as ContratoSort)}
               className="h-7 px-2.5 text-xs rounded-lg border focus:outline-none"
-              style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(150,165,180,0.80)' }}
+              style={{ background: 'var(--alpha-bg-xs)', borderColor: 'var(--alpha-border-md)', color: 'var(--text-soft-a)' }}
             >
               {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -453,16 +453,16 @@ export function ContratosPage() {
       {isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-card rounded-xl p-4 animate-pulse" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div key={i} className="bg-card rounded-xl p-4 animate-pulse" style={{ border: '1px solid var(--alpha-border)' }}>
               <div className="flex items-start gap-4">
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-[rgba(255,255,255,0.07)] rounded w-48" />
-                  <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-64" />
-                  <div className="h-2 bg-[rgba(255,255,255,0.04)] rounded w-full mt-3" />
+                  <div className="h-4 bg-[var(--alpha-border)] rounded w-48" />
+                  <div className="h-3 bg-[var(--alpha-bg-xs)] rounded w-64" />
+                  <div className="h-2 bg-[var(--alpha-bg-xs)] rounded w-full mt-3" />
                 </div>
                 <div className="space-y-1.5">
-                  <div className="h-4 bg-[rgba(255,255,255,0.07)] rounded w-20" />
-                  <div className="h-3 bg-[rgba(255,255,255,0.04)] rounded w-16" />
+                  <div className="h-4 bg-[var(--alpha-border)] rounded w-20" />
+                  <div className="h-3 bg-[var(--alpha-bg-xs)] rounded w-16" />
                 </div>
               </div>
             </div>
@@ -508,7 +508,7 @@ export function ContratosPage() {
                       </p>
                       <div className="flex flex-wrap gap-1 mt-1.5">
                         {contrato.areas_direito?.map(a => (
-                          <span key={a} className="text-xs bg-[rgba(255,255,255,0.04)] text-muted-foreground px-1.5 py-0.5 rounded">{a.replace(/_/g, ' ')}</span>
+                          <span key={a} className="text-xs bg-[var(--alpha-bg-xs)] text-muted-foreground px-1.5 py-0.5 rounded">{a.replace(/_/g, ' ')}</span>
                         ))}
                       </div>
                       <div className="mt-2">

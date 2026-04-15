@@ -35,6 +35,30 @@
     --fg-2:                210 14% 72%;   /* ~rgba(165,175,185) secondary text */
     --fg-4:                214 14% 38%;   /* ~rgba(72,88,104) subtle text */
 
+    /* ── Semi-transparent surface tokens (dark theme = white alpha) ── */
+    --alpha-bg-xs:    rgba(255,255,255,0.03);  /* very subtle card */
+    --alpha-bg-sm:    rgba(255,255,255,0.06);  /* subtle card */
+    --alpha-bg-md:    rgba(255,255,255,0.09);  /* medium surface */
+    --alpha-bg-lg:    rgba(255,255,255,0.13);  /* strong surface */
+    --alpha-border:   rgba(255,255,255,0.07);  /* subtle border */
+    --alpha-border-md:rgba(255,255,255,0.10);  /* medium border */
+    /* Text alphas used on dark surfaces */
+    --text-strong-a:  rgba(230,235,240,0.92);
+    --text-mid-a:     rgba(200,215,225,0.78);
+    --text-soft-a:    rgba(150,165,180,0.65);
+    --text-dim-a:     rgba(255,255,255,0.40);
+    /* Semantic color tokens (alpha = works on dark bg) */
+    --emerald-hi:  rgba(52,211,153,0.90);
+    --emerald-mid: rgba(52,211,153,0.78);
+    --emerald-lo:  rgba(52,211,153,0.65);
+    --amber-hi:    rgba(251,191,36,0.88);
+    --amber-mid:   rgba(251,191,36,0.75);
+    --amber-lo:    rgba(251,191,36,0.62);
+    --cyan-hi:     rgba(107,208,231,0.88);
+    --cyan-mid:    rgba(107,208,231,0.65);
+    --cyan-lo:     rgba(107,208,231,0.50);
+    --red-hi:      rgba(248,113,113,0.88);
+
     /* Sidebar (always dark — not overridden in light) */
     --sidebar-bg:          214 100% 6%;   /* #00081d */
     --sidebar-border:      214 100% 10%;  /* #000d32 */
@@ -73,6 +97,30 @@
     /* Text hierarchy — all ≥ 4.5:1 contrast on white */
     --fg-2:                215 25% 22%;   /* #2b3d52 */
     --fg-4:                215 18% 40%;   /* #526070 — 6.2:1 on white */
+
+    /* ── Surface tokens override for light theme ── */
+    --alpha-bg-xs:    hsl(210 22% 93%);
+    --alpha-bg-sm:    hsl(210 18% 90%);
+    --alpha-bg-md:    hsl(210 15% 86%);
+    --alpha-bg-lg:    hsl(210 12% 80%);
+    --alpha-border:   hsl(214 20% 78%);
+    --alpha-border-md:hsl(214 18% 70%);
+    /* Text tokens override — dark text for light bg */
+    --text-strong-a:  hsl(215 32% 10%);
+    --text-mid-a:     hsl(215 25% 20%);
+    --text-soft-a:    hsl(215 18% 42%);
+    --text-dim-a:     hsl(215 15% 50%);
+    /* Semantic colors boosted for light bg contrast */
+    --emerald-hi:  #059669;
+    --emerald-mid: #047857;
+    --emerald-lo:  #065f46;
+    --amber-hi:    #b45309;
+    --amber-mid:   #92400e;
+    --amber-lo:    #78350f;
+    --cyan-hi:     #0369a1;
+    --cyan-mid:    #075985;
+    --cyan-lo:     #0c4a6e;
+    --red-hi:      #b91c1c;
   }
 }
 
