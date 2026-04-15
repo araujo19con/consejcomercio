@@ -71,8 +71,13 @@ export function useUpdateLeadStatus() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, status, motivo_perda }: { id: string; status: string; motivo_perda?: string }) => {
-      const updates: Record<string, string> = { status }
+      const updates: Record<string, unknown> = { status }
       if (motivo_perda) updates.motivo_perda = motivo_perda
+      // When a deal is won, record who closed it
+      if (status === 'ganho_assessoria' || status === 'ganho_consultoria') {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) updates.fechado_por_id = user.id
+      }
       const { data, error } = await supabase.from('leads').update(updates).eq('id', id).select().single()
       if (error) throw error
       return data as Lead
@@ -89,10 +94,23 @@ export function useUpdateLeadStatus() {
       if (ctx?.previous) queryClient.setQueryData(QUERY_KEYS.leads.all, ctx.previous)
       toast.error('Erro ao mover lead')
     },
-    onSettled: (lead) => {
+    onSettled: async (lead) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.leads.all })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard })
-      if (lead) supabase.from('audit_logs').insert({ tabela: 'leads', registro_id: lead.id, acao: 'status_alterado', campo: 'status', valor_depois: { status: lead.status } })
+      if (lead) {
+        const { data: { user } } = await supabase.auth.getUser()
+        const { data: perfil } = user
+          ? await supabase.from('perfis').select('nome').eq('id', user.id).single()
+          : { data: null }
+        supabase.from('audit_logs').insert({
+          tabela: 'leads',
+          registro_id: lead.id,
+          acao: 'status_alterado',
+          campo: 'status',
+          valor_depois: { status: lead.status },
+          usuario: perfil?.nome ?? user?.email ?? null,
+        })
+      }
     },
   })
 }

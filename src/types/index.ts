@@ -14,6 +14,7 @@ export interface Lead {
   investimento_estimado?: string | null
   responsavel?: string | null
   responsavel_id?: string | null
+  fechado_por_id?: string | null
   referido_por_cliente_id?: string | null
   referido_por_parceiro_id?: string | null
   notas?: string | null
@@ -187,10 +188,27 @@ export interface ServicoConfig {
   valor: number
 }
 
+export interface MetasConfig {
+  meta_leads_mes: number
+  meta_mrr_mes: number
+  meta_diagnosticos_mes: number
+  meta_reunioes_mes: number
+  pontos_lead_criado: number
+  pontos_proposta: number
+  pontos_negociacao: number
+  pontos_diagnostico: number
+  pontos_reuniao: number
+  pontos_ganho_assessoria: number
+  pontos_ganho_consultoria: number
+  pontos_indicacao: number
+  recompensa_descricao: string
+}
+
 export interface Configuracoes {
   id: string
   alerta_renovacao_dias: number
   servicos: ServicoConfig[]
+  metas?: MetasConfig
   updated_at: string
 }
 

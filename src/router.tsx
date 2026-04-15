@@ -25,6 +25,7 @@ import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { PosJuniorsPage } from '@/pages/PosJuniorsPage'
 import { ProspeccaoPage } from '@/pages/ProspeccaoPage'
 import { AjudaPage } from '@/pages/AjudaPage'
+import { RankingPage } from '@/pages/RankingPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -57,6 +58,7 @@ export const router = createBrowserRouter([
       { path: 'pos-juniors', element: <PosJuniorsPage /> },
       { path: 'perfil', element: <PerfilPage /> },
       { path: 'ajuda', element: <AjudaPage /> },
+      { path: 'ranking', element: <RankingPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/dashboard" replace /> },

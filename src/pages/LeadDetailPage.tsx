@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { STAGE_COLORS, LEAD_SOURCE_LABELS, SEGMENTS, PIPELINE_STAGES, ESTADOS_BR } from '@/lib/constants'
+import { usePerfis } from '@/hooks/usePerfis'
 import { formatDate, getUFFromPhone } from '@/lib/utils'
 import { ArrowLeft, Stethoscope } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -22,6 +23,7 @@ export function LeadDetailPage() {
   const navigate = useNavigate()
   const { data: leads } = useLeads()
   const updateLead = useUpdateLead()
+  const { data: perfis = [] } = usePerfis()
   const lead = leads?.find(l => l.id === id)
 
   const [editing, setEditing] = useState<Partial<Lead>>({})
@@ -120,7 +122,23 @@ export function LeadDetailPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Responsável</Label>
-                  <Input value={editing.responsavel || ''} onChange={e => setEditing(p => ({ ...p, responsavel: e.target.value }))} />
+                  <Select
+                    value={editing.responsavel_id || ''}
+                    onValueChange={v => {
+                      const p = perfis.find(p => p.id === v)
+                      setEditing(prev => ({ ...prev, responsavel_id: v || null, responsavel: p?.nome ?? null }))
+                    }}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Membro da equipe" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Sem responsável</SelectItem>
+                      {perfis.map(p => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.nome}{p.cargo ? ` — ${p.cargo}` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label>Data do Diagnóstico</Label>

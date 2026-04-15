@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCreateLead } from '@/hooks/useLeads'
 import { useClientes } from '@/hooks/useClientes'
 import { useParceiros } from '@/hooks/useParceiros'
+import { usePerfis } from '@/hooks/usePerfis'
 import { LEAD_SOURCES, SEGMENTS, ESTADOS_BR } from '@/lib/constants'
 import { getUFFromPhone } from '@/lib/utils'
 
@@ -52,14 +53,20 @@ export function NewLeadModal({ open, onClose }: Props) {
   const createLead = useCreateLead()
   const { data: clientes } = useClientes()
   const { data: parceiros } = useParceiros()
+  const { data: perfis = [] } = usePerfis()
+
+  // Responsável: controlled separately so we can set both name + id
+  const [responsavelId, setResponsavelId] = useState('')
 
   function onSubmit(data: FormData) {
+    const selectedPerfil = perfis.find(p => p.id === responsavelId)
     createLead.mutate({
       ...data,
       email: data.email || null,
       estado: data.estado || null,
       notas: data.notas || null,
-      responsavel: data.responsavel || null,
+      responsavel: selectedPerfil?.nome ?? data.responsavel ?? null,
+      responsavel_id: responsavelId || null,
       status: 'classificacao',
       referido_por_cliente_id: origem === 'indicacao_cliente' ? referenteClienteId || null : null,
       referido_por_parceiro_id: origem === 'indicacao_parceiro' ? referenteParceiroId || null : null,
@@ -72,6 +79,7 @@ export function NewLeadModal({ open, onClose }: Props) {
         reset()
         setReferenteClienteId('')
         setReferenteParceiroId('')
+        setResponsavelId('')
         onClose()
       }
     })
@@ -168,7 +176,16 @@ export function NewLeadModal({ open, onClose }: Props) {
 
           <div className="space-y-1.5">
             <Label>Responsável</Label>
-            <Input {...register('responsavel')} placeholder="Nome do membro da equipe" />
+            <Select value={responsavelId} onValueChange={setResponsavelId}>
+              <SelectTrigger><SelectValue placeholder="Membro da equipe" /></SelectTrigger>
+              <SelectContent>
+                {perfis.map(p => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.nome}{p.cargo ? ` — ${p.cargo}` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
