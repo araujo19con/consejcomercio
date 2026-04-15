@@ -156,6 +156,15 @@ export function useConfiguracoes() {
         // Table may not exist yet — return defaults gracefully
         return DEFAULT_CONFIGURACOES
       }
+      // If the DB still has the old placeholder services, replace with real defaults
+      const rawServicos: ServicoConfig[] = data.servicos ?? []
+      const isOldPlaceholders = rawServicos.length <= 2 &&
+        rawServicos.every(s => s.id === 'simples' || s.id === 'complexa')
+
+      if (isOldPlaceholders) {
+        return { ...data, servicos: DEFAULT_SERVICOS } as Configuracoes
+      }
+
       // Merge DB servicos with any new default fields (backward compat)
       const servicoDefaults = {
         descricao: '',
@@ -166,7 +175,7 @@ export function useConfiguracoes() {
         up_sells: [] as string[],
         ativo: true,
       }
-      const dbServicos: ServicoConfig[] = (data.servicos ?? []).map((s: ServicoConfig) => ({
+      const dbServicos: ServicoConfig[] = rawServicos.map((s: ServicoConfig) => ({
         ...servicoDefaults,
         ...s,
       }))
