@@ -9,7 +9,8 @@ import { cn } from '@/lib/utils'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Stage = 'primeiro_contato' | 'followup' | 'diagnostico' | 'proposta' | 'negociacao' | 'pos_fechamento' | 'reativacao'
-type Sector = 'empresarial' | 'trabalhista' | 'familia' | 'imobiliario' | 'tributario' | 'consumidor' | 'contratual' | 'previdenciario' | 'geral'
+// Setores alinhados ao catálogo real da CONSEJ (useConfiguracoes.ts → ServicoCategoria)
+type Sector = 'geral' | 'societario' | 'contratual' | 'digital_lgpd' | 'trabalhista' | 'marca_pi'
 type Channel = 'whatsapp' | 'email' | 'linkedin'
 
 interface MsgTemplate { subject?: string; body: string }
@@ -28,16 +29,14 @@ const STAGES: { id: Stage; label: string; colorVal: string; bgVal: string }[] = 
   { id: 'reativacao',       label: 'Reativação',         colorVal: '#fda4af', bgVal: 'rgba(244,63,94,0.12)'   },
 ]
 
+// Setores espelham as categorias do catálogo de serviços (ServicoCategoria)
 const SECTORS: { id: Sector; label: string; emoji: string }[] = [
-  { id: 'geral',           label: 'Geral',                     emoji: '⚖️'  },
-  { id: 'empresarial',     label: 'Empresarial / Societário',  emoji: '🏢'  },
-  { id: 'trabalhista',     label: 'Trabalhista',               emoji: '👷'  },
-  { id: 'familia',         label: 'Família e Sucessões',       emoji: '👨‍👩‍👧'  },
-  { id: 'imobiliario',     label: 'Imobiliário',               emoji: '🏠'  },
-  { id: 'tributario',      label: 'Tributário / Fiscal',       emoji: '📊'  },
-  { id: 'consumidor',      label: 'Direito do Consumidor',     emoji: '🛒'  },
-  { id: 'contratual',      label: 'Contratos e Compliance',    emoji: '📝'  },
-  { id: 'previdenciario',  label: 'Previdenciário',            emoji: '🏛️'  },
+  { id: 'geral',         label: 'Geral / Assessoria',          emoji: '⚖️'  },
+  { id: 'societario',    label: 'Societário / Acordo Sócios',  emoji: '🤝'  },
+  { id: 'contratual',    label: 'Contratos / Inadimplência',   emoji: '📝'  },
+  { id: 'digital_lgpd',  label: 'Digital / LGPD',              emoji: '🔐'  },
+  { id: 'trabalhista',   label: 'Trabalhista',                 emoji: '👥'  },
+  { id: 'marca_pi',      label: 'Marca / INPI',                emoji: '™️'  },
 ]
 
 const CHANNELS: { id: Channel; label: string; icon: React.FC<{ className?: string }> }[] = [
@@ -59,122 +58,143 @@ const TEMPLATES: Templates = {
   /* ────────────────── PRIMEIRO CONTATO ────────────────── */
   primeiro_contato: {
     whatsapp: {
-      empresarial: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nMeu nome é {{responsavel}}, sou advogada na CONSEJ Advocacia.\n\nAtuamos com assessoria jurídica empresarial — contratos, societário e compliance — para empresas que querem crescer com segurança jurídica.\n\nTeria 15 minutinhos para uma conversa rápida essa semana?` },
-        { body: `Oi, {{nome}}! Tudo certo?\n\nSou {{responsavel}}, da CONSEJ Advocacia. Vi que você está à frente da {{empresa}} e acredito que podemos agregar bastante na área jurídica.\n\nPodemos marcar uma conversa rápida? Prometo ser breve! 😄` },
+      geral: [
+        { body: `Oi, {{nome}}, tudo certo?\n\nAqui é o(a) {{responsavel}}, da CONSEJ. A gente acompanha negócios em crescimento como a {{empresa}} e ajuda a dar os próximos passos sem burocratizar o jurídico.\n\nRola trocar uma ideia rápida essa semana? Tenho um diagnóstico gratuito que costuma render bastante insight — são uns 30 minutos, sem compromisso.` },
+        { body: `{{nome}}, tudo bem? 👋\n\n{{responsavel}} aqui, da CONSEJ. Vi a {{empresa}} e fiquei curioso(a) sobre o momento de vocês — a gente ajuda negócios a estruturar o jurídico enquanto eles crescem, não depois do problema acontecer.\n\nTopa uma conversa de 20 min pra eu entender o contexto e te mostrar onde dá pra destravar?` },
       ],
-      trabalhista: [
-        { body: `Olá, {{nome}}! Tudo bem?\n\nSou {{responsavel}}, da CONSEJ Advocacia. Trabalhamos com assessoria trabalhista preventiva — ajudando empresas a evitar passivos e gerir contratos de trabalho com segurança.\n\nTem um tempinho essa semana para conversarmos? 😊` },
-        { body: `Oi, {{nome}}! Tudo certo?\n\nMeu nome é {{responsavel}}, advogada trabalhista na CONSEJ. Sabemos o quanto o compliance trabalhista pode ser desafiador para empresas em crescimento como a {{empresa}}.\n\nPodemos marcar 15 min para eu te mostrar como podemos ajudar?` },
-      ],
-      familia: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nMeu nome é {{responsavel}}, sou advogada na CONSEJ Advocacia. Atuamos com Direito de Família e Sucessões — inventários, divórcios, planejamento patrimonial — com foco em resolver questões sensíveis com agilidade e discrição.\n\nSe você ou alguém próximo precisar, estarei à disposição!` },
-        { body: `Oi, {{nome}}! Tudo bem?\n\nSou {{responsavel}}, da CONSEJ Advocacia. Trabalhamos com planejamento sucessório e questões familiares com muito cuidado e sigilo.\n\nCaso queira conversar sobre proteção patrimonial ou qualquer demanda familiar, é só me chamar! 😊` },
-      ],
-      imobiliario: [
-        { body: `Olá, {{nome}}! Tudo bem?\n\nSou {{responsavel}}, da CONSEJ Advocacia. Atuamos com assessoria jurídica imobiliária — análise de contratos, due diligence e regularização de imóveis — para quem quer transacionar com total segurança.\n\nTem interesse em conversarmos? 😊` },
-        { body: `Oi, {{nome}}! Tudo certo?\n\nMeu nome é {{responsavel}}, advogada na CONSEJ. Sabemos que toda transação imobiliária envolve riscos jurídicos que podem ser evitados com a assessoria certa.\n\nPodemos marcar uma conversa rápida esta semana?` },
-      ],
-      tributario: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nSou {{responsavel}}, da CONSEJ Advocacia. Trabalhamos com planejamento tributário e contencioso fiscal — ajudando empresas a reduzir sua carga tributária de forma legal e segura.\n\nTem como conversarmos essa semana?` },
-        { body: `Oi, {{nome}}!\n\nMeu nome é {{responsavel}}, advogada tributarista na CONSEJ. Empresas como a {{empresa}} frequentemente pagam mais impostos do que o necessário por falta de planejamento adequado.\n\nGostaria de te mostrar como podemos ajudar. Tem 15 min esta semana?` },
-      ],
-      consumidor: [
-        { body: `Olá, {{nome}}! Tudo bem?\n\nSou {{responsavel}}, da CONSEJ Advocacia. Atuamos com Direito do Consumidor — tanto na defesa de consumidores quanto na assessoria de empresas para adequação às normas do CDC.\n\nPodemos conversar rapidamente? 😊` },
-        { body: `Oi, {{nome}}! Tudo certo?\n\nMeu nome é {{responsavel}}, da CONSEJ Advocacia. Sei que adequar a {{empresa}} ao CDC pode gerar dúvidas — estamos aqui para simplificar isso.\n\nTem um tempinho para conversarmos esta semana?` },
+      societario: [
+        { body: `Oi, {{nome}}! {{responsavel}} aqui, da CONSEJ.\n\nUma coisa que a gente vê muito em negócios como a {{empresa}}: sócios que começaram no boca-a-boca e hoje estão tomando decisões grandes sem um acordo formal. Quando vira conflito, vira caro.\n\nAcordo de sócios resolve isso em 1–2 semanas. Bora marcar 20 min pra eu te explicar como a gente estrutura?` },
+        { body: `{{nome}}, tudo bem?\n\nSou {{responsavel}}, da CONSEJ. A gente ajuda empresas na parte societária — contrato social, acordo de sócios, saída/entrada de sócio, governança.\n\nSó queria te fazer uma pergunta: se um dos sócios da {{empresa}} quisesse sair hoje, vocês sabem exatamente como ficaria a divisão? Se a resposta for "acho que sim", vale a pena a gente conversar 15 min.` },
       ],
       contratual: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nSou {{responsavel}}, da CONSEJ Advocacia. Somos especialistas em elaboração, revisão e gestão de contratos comerciais — ajudando empresas a fechar negócios com segurança.\n\nPodemos marcar uma conversa rápida?` },
-        { body: `Oi, {{nome}}!\n\nMeu nome é {{responsavel}}, da CONSEJ. Sabemos que contratos mal redigidos são uma das maiores fontes de litígio para empresas.\n\nGostaria de mostrar como podemos blindar juridicamente os contratos da {{empresa}}. Tem 15 min esta semana?` },
+        { body: `Oi, {{nome}}! {{responsavel}} aqui, da CONSEJ 👋\n\nUm padrão que vejo em empresas em crescimento: contrato baixado da internet, adaptado no Word, sem cláusula de reajuste, sem multa, sem foro. Funciona até o dia que vira problema.\n\nA gente revisa e estrutura um modelo-padrão pra {{empresa}} em poucos dias. Rolaria uns 20 min essa semana pra eu te mostrar como?` },
+        { body: `{{nome}}, tudo certo?\n\nSou {{responsavel}}, da CONSEJ. A gente cuida de contratos e inadimplência pra empresas como a {{empresa}} — revisão, modelos-padrão, cobrança estruturada.\n\nPergunta rápida: quando um cliente atrasa, existe um processo claro na {{empresa}} ou fica no improviso? Se é improviso, talvez valha 15 min de conversa. Tem um diagnóstico gratuito que já te entrega um plano de ação.` },
       ],
-      previdenciario: [
-        { body: `Olá, {{nome}}! Tudo bem?\n\nSou {{responsavel}}, da CONSEJ Advocacia. Atuamos com Direito Previdenciário — aposentadorias, revisões de benefícios e recursos administrativos — para garantir que você receba o que tem direito.\n\nPodemos conversar? 😊` },
-        { body: `Oi, {{nome}}! Tudo certo?\n\nMeu nome é {{responsavel}}, da CONSEJ Advocacia. Muitas pessoas deixam de receber benefícios previdenciários por falta de orientação adequada.\n\nGostaria de fazer uma análise gratuita do seu caso. Tem interesse?` },
+      digital_lgpd: [
+        { body: `Oi, {{nome}}! {{responsavel}}, da CONSEJ.\n\nVi que a {{empresa}} coleta dado de cliente (formulário, cadastro, checkout) — e hoje isso é LGPD. Sem política de privacidade e mapeamento mínimo, um cliente pode travar um pagamento ou a ANPD pode vir bater.\n\nA gente adequa em 2–3 semanas, sem virar projeto infinito. Topa 20 min pra eu te mostrar o escopo?` },
+        { body: `{{nome}}, tudo bem?\n\nSou {{responsavel}}, da CONSEJ. Uma dor recorrente em negócios digitais como a {{empresa}}: começam a fechar contratos maiores e o cliente pede "comprovação de LGPD". Quem não tem, perde o contrato.\n\nA gente faz a adequação de forma enxuta — política, termos, mapeamento. Rola uma conversa rápida essa semana?` },
       ],
-      geral: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nMeu nome é {{responsavel}}, sou advogada na CONSEJ Advocacia. Trabalhamos com assessoria jurídica para pessoas e empresas que buscam resolver questões legais com agilidade e segurança.\n\nPosso te contar mais sobre o nosso trabalho?` },
-        { body: `Oi, {{nome}}! Tudo certo?\n\nSou {{responsavel}}, da CONSEJ Advocacia. Temos ajudado pessoas e empresas a resolver demandas jurídicas de forma eficiente e acessível.\n\nGostaria de marcar uma conversa rápida para entender melhor como posso te ajudar? 😊` },
+      trabalhista: [
+        { body: `Oi, {{nome}}! {{responsavel}} aqui, da CONSEJ.\n\nOlhando pra {{empresa}}, uma coisa que a gente vê bastante: time crescendo, contratação na base do PJ "porque é mais fácil", sem documentação trabalhista adequada. Isso vira passivo rápido.\n\nA gente estrutura os documentos (contrato, política, acordo) numa sprint curta. 20 min de conversa pra eu te explicar?` },
+        { body: `{{nome}}, tudo certo?\n\nSou {{responsavel}}, da CONSEJ. A gente ajuda empresas em crescimento a estruturar a parte trabalhista sem criar burocracia — contrato CLT, PJ bem feito, política de home office, regras claras.\n\nSe a {{empresa}} já contrata ou tá perto de contratar, vale a pena 15 min. Quando fica bom pra você?` },
+      ],
+      marca_pi: [
+        { body: `Oi, {{nome}}! 👋\n\n{{responsavel}}, da CONSEJ. Fiz uma busca rápida no INPI e a marca da {{empresa}} não aparece registrada (ou tá em nome de outro titular — por isso quero confirmar com você).\n\nSem registro, qualquer um pode pedir a marca antes e você é obrigado a mudar de nome. A gente deposita e acompanha o processo inteiro. Rola 15 min pra alinhar?` },
+        { body: `{{nome}}, tudo bem?\n\nSou {{responsavel}}, da CONSEJ. Trabalho com registro de marca no INPI — e uma coisa que vejo muito é empresa que investe pesado em branding e deixa a marca vulnerável porque "depois a gente registra".\n\nO processo leva ~18 meses, então quanto antes começar, melhor. Topa uma conversa rápida pra eu te mostrar o passo a passo?` },
       ],
     },
     email: {
-      empresarial: [
+      geral: [
         {
-          subject: `Assessoria Jurídica Empresarial para a {{empresa}}`,
-          body: `Olá, {{nome}},\n\nEspero que esteja bem!\n\nMeu nome é {{responsavel}} e faço parte da equipe da CONSEJ Advocacia. Trabalhamos com assessoria jurídica empresarial, apoiando empresas como a {{empresa}} em:\n\n• Elaboração e revisão de contratos\n• Estruturação e reestruturação societária\n• Compliance e gestão de riscos jurídicos\n• Resolução de disputas e litígios\n\nGostaria de agendar uma conversa de 20 minutos para entender melhor as necessidades da {{empresa}} e apresentar como podemos contribuir.\n\nEstaria disponível ainda esta semana?\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Segurança jurídica pra {{empresa}} — sem virar burocracia`,
+          body: `Oi, {{nome}},\n\nAqui é o(a) {{responsavel}}, da CONSEJ.\n\nA gente trabalha com negócios em crescimento — startups, empresas juniores, escritórios criativos, empresas de gestão — e o que a gente mais ouve é "precisamos organizar o jurídico, mas não queremos virar uma empresa engessada". É exatamente esse o ponto da CONSEJ: estruturar sem burocratizar.\n\nPor isso queria te propor uma conversa curta (30 min, sem custo) pra entender o momento da {{empresa}} e, se fizer sentido, desenhar um diagnóstico do que vale a pena cuidar agora e do que pode esperar.\n\nAlgum horário essa semana funcionaria pra você?\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
+        },
+      ],
+      societario: [
+        {
+          subject: `Acordo de sócios — antes do problema aparecer, {{nome}}`,
+          body: `Oi, {{nome}},\n\n{{responsavel}} aqui, da CONSEJ.\n\nPerguntinha direta: se um dos sócios da {{empresa}} quisesse sair amanhã, vocês conseguiriam resolver essa saída em uma conversa — ou viraria uma negociação longa, cara e desgastante?\n\nEssa é a pergunta que a gente faz logo no início porque ela decide se um acordo de sócios é urgente ou pode esperar. Na maioria dos negócios em crescimento, descobrimos que é urgente — e dá pra resolver em 1 ou 2 semanas, com um documento que cobre saída, entrada, morte, incapacidade, deadlock e distribuição.\n\nSe quiser, tenho um diagnóstico gratuito (30 min) pra mapear isso junto com você. Me avisa se faz sentido essa semana ou a próxima.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
+        },
+      ],
+      contratual: [
+        {
+          subject: `Um contrato bem feito é a coisa mais barata que a {{empresa}} pode ter`,
+          body: `Oi, {{nome}},\n\n{{responsavel}}, da CONSEJ.\n\nA maior parte dos problemas jurídicos que a gente resolve em empresas em crescimento começa no mesmo lugar: contrato baixado da internet, adaptado no Word, sem cláusulas básicas de reajuste, rescisão ou multa. Quando o cliente atrasa ou quer sair, não tem como cobrar direito.\n\nA gente estrutura os contratos da {{empresa}} (padrão de venda, prestação de serviço, fornecimento, NDA) de forma que você use sem pedir ajuda toda vez. Normalmente fecha em 2–3 semanas.\n\nTopa uns 30 min de conversa pra eu entender o contexto e te mostrar o escopo?\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
+        },
+      ],
+      digital_lgpd: [
+        {
+          subject: `LGPD na {{empresa}} — sem transformar isso num projeto de 6 meses`,
+          body: `Oi, {{nome}},\n\n{{responsavel}}, da CONSEJ.\n\nUma coisa que vejo bastante em negócios digitais: a LGPD vira um monstro quando ninguém ataca. A gente acredita no oposto — adequação enxuta, em 2 ou 3 semanas, que cobre o que realmente importa: política de privacidade, termos de uso, mapeamento de dados, processo de atendimento a titular e base legal de tratamento.\n\nIsso resolve 90% do risco prático e garante que, quando um cliente grande pedir "comprovação de LGPD", a {{empresa}} tem a resposta pronta.\n\nRolaria 30 min pra eu entender como vocês coletam e tratam dados hoje e te devolver um plano de ação?\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
       trabalhista: [
         {
-          subject: `Assessoria Trabalhista Preventiva — CONSEJ Advocacia`,
-          body: `Olá, {{nome}},\n\nMeu nome é {{responsavel}}, advogada na CONSEJ Advocacia.\n\nEntrei em contato porque trabalhamos com assessoria trabalhista preventiva para empresas em crescimento — auxiliando na elaboração de contratos de trabalho, gestão de passivos e treinamentos de compliance.\n\nEmpesas que investem em prevenção reduzem significativamente o risco de ações trabalhistas e passivos ocultos.\n\nGostaria de marcar uma conversa rápida para conhecer melhor a realidade da {{empresa}}?\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Estruturar o RH da {{empresa}} antes de virar passivo`,
+          body: `Oi, {{nome}},\n\n{{responsavel}}, da CONSEJ.\n\nA gente vê muito negócio em crescimento contratando PJ "porque é mais simples" — e depois descobrindo que aquele PJ virou vínculo, o que vira passivo, que vira ação, que vira prejuízo. O remédio é chato; a prevenção é barata.\n\nNa CONSEJ, a gente ajuda a {{empresa}} a estruturar os documentos trabalhistas certos pro momento: contrato CLT quando faz sentido, PJ bem redigido quando faz sentido, política interna, regras de home office e acordo de confidencialidade.\n\nSe tiver 30 min essa semana, topo te mostrar o que costuma ser prioridade pra empresa do porte da {{empresa}}.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
-      imobiliario: [
+      marca_pi: [
         {
-          subject: `Assessoria Jurídica Imobiliária — CONSEJ Advocacia`,
-          body: `Olá, {{nome}},\n\nMeu nome é {{responsavel}}, da CONSEJ Advocacia.\n\nAtuamos com assessoria jurídica imobiliária completa — análise de contratos de compra e venda, due diligence, regularização de imóveis e contencioso.\n\nSabemos que cada negócio imobiliário envolve riscos que podem ser mitigados com a assessoria certa desde o início.\n\nGostaria de agendar uma conversa breve para entender sua demanda e apresentar como podemos ajudar?\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
-        },
-      ],
-      tributario: [
-        {
-          subject: `Redução de Carga Tributária — CONSEJ Advocacia`,
-          body: `Olá, {{nome}},\n\nMeu nome é {{responsavel}}, tributarista na CONSEJ Advocacia.\n\nMuitas empresas pagam mais impostos do que o necessário pela ausência de planejamento tributário adequado. Nossa equipe atua na identificação de oportunidades legais de redução de carga tributária e na defesa em contencioso fiscal.\n\nGostaria de agendar uma análise preliminar gratuita da situação tributária da {{empresa}}?\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
-        },
-      ],
-      geral: [
-        {
-          subject: `CONSEJ Advocacia — Assessoria Jurídica para {{empresa}}`,
-          body: `Olá, {{nome}},\n\nEspero encontrá-lo(a) bem!\n\nMeu nome é {{responsavel}} e faço parte da equipe da CONSEJ Advocacia. Somos um escritório comprometido em oferecer assessoria jurídica ágil e acessível para pessoas e empresas.\n\nGostaríamos de entender melhor as suas necessidades jurídicas e apresentar como podemos contribuir.\n\nPodemos marcar uma conversa rápida ainda esta semana?\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `A marca da {{empresa}} tá protegida? (provavelmente não)`,
+          body: `Oi, {{nome}},\n\n{{responsavel}}, da CONSEJ.\n\nFui olhar rapidamente a marca da {{empresa}} no INPI e não achei registro ativo em nome de vocês — ou achei algo que precisa ser validado com você pra ter certeza.\n\nO ponto é: marca sem registro é marca vulnerável. Qualquer pessoa pode depositar antes e, se depositar, a {{empresa}} é obrigada a mudar de nome. O processo leva cerca de 18 meses, então quanto antes começar, menor o risco.\n\nNa CONSEJ, a gente faz a busca de anterioridade, o depósito e o acompanhamento até a concessão. Se quiser, te mando a análise da marca de vocês junto de uma conversa de 20 min essa semana.\n\nMe avisa se faz sentido.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
     },
     linkedin: {
-      empresarial: [
-        { body: `Olá, {{nome}}! Vi o seu trabalho à frente da {{empresa}} e fiquei muito impressionado(a) com o que vocês estão construindo.\n\nSou {{responsavel}}, advogada na CONSEJ Advocacia — trabalhamos com assessoria jurídica empresarial para empresas em crescimento.\n\nGostaria de trocar uma ideia sobre como podemos apoiar a {{empresa}} juridicamente. Seria possível marcarmos uma conversa rápida?` },
+      geral: [
+        { body: `Oi, {{nome}}! Acompanhei um pouco o que vocês estão construindo na {{empresa}} e fiquei curioso(a) pra conversar.\n\nAqui é o(a) {{responsavel}}, da CONSEJ — a gente trabalha com negócios em crescimento (startups, MEJs, escritórios criativos, empresas de gestão) ajudando a estruturar o jurídico sem burocratizar. O foco é prevenir problema, não apagar incêndio.\n\nTopa trocar uma ideia rápida? Tenho um diagnóstico gratuito de 30 min que costuma gerar vários insights mesmo pra quem já tem tudo "mais ou menos" organizado.` },
+      ],
+      societario: [
+        { body: `Oi, {{nome}}! Vi o trabalho de vocês à frente da {{empresa}} e fiquei com vontade de conversar.\n\nSou {{responsavel}}, da CONSEJ. A gente ajuda negócios a estruturar a parte societária — contrato social, acordo de sócios, governança — antes que vire conflito. É o tipo de coisa que parece que pode esperar… até não poder mais.\n\nRolaria uma conversa curta essa semana? Se preferir, consigo te mandar um material curto sobre acordo de sócios antes, sem compromisso.` },
+      ],
+      contratual: [
+        { body: `Oi, {{nome}}! Acompanhei o que vocês estão construindo na {{empresa}} e fiquei impressionado(a).\n\nAqui é o(a) {{responsavel}}, da CONSEJ. Trabalho com estruturação de contratos e cobrança para empresas em crescimento — basicamente, deixar o time comercial rodando sem medo de assinar, e deixar o financeiro com um processo claro quando alguém atrasa.\n\nTopa trocar uma ideia? Não é reunião de venda, é conversa mesmo — quero entender o momento de vocês.` },
+      ],
+      digital_lgpd: [
+        { body: `Oi, {{nome}}! Vi o posicionamento digital da {{empresa}} e me chamou atenção.\n\n{{responsavel}} aqui, da CONSEJ. A gente ajuda negócios digitais a fazer adequação à LGPD de forma enxuta — sem virar projeto infinito, sem relatórios que ninguém lê. O objetivo é que, quando o cliente grande pedir "comprovação de LGPD", vocês tenham a resposta pronta.\n\nRola uma conversa de 20 min nos próximos dias? Sem compromisso.` },
       ],
       trabalhista: [
-        { body: `Olá, {{nome}}! Acompanho o trabalho da {{empresa}} e admiro muito o que vocês têm feito.\n\nSou {{responsavel}}, advogada trabalhista na CONSEJ Advocacia. Apoiamos empresas em crescimento a estruturar relações trabalhistas sólidas e a mitigar riscos de passivos.\n\nPodemos conversar sobre isso? Tenho algumas ideias que podem ser relevantes para a {{empresa}}.` },
+        { body: `Oi, {{nome}}! Curti bastante o que vocês estão construindo na {{empresa}}.\n\nSou {{responsavel}}, da CONSEJ. Ajudo negócios em crescimento a estruturar a parte trabalhista antes de virar passivo — contratação certa, documentos certos, regras claras. A ideia é que o time comercial e o time operacional cresçam sem o jurídico virar gargalo.\n\nSe fizer sentido, topo 20 min de conversa essa semana. Se não, fica o contato pra quando precisar.` },
       ],
-      geral: [
-        { body: `Olá, {{nome}}! Tive a oportunidade de conhecer seu trabalho e fiquei com vontade de conversar.\n\nSou {{responsavel}}, da CONSEJ Advocacia — trabalhamos com assessoria jurídica personalizada para pessoas e empresas.\n\nSeria possível trocarmos uma ideia sobre como posso contribuir? Ficarei feliz em agendar uma conversa breve no horário que for melhor para você.` },
+      marca_pi: [
+        { body: `Oi, {{nome}}! Fiquei olhando o branding da {{empresa}} — gostei muito.\n\nAqui é o(a) {{responsavel}}, da CONSEJ. Só queria te avisar uma coisa: dei uma olhada no INPI e não achei a marca de vocês registrada (ou achei algo que precisa ser confirmado). Marca sem registro é marca vulnerável — qualquer um pode depositar antes.\n\nSe topar, tenho uns 15 min pra te mostrar a busca e explicar o processo. Sem compromisso.` },
       ],
     },
   },
 
   /* ────────────────── FOLLOW-UP ────────────────── */
+  /* Cadência CONSEJ: Dia 3 (reforço), Dia 5 (educativo), Dia 7 (descontraído), Dia 10 (encerramento) */
   followup: {
     whatsapp: {
       geral: [
-        { body: `Oi, {{nome}}! Tudo bem? 😊\n\nPassando para dar um oi e ver se você teve a oportunidade de pensar na nossa conversa.\n\nCaso tenha surgido alguma dúvida ou queira saber mais sobre como a CONSEJ pode te ajudar, é só me chamar!\n\n{{responsavel}} — CONSEJ Advocacia` },
-        { body: `Olá, {{nome}}! Tudo certo?\n\nSei que a rotina é corrida, mas queria retomar nossa conversa. Acredito que temos muito a oferecer para {{empresa}}.\n\nTem 15 minutos essa semana para conversarmos?\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `Oi, {{nome}}! Tô por aqui 👋\n\nSei que semana passou rápido. Só queria reforçar: aquele diagnóstico de 30 min continua em pé, sem custo e sem compromisso. Se fizer sentido, me manda um horário que a gente encaixa.\n\nSe não for o momento, sem problema — é só me avisar que eu paro de encher. 🙂\n\n{{responsavel}} — CONSEJ` },
+        { body: `{{nome}}, boa tarde!\n\nNão quero virar spam, prometo. Só queria deixar uma coisa pra você pensar: a maioria dos negócios que a gente atende na CONSEJ chegou depois de um problema — não antes. O diagnóstico gratuito existe justamente pra inverter essa ordem.\n\nSe rolar 30 min na próxima semana, me avisa. Senão, fica o contato. 🤝\n\n{{responsavel}} — CONSEJ` },
+        { body: `Oi, {{nome}}! Última tentativa (prometo). 😅\n\nVou parar de te chamar por aqui pra não incomodar. Mas fica o meu contato salvo — no dia que precisar de qualquer coisa jurídica na {{empresa}}, pode me mandar mensagem direto. A conversa fica aberta.\n\nAbraço e sucesso aí!\n\n{{responsavel}} — CONSEJ` },
       ],
-      empresarial: [
-        { body: `Oi, {{nome}}! 😊\n\nPassando para retomar nosso contato. Sei que é uma semana agitada, mas queria reforçar: estamos prontos para apoiar a {{empresa}} com assessoria jurídica empresarial sob medida.\n\nQuando tiver um tempinho, me chama! 🙂\n\n{{responsavel}} — CONSEJ Advocacia` },
+      societario: [
+        { body: `Oi, {{nome}}! 👋\n\nRetomando nossa conversa sobre acordo de sócios. Sei que não é o tipo de coisa que parece urgente até o dia que é — e por isso insisto um pouco.\n\nTenho 3 janelas na semana que vem. Topa 20 min só pra eu te mostrar o que costuma entrar no documento e o impacto prático de ter/não ter?\n\n{{responsavel}} — CONSEJ` },
+      ],
+      contratual: [
+        { body: `Oi, {{nome}}! Tudo bem?\n\nUma coisa que esqueci de te mencionar: a gente fez recentemente um diagnóstico numa empresa parecida com a {{empresa}} e descobrimos que 80% dos contratos deles não tinham cláusula de reajuste. Acontece muito.\n\nSe quiser, mando o checklist que a gente usa pra avaliar contrato — é gratuito, te chega por aqui mesmo. É só falar "manda".\n\n{{responsavel}} — CONSEJ` },
+      ],
+      digital_lgpd: [
+        { body: `Oi, {{nome}}!\n\nSó uma curiosidade: a {{empresa}} já recebeu algum pedido de "comprovação de LGPD" de cliente grande? Tá cada vez mais comum, e quem não tem, trava o fechamento.\n\nSe tiver 20 min na próxima semana, te mostro o escopo enxuto que a gente faz pra resolver isso rápido. Se preferir por escrito, te mando um resumo.\n\n{{responsavel}} — CONSEJ` },
       ],
       trabalhista: [
-        { body: `Olá, {{nome}}! Tudo bem?\n\nSei que o dia a dia da {{empresa}} é intenso, então vou ser breve: gostaria de retomar nossa conversa sobre assessoria trabalhista preventiva.\n\nQuando for um bom momento? 😊\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `Oi, {{nome}}!\n\nSó retomando: aquela conversa sobre estruturar a parte trabalhista da {{empresa}} continua de pé. Especialmente se vocês tão contratando ou pensando em contratar nos próximos meses — é muito mais barato estruturar antes do que corrigir depois.\n\nTopa 20 min essa semana? Se não, me avisa que a gente marca mais pra frente.\n\n{{responsavel}} — CONSEJ` },
       ],
-      tributario: [
-        { body: `Oi, {{nome}}! Tudo certo?\n\nRetomando nossa conversa — ainda estou convicto(a) de que há oportunidades reais de otimização tributária para a {{empresa}}.\n\nPodemos marcar 20 minutos para eu te mostrar um diagnóstico inicial? 😊\n\n{{responsavel}} — CONSEJ Advocacia` },
+      marca_pi: [
+        { body: `Oi, {{nome}}!\n\nSó um lembrete rápido: se você quiser que eu mande a busca que fiz da marca da {{empresa}} no INPI, me avisa — te mando por aqui, sem compromisso. Te ajuda a entender o risco real.\n\nSe topar conversar depois de ver, a gente marca. Senão, a informação já é sua. 🙂\n\n{{responsavel}} — CONSEJ` },
       ],
     },
     email: {
       geral: [
         {
-          subject: `Re: Assessoria Jurídica — CONSEJ Advocacia`,
-          body: `Olá, {{nome}},\n\nEspero que esteja tudo bem!\n\nEntro em contato para dar continuidade à nossa conversa. Sei que o dia a dia é muito agitado, por isso quero facilitar ao máximo.\n\nCaso ainda faça sentido, estou disponível para uma conversa rápida de 15–20 minutos no horário que for melhor para você.\n\nSe preferir, posso te enviar uma proposta inicial por aqui mesmo — é só me dizer!\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Re: {{empresa}} + CONSEJ — retomando o contato`,
+          body: `Oi, {{nome}},\n\nVoltando aqui pra não deixar a conversa morrer. Sei que sua agenda deve estar cheia, então vou direto:\n\n1. O diagnóstico gratuito (30 min) continua em pé quando fizer sentido pra você.\n2. Se preferir um formato mais leve, posso te mandar por escrito o que costumamos cobrir, e você decide se quer conversar depois.\n3. Se esse não é o momento, me avisa — eu paro de insistir e guardo o contato pra quando for.\n\nQualquer das três opções funciona pra mim. Qual prefere?\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
+        },
+        {
+          subject: `Último toque por aqui — {{empresa}}`,
+          body: `Oi, {{nome}},\n\nEsse vai ser meu último e-mail por aqui pra não virar incômodo. Entendo que o momento pode não ser agora, e tudo bem.\n\nDeixo o contato caso mude: é só responder esse e-mail ou me chamar direto. No dia que a {{empresa}} precisar de qualquer coisa jurídica — contrato, societário, marca, LGPD, trabalhista — pode contar comigo.\n\nSucesso aí e seguimos em contato pelo LinkedIn.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
-      empresarial: [
+      societario: [
         {
-          subject: `Seguindo nosso contato — {{empresa}} + CONSEJ`,
-          body: `Olá, {{nome}},\n\nEspero que esteja tudo bem!\n\nRetomo nosso contato para saber se você teve a oportunidade de refletir sobre a assessoria jurídica empresarial para a {{empresa}}.\n\nEstou à disposição para uma conversa rápida ou para encaminhar um diagnóstico inicial sem compromisso.\n\nQuando seria um bom momento?\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Re: Acordo de sócios — {{empresa}}`,
+          body: `Oi, {{nome}},\n\nRetomando nosso papo sobre acordo de sócios. Pensei em te mandar um material curto (1 página) que resume o que entra no documento e o que cada cláusula resolve na prática — é o que a gente usa no começo de qualquer conversa pra alinhar expectativa.\n\nSe quiser, respondo aqui mesmo com o PDF e você olha no seu tempo. Se depois fizer sentido conversar, a gente marca.\n\nO que acha?\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
+        },
+      ],
+      contratual: [
+        {
+          subject: `Checklist rápido de contratos — {{empresa}}`,
+          body: `Oi, {{nome}},\n\nQueria te oferecer algo concreto, mesmo que a gente não converse ainda: tenho um checklist de 12 itens que a gente usa pra avaliar contratos de clientes e fornecedores. Te entrega um retrato honesto do risco em 10 minutos de leitura.\n\nSe quiser, respondo aqui com o checklist — é gratuito, sem compromisso. Depois, se fizer sentido, a gente conversa sobre o que cabe arrumar.\n\nMe avisa.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
     },
     linkedin: {
       geral: [
-        { body: `Olá, {{nome}}! Passando para retomar nossa conversa.\n\nSei que a agenda costuma estar cheia, mas gostaria de manter o contato. Caso queira saber mais sobre como a CONSEJ pode apoiar a {{empresa}}, é só me chamar.\n\nUm ótimo dia! 😊\n\n{{responsavel}}` },
+        { body: `Oi, {{nome}}! Vi uns posts seus recentes sobre {{empresa}} e fiquei mais curioso(a) sobre o momento de vocês.\n\nSó um toque rápido por aqui: aquela conversa de 30 min continua em pé quando fizer sentido. Sem compromisso e sem roteiro comercial — é literalmente pra entender onde vocês estão e o que vale a pena cuidar agora.\n\nSe esse não é o momento, sem problema. Seguimos conectados por aqui. 🤝\n\n{{responsavel}}` },
       ],
     },
   },
@@ -183,33 +203,42 @@ const TEMPLATES: Templates = {
   diagnostico: {
     whatsapp: {
       geral: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nPassando para confirmar nossa reunião de diagnóstico!\n\n📅 Data e horário: [data]\n📍 Local/Link: [link]\n\nO diagnóstico dura cerca de 40 minutos e é totalmente gratuito. Nele vamos entender sua situação atual e identificar as melhores soluções jurídicas para você.\n\nQualquer dúvida, me chama! Até lá!\n\n{{responsavel}} — CONSEJ Advocacia` },
-        { body: `Oi, {{nome}}! 😊\n\nFicou confirmado o nosso diagnóstico!\n\nEnquanto isso, se puder me contar um pouquinho mais sobre sua principal demanda jurídica, consigo me preparar melhor para nossa conversa.\n\nNos vemos em breve!\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `Oi, {{nome}}! Confirmando nosso diagnóstico 👇\n\n📅 [data] às [horário]\n📍 [link]\n⏱ 30–40 min\n\nComo a ideia é ser útil de verdade, seria ótimo se você pudesse pensar nessas 3 perguntas antes:\n\n1. Qual é a dor jurídica que mais tira seu sono hoje?\n2. Qual é o plano da {{empresa}} pros próximos 12 meses?\n3. Se tivesse uma varinha mágica, o que você resolveria primeiro?\n\nNão precisa escrever nada, só vir com isso na cabeça. Até lá! 🤝\n\n{{responsavel}} — CONSEJ` },
+        { body: `{{nome}}, diagnóstico confirmado! 🎯\n\n📅 [data] [horário] · [link]\n\nPode deixar comigo — quem faz o roteiro sou eu. Sua parte é só trazer o contexto real da {{empresa}}, nada ensaiado. Quanto mais honesto for o papo, mais útil o diagnóstico fica.\n\nSe surgir algo antes, me chama por aqui.\n\n{{responsavel}} — CONSEJ` },
       ],
-      empresarial: [
-        { body: `Olá, {{nome}}! Tudo bem?\n\nConfirmado nosso diagnóstico jurídico da {{empresa}}! 🎯\n\nPara aproveitar melhor o nosso tempo, seria possível você trazer:\n• Principais contratos em andamento\n• Estrutura societária atual\n• Principais dores/riscos que identificam hoje\n\nNos vemos em breve! 😊\n\n{{responsavel}} — CONSEJ Advocacia` },
+      societario: [
+        { body: `Oi, {{nome}}! Diagnóstico societário confirmado 🤝\n\n📅 [data] · [link]\n\nPra gente aproveitar o tempo, se tiver fácil, traga:\n\n• Contrato social atual (pode ser foto/pdf)\n• Quem são os sócios e % de cada um\n• Se já rolou alguma conversa sobre saída/entrada de sócio\n\nSe não tiver tudo, zero problema — a gente vai descobrindo junto. Até lá!\n\n{{responsavel}} — CONSEJ` },
+      ],
+      contratual: [
+        { body: `Oi, {{nome}}! Confirmando o diagnóstico de contratos 📝\n\n📅 [data] · [link]\n\nSe der, separa 1 ou 2 contratos reais da {{empresa}} pra gente olhar junto (pode ser o de cliente ou fornecedor). Ver contrato de verdade vale por 10 reuniões teóricas.\n\nPrometo sigilo total — é só pra eu te mostrar riscos e oportunidades concretas. Até breve!\n\n{{responsavel}} — CONSEJ` },
+      ],
+      digital_lgpd: [
+        { body: `Oi, {{nome}}! Diagnóstico LGPD confirmado 🔐\n\n📅 [data] · [link]\n\nPra ser útil de verdade, pensa nessas 3:\n\n1. Que dado pessoal a {{empresa}} coleta hoje? (cliente, funcionário, lead)\n2. Onde esse dado fica? (planilha, CRM, e-mail)\n3. Já recebeu pedido de "comprovação de LGPD" de algum cliente?\n\nCom isso, consigo te devolver um plano de ação realista.\n\n{{responsavel}} — CONSEJ` },
       ],
       trabalhista: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nConfirmando nosso diagnóstico trabalhista!\n\nSe possível, traga uma ideia de:\n• Número de colaboradores\n• Principais modalidades de contratação (CLT, PJ, autônomo…)\n• Se já houve ações trabalhistas recentes\n\nIsso vai nos ajudar a ser muito mais assertivos! Até lá!\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `Oi, {{nome}}! Diagnóstico trabalhista confirmado 👥\n\n📅 [data] · [link]\n\nSe possível, traz na cabeça:\n\n• Quantas pessoas na {{empresa}} hoje (CLT, PJ, autônomo, estagiário)\n• Como são contratadas (tem contrato formal? modelo padrão?)\n• Alguma reclamação trabalhista em andamento ou passada\n\nTudo 100% sigiloso, claro. Até lá!\n\n{{responsavel}} — CONSEJ` },
+      ],
+      marca_pi: [
+        { body: `Oi, {{nome}}! Diagnóstico de marca confirmado ™️\n\n📅 [data] · [link]\n\nJá vou chegar com a busca de anterioridade da marca da {{empresa}} feita — você vai ver na tela comigo o que existe registrado, em nome de quem, e qual o risco real.\n\nSe tiver outras marcas/logos/produtos que queira analisar junto, me manda antes por aqui.\n\n{{responsavel}} — CONSEJ` },
       ],
     },
     email: {
       geral: [
         {
-          subject: `Confirmação — Diagnóstico Jurídico CONSEJ`,
-          body: `Olá, {{nome}},\n\nTudo certo para o nosso diagnóstico jurídico!\n\n📅 Data: [data]\n🕐 Horário: [horário]\n📍 Local/Link: [link]\n\nO diagnóstico tem duração de aproximadamente 40 minutos e é totalmente gratuito. Nosso objetivo é entender profundamente sua situação e identificar as melhores soluções jurídicas.\n\nCaso precise reagendar, basta me avisar com antecedência.\n\nAté breve!\n\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Diagnóstico confirmado — {{empresa}} + CONSEJ`,
+          body: `Oi, {{nome}},\n\nConfirmado nosso diagnóstico:\n\n📅 Data: [data]\n🕐 Horário: [horário]\n📍 Link: [link]\n⏱ Duração: 30–40 min\n\nO formato é bem direto: vou fazer perguntas pra entender o momento real da {{empresa}} e, ao final, te entrego um mini-mapa com (1) o que cuidar agora, (2) o que pode esperar, e (3) o custo aproximado de cada frente. Sem venda, sem pressão.\n\nSe puder, pensa antes nessas três coisas:\n\n1. O que hoje te dá insegurança no jurídico?\n2. Qual é o plano da {{empresa}} pros próximos 12 meses?\n3. Algum problema concreto (atrasado, perdido, em aberto) que você gostaria de destravar?\n\nNão precisa responder — é só pra a gente ir direto ao ponto na conversa.\n\nAté breve!\n\n{{responsavel}}\nCONSEJ`,
         },
       ],
-      empresarial: [
+      societario: [
         {
-          subject: `Diagnóstico Jurídico — {{empresa}} + CONSEJ`,
-          body: `Olá, {{nome}},\n\nConfirmado o nosso diagnóstico jurídico da {{empresa}}!\n\n📅 Data: [data] | 🕐 Horário: [horário]\n\nPara otimizar nossa reunião, seria muito útil se você pudesse trazer um breve panorama sobre:\n\n• Estrutura societária e contratos principais em vigor\n• Maiores riscos jurídicos percebidos atualmente\n• Objetivos de crescimento para os próximos 12 meses\n\nCom essas informações, conseguimos ser muito mais precisos e propor soluções realmente relevantes.\n\nAté breve!\n\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Diagnóstico societário — {{empresa}} confirmado`,
+          body: `Oi, {{nome}},\n\nConfirmado nosso diagnóstico societário:\n\n📅 [data] às [horário] · [link]\n\nPra aproveitar bem os 40 min, se tiver acesso fácil, traga:\n\n• Contrato social atual (pode ser foto/pdf do documento)\n• Lista dos sócios com % de cada um\n• Se já existiu conversa sobre saída, entrada ou morte de sócio\n• Se algum sócio tem papel muito diferente dos outros (operacional vs. investidor, por exemplo)\n\nNada disso é obrigatório — a gente faz o diagnóstico mesmo sem os documentos, mas com eles o valor prático triplica.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
     },
     linkedin: {
       geral: [
-        { body: `{{nome}}, tudo confirmado para nosso diagnóstico! 🎯\n\nEstou animado(a) para entender melhor a sua situação e apresentar como a CONSEJ pode contribuir.\n\nCaso precise reagendar, é só me avisar.\n\nAté logo!\n{{responsavel}}` },
+        { body: `{{nome}}, tá tudo confirmado pro nosso diagnóstico 🎯\n\n📅 [data] · [link]\n\nComo te falei, o formato é direto e prático — a ideia é sair com clareza do que vale a pena priorizar na {{empresa}}. Se precisar reagendar, é só me avisar por aqui mesmo.\n\nAté breve!\n{{responsavel}}` },
       ],
     },
   },
@@ -218,33 +247,33 @@ const TEMPLATES: Templates = {
   proposta: {
     whatsapp: {
       geral: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nAcabei de encaminhar a proposta da CONSEJ para você! 📄\n\nFique à vontade para ler com calma. Qualquer dúvida sobre valores, escopo ou forma de atuação, é só me chamar — vou adorar te explicar!\n\nEspero que faça muito sentido para você. 🙂\n\n{{responsavel}} — CONSEJ Advocacia` },
-        { body: `Oi, {{nome}}! Proposta enviada! 🎉\n\nMontamos uma solução especialmente pensada para a sua situação. Se quiser, posso te apresentar em uma chamada rápida de 15 min os pontos principais.\n\nQuando for bom para você?\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `{{nome}}, proposta na sua caixa! 📄\n\nMontei com base exatamente no que a gente conversou — nada de "pacote padrão", é o escopo que faz sentido pra {{empresa}} agora. No próprio documento tem tudo: entregáveis, prazo, investimento e forma de pagamento.\n\nLê com calma, anota as dúvidas e me manda por aqui mesmo — ou, se preferir, a gente faz 15 min de call rápida pra eu passar ponto a ponto. O que funciona melhor pra você?\n\n{{responsavel}} — CONSEJ` },
+        { body: `Oi, {{nome}}! Proposta enviada ✅\n\nResumo do que tem lá dentro:\n• Escopo do que vamos entregar\n• Prazo realista (sem promessa de milagre)\n• Investimento e forma de pagamento\n• O que NÃO tá incluso (pra zero surpresa depois)\n\nQualquer coisa que não tá clara, prefiro que você me pergunte antes de decidir. É sério — nada de "assina primeiro, pergunta depois".\n\n{{responsavel}} — CONSEJ` },
       ],
-      empresarial: [
-        { body: `Olá, {{nome}}! 😊\n\nA proposta de assessoria jurídica para a {{empresa}} foi encaminhada!\n\nEla contempla [escopo acordado] com dedicação exclusiva da nossa equipe.\n\nGostaria de apresentá-la pessoalmente para tirar todas as dúvidas? Consigo um slot ainda essa semana.\n\n{{responsavel}} — CONSEJ Advocacia` },
+      societario: [
+        { body: `{{nome}}, proposta do acordo de sócios enviada 🤝\n\nMontei um escopo que cobre saída, entrada, morte, incapacidade, deadlock e regras de distribuição — exatamente o que a gente viu no diagnóstico que tava em aberto na {{empresa}}.\n\nPrazo de entrega e valor tão tudo na proposta. Qualquer dúvida antes de fechar, me chama. Prefiro responder 10 perguntas agora do que descobrir depois que algo ficou mal entendido.\n\n{{responsavel}} — CONSEJ` },
       ],
-      tributario: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nProporta de planejamento tributário enviada!\n\nBaseamos tudo no que conversamos — levantamos oportunidades reais de economia para a {{empresa}}.\n\nQuando puder, me diz o que achou! Estou à disposição para qualquer ajuste.\n\n{{responsavel}} — CONSEJ Advocacia` },
+      contratual: [
+        { body: `{{nome}}, proposta de contratos enviada 📝\n\nO que vai: revisão dos contratos atuais + criação dos modelos-padrão da {{empresa}} + playbook de uso interno (pra sua equipe comercial usar sem me chamar toda vez).\n\nLê com calma e me avisa se algo ficou confuso ou se quer ajustar escopo. Sem pressão — prefiro que a gente feche quando você tiver certeza.\n\n{{responsavel}} — CONSEJ` },
       ],
     },
     email: {
       geral: [
         {
-          subject: `Proposta de Serviços Jurídicos — CONSEJ Advocacia`,
-          body: `Olá, {{nome}},\n\nSegue em anexo a proposta de serviços jurídicos da CONSEJ Advocacia, elaborada especialmente com base nas necessidades que identificamos em nossa conversa.\n\nA proposta contempla:\n• [Item 1]\n• [Item 2]\n• [Item 3]\n\nEstou à inteira disposição para apresentá-la pessoalmente e esclarecer qualquer dúvida sobre escopo, valores ou forma de atuação.\n\nAguardo seu retorno!\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Proposta CONSEJ — {{empresa}}`,
+          body: `Oi, {{nome}},\n\nProposta em anexo (e copiada aqui embaixo pra facilitar).\n\nEscrevi ela do jeito que eu gostaria de receber como cliente: objetiva, honesta sobre o que entra e o que não entra, com prazo realista e forma de pagamento explícita. Sem linguagem rebuscada, sem "sob consulta".\n\nO que eu te peço é:\n\n1. Lê com calma (não precisa ser hoje)\n2. Anota qualquer dúvida, por menor que seja\n3. Me manda as dúvidas antes de decidir — por e-mail, WhatsApp, como preferir\n\nSe quiser, a gente faz 15 min de call pra eu passar o documento ponto a ponto com você. Só me dizer.\n\nFico no aguardo!\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
-      empresarial: [
+      societario: [
         {
-          subject: `Proposta de Assessoria Jurídica — {{empresa}}`,
-          body: `Olá, {{nome}},\n\nConforme combinado, segue em anexo a proposta de assessoria jurídica empresarial para a {{empresa}}.\n\nEla foi desenhada para atender às suas necessidades específicas, com foco em:\n• Segurança contratual e societária\n• Prevenção e gestão de riscos jurídicos\n• Suporte ágil e próximo ao dia a dia da empresa\n\nCaso queira agendar uma apresentação rápida, fico à disposição.\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Proposta — Acordo de sócios da {{empresa}}`,
+          body: `Oi, {{nome}},\n\nProposta em anexo. O escopo foi desenhado exatamente no que a gente identificou no diagnóstico:\n\n• Regras claras de saída voluntária e involuntária\n• Tratamento de entrada de novo sócio\n• Morte, incapacidade e sucessão\n• Deadlock (como resolver empate em decisão)\n• Distribuição de resultado e tomada de decisão estratégica\n\nO prazo é {[prazo]} e o investimento é {[valor]}, com {[forma de pagamento]}. Não tem "fee extra" nem custo escondido — o que tá ali é o total.\n\nSe algo não fez sentido, me avisa. Prefiro ajustar o que for preciso antes de você assinar.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
     },
     linkedin: {
       geral: [
-        { body: `{{nome}}, proposta enviada por e-mail! 📄\n\nMontamos algo personalizado para a sua situação. Qualquer dúvida ou ajuste que queira discutir, pode me chamar aqui mesmo.\n\nAguardo seu retorno!\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `{{nome}}, proposta enviada por e-mail 📄\n\nMontei algo enxuto e honesto — se você ler e achar que tá faltando algo, ou que tem item que não faz sentido, me fala sem cerimônia. Proposta é ponto de partida de conversa, não documento fechado.\n\nFico no aguardo!\n\n{{responsavel}} — CONSEJ` },
       ],
     },
   },
@@ -253,24 +282,27 @@ const TEMPLATES: Templates = {
   negociacao: {
     whatsapp: {
       geral: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nPassando para saber se você teve a oportunidade de analisar nossa proposta e se surgiu alguma dúvida ou ponto que queira discutir.\n\nEstamos abertos para conversar sobre qualquer ajuste que faça sentido para vocês!\n\n{{responsavel}} — CONSEJ Advocacia` },
-        { body: `Oi, {{nome}}! 😊\n\nQueria saber se a proposta ficou clara ou se tem algum ponto que gostaria de ajustar.\n\nNão precisa decidir agora — pode me contar o que está passando pela sua cabeça que resolvo! 🙂\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `Oi, {{nome}}! Tô retomando aqui 👋\n\nQueria saber se a proposta fez sentido e, principalmente, se tem algo travando. Pode ser escopo, prazo, valor, forma de pagamento, qualquer coisa. Prefiro que você me fale o que tá na sua cabeça do que ficar no "vou pensar" sem data.\n\nSe preferir 10 min de call pra bater bola, me manda um horário. Se preferir resolver por aqui, também tá ótimo.\n\n{{responsavel}} — CONSEJ` },
+        { body: `{{nome}}, só um toque 🤝\n\nNegociação é conversa de verdade — se alguma coisa tá pesando, me conta direto. A gente já ajustou escopo, prazo e forma de pagamento em outras propostas, e quase sempre dá pra chegar num ponto bom pros dois lados.\n\nMe fala o que tá na cabeça que a gente resolve.\n\n{{responsavel}} — CONSEJ` },
       ],
-      empresarial: [
-        { body: `Olá, {{nome}}! Tudo certo?\n\nRetomando a conversa sobre a assessoria para a {{empresa}}. Sei que é uma decisão importante — e justamente por isso estou aqui para garantir que a proposta esteja 100% alinhada com o que vocês precisam.\n\nHá algum ponto que gostariam de ajustar ou discutir?\n\n{{responsavel}} — CONSEJ Advocacia` },
+      societario: [
+        { body: `Oi, {{nome}}! Tudo certo?\n\nSobre o acordo de sócios: entendo que é uma decisão importante porque envolve todos os sócios, não só você. Se ajudar, posso preparar um resumo de 1 página da proposta pra você apresentar na conversa interna — fica mais fácil explicar pros outros sócios.\n\nMe avisa se faz sentido. Qualquer coisa, tô por aqui.\n\n{{responsavel}} — CONSEJ` },
+      ],
+      contratual: [
+        { body: `Oi, {{nome}}! Só retomando 👋\n\nNormalmente, quando uma proposta de contratos trava, é por causa de um de três motivos: (1) escopo parece grande demais, (2) prazo não encaixa no momento da empresa, (3) forma de pagamento. Me diz qual dos três (ou se é outro) que a gente conversa.\n\nSem pressão, prometo.\n\n{{responsavel}} — CONSEJ` },
       ],
     },
     email: {
       geral: [
         {
-          subject: `Dúvidas sobre a proposta? — CONSEJ Advocacia`,
-          body: `Olá, {{nome}},\n\nEspero que esteja tudo bem!\n\nEntro em contato para verificar se surgiu alguma dúvida sobre a proposta enviada e se há pontos que gostaria de discutir ou ajustar.\n\nEstamos abertos a conversar sobre escopo, valores e condições para que a parceria faça total sentido para a {{empresa}}.\n\nQuando for conveniente, podemos agendar uma ligação rápida?\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Re: Proposta CONSEJ — {{empresa}}`,
+          body: `Oi, {{nome}},\n\nRetomando pra saber como tá o processo aí do lado. Quero ser direto contigo: se tem algo na proposta travando — escopo, prazo, valor, forma de pagamento, timing — prefiro muito mais que você me fale isso agora do que a gente ficar num "vou pensar" sem fim.\n\nDa minha parte, eu consigo flexibilizar várias coisas: ajustar escopo, rever prazo, parcelar diferente, até começar por um escopo menor e evoluir. O que eu não consigo é adivinhar o que tá pegando — então me conta.\n\nSe preferir conversar em 15 min de call, me manda um horário. Se preferir resolver por e-mail, também tá ótimo.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
     },
     linkedin: {
       geral: [
-        { body: `{{nome}}, tudo bem?\n\nPassando para retomar nossa conversa sobre a proposta. Se houver qualquer dúvida ou ponto que queira discutir, estou à disposição.\n\nComo estão vendo até agora?\n\n{{responsavel}}` },
+        { body: `{{nome}}, só um toque rápido por aqui.\n\nSobre a proposta — se tem algo travando, me fala sem cerimônia. Prefiro ajustar e fechar do que ficar no limbo. Escopo, prazo, valor, momento, qualquer coisa. A gente resolve.\n\nAbraço!\n{{responsavel}}` },
       ],
     },
   },
@@ -279,24 +311,24 @@ const TEMPLATES: Templates = {
   pos_fechamento: {
     whatsapp: {
       geral: [
-        { body: `Olá, {{nome}}! 🎉\n\nMuito feliz em ter você como cliente da CONSEJ Advocacia!\n\nEm breve nossa equipe entrará em contato para alinhar os próximos passos e iniciar nossos trabalhos. Qualquer dúvida até lá, pode me chamar!\n\nSeja muito bem-vindo(a)! 😊\n\n{{responsavel}} — CONSEJ Advocacia` },
-        { body: `Oi, {{nome}}! Bem-vindo(a) à CONSEJ! 🎉\n\nEstamos muito animados para trabalhar junto com você e a {{empresa}}!\n\nVou te enviar um e-mail com todas as informações de onboarding. Qualquer dúvida, pode contar comigo!\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `{{nome}}, fechou! 🤝\n\nMuito feliz com essa parceria. Agora começa a parte boa: o trabalho de verdade.\n\nDos próximos passos:\n\n1. Vou te mandar um e-mail com o checklist de documentos e acessos que preciso\n2. Marco uma call curta de kick-off (15 min) pra alinhar ritmo e canais\n3. Começamos a entregar conforme o cronograma da proposta\n\nQualquer coisa que surgir nesse caminho, fala comigo direto. O canal principal fica sendo aqui mesmo.\n\nBora! 🚀\n\n{{responsavel}} — CONSEJ` },
+        { body: `Oi, {{nome}}! 🎉\n\nContrato assinado, oficialmente parceiros da {{empresa}}. Obrigado pela confiança — isso não é leve pra gente.\n\nJá tô montando o onboarding. Em 24h você recebe um e-mail com tudo organizado: cronograma, documentos que preciso, canais de comunicação, quem é quem no time.\n\nQualquer coisa antes, me chama.\n\n{{responsavel}} — CONSEJ` },
       ],
-      empresarial: [
-        { body: `Olá, {{nome}}! Que ótima notícia! 🎉\n\nSeja muito bem-vindo(a) à CONSEJ Advocacia!\n\nVamos iniciar o onboarding jurídico da {{empresa}} o quanto antes. Vou te enviar um e-mail com o checklist de documentos que precisamos para começar.\n\nEstamos animados com essa parceria! 💪\n\n{{responsavel}} — CONSEJ Advocacia` },
+      societario: [
+        { body: `{{nome}}, fechamos o acordo de sócios! 🤝\n\nOs próximos passos:\n\n1. Vou agendar uma call com você e os outros sócios pra alinhar expectativas (é importante que todos estejam na mesma página desde o início)\n2. Após essa call, mando a minuta inicial em 5 dias úteis\n3. A gente itera até ficar redondo pra todos\n4. Assinatura final com reconhecimento de firma\n\nQualquer dúvida no caminho, é só me chamar.\n\n{{responsavel}} — CONSEJ` },
       ],
     },
     email: {
       geral: [
         {
-          subject: `Bem-vindo(a) à CONSEJ Advocacia, {{nome}}! 🎉`,
-          body: `Olá, {{nome}},\n\nÉ um prazer tê-lo(a) como cliente da CONSEJ Advocacia!\n\nA partir de agora, você conta com nossa equipe dedicada para apoiar todas as suas demandas jurídicas com agilidade e comprometimento.\n\nPara darmos início aos trabalhos, precisaremos de alguns documentos:\n• [Documento 1]\n• [Documento 2]\n\nNosso canal de comunicação principal será [canal]. Nossa equipe estará disponível de segunda a sexta, das 9h às 18h.\n\nQualquer dúvida, estamos à disposição!\n\nSeja muito bem-vindo(a)!\n\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Bem-vindo(a) à CONSEJ, {{nome}} 🤝`,
+          body: `Oi, {{nome}},\n\nContrato assinado. Obrigado pela confiança — e prometo que você não vai se arrepender.\n\nDos próximos passos (em ordem):\n\n1. Kick-off (15 min, essa semana): alinhamento de canais, ritmo e pessoas envolvidas\n2. Documentos e acessos: vou te mandar um checklist curto do que preciso pra começar\n3. Execução: conforme cronograma da proposta, com check-ins regulares\n\nCanais de comunicação:\n• WhatsApp: pra coisas rápidas e do dia a dia\n• E-mail: pra tudo que é documento, aprovação formal ou precisa ficar registrado\n• Reunião mensal (opcional): se fizer sentido, a gente marca uma recorrente\n\nNos próximos dias eu te chamo pra marcar o kick-off. Qualquer coisa urgente antes disso, é só me chamar direto.\n\nBora começar!\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
     },
     linkedin: {
       geral: [
-        { body: `{{nome}}, que notícia incrível! 🎉\n\nSeja muito bem-vindo(a) à família CONSEJ Advocacia!\n\nEstamos empolgados para iniciar nossa parceria e contribuir com o crescimento da {{empresa}}.\n\nEm breve, nossa equipe entrará em contato com os próximos passos. Muito obrigado pela confiança!\n\n{{responsavel}} — CONSEJ Advocacia` },
+        { body: `{{nome}}, fechamos! 🤝\n\nObrigado pela confiança — e bora fazer um trabalho do qual a gente se orgulhe. Vou te chamar nos próximos dias pra alinhar o kick-off.\n\nAté já!\n{{responsavel}} — CONSEJ` },
       ],
     },
   },
@@ -305,24 +337,24 @@ const TEMPLATES: Templates = {
   reativacao: {
     whatsapp: {
       geral: [
-        { body: `Olá, {{nome}}! Quanto tempo! 😊\n\nSou {{responsavel}}, da CONSEJ Advocacia. Tivemos o prazer de conversar há um tempo e queria retomar o contato.\n\nComo estão as coisas por aí? Alguma necessidade jurídica surgiu que eu possa ajudar?\n\nEstou aqui! 🙂` },
-        { body: `Oi, {{nome}}! Tudo bem?\n\nSou {{responsavel}}, da CONSEJ. Há um tempo não conversamos e queria dar um oi!\n\nA gente cresceu bastante, expandimos nossa equipe e hoje conseguimos atender muito bem demandas de [setor].\n\nSe surgir algo que eu possa ajudar, pode contar! 😊` },
+        { body: `Oi, {{nome}}! Quanto tempo 👋\n\n{{responsavel}} aqui, da CONSEJ. A gente conversou há um tempo sobre o jurídico da {{empresa}} e a coisa acabou não engatando na época — talvez o momento não fosse agora. Tudo bem, faz parte.\n\nSó queria voltar pra saber: como tá a {{empresa}} hoje? Surgiu alguma demanda nova, algum problema em aberto, algo que vale uma conversa?\n\nSe sim, me fala. Se não, fica registrado o "oi" e seguimos conectados.\n\n{{responsavel}} — CONSEJ` },
+        { body: `{{nome}}, tudo bem?\n\n{{responsavel}} aqui, da CONSEJ. Tô passando só pra lembrar que o diagnóstico gratuito continua valendo — especialmente agora, que a {{empresa}} provavelmente tá em um momento diferente do que estava na última vez que a gente conversou.\n\nSe fizer sentido um papo rápido, me manda um horário. Se não, guarda o contato pra quando precisar.\n\nAbraço!\n{{responsavel}} — CONSEJ` },
       ],
-      empresarial: [
-        { body: `Olá, {{nome}}! Tudo bem? 😊\n\nSou {{responsavel}}, da CONSEJ Advocacia. Queria retomar nosso contato — a {{empresa}} está em constante crescimento e acredito que o momento pode ser oportuno para conversarmos sobre assessoria jurídica.\n\nO que acha de marcarmos uma conversa rápida?` },
+      societario: [
+        { body: `Oi, {{nome}}! 👋\n\nLembra da nossa conversa sobre acordo de sócios? Tô dando um toque porque, na maioria das vezes, esse tema fica em "a gente resolve depois" — até a hora que vira urgência.\n\nSe a {{empresa}} tá chegando nessa hora, me avisa. Se continua em "depois", tudo bem também — só quis deixar registrado que tô por aqui quando precisar.\n\n{{responsavel}} — CONSEJ` },
       ],
     },
     email: {
       geral: [
         {
-          subject: `Retomando o contato — CONSEJ Advocacia`,
-          body: `Olá, {{nome}},\n\nEspero que esteja tudo bem!\n\nMeu nome é {{responsavel}}, da CONSEJ Advocacia. Tivemos o prazer de conversar anteriormente e queria retomar o contato.\n\nNosso escritório cresceu bastante e hoje contamos com uma equipe ainda mais robusta para atender demandas jurídicas com agilidade e qualidade.\n\nCaso tenha surgido alguma necessidade na área jurídica, gostaríamos de retomar a conversa.\n\nEstaria disponível para uma conversa rápida?\n\nAtenciosamente,\n{{responsavel}}\nCONSEJ Advocacia`,
+          subject: `Quanto tempo, {{nome}} — como tá a {{empresa}}?`,
+          body: `Oi, {{nome}},\n\nFaz um tempo que a gente não fala. Sou {{responsavel}}, da CONSEJ — conversamos em algum momento sobre o jurídico da {{empresa}} e acabamos não indo adiante, o que é normal: nem todo momento é o momento.\n\nTô retomando o contato só pra saber como vocês estão hoje. Muita coisa muda em poucos meses — time cresce, contratos aparecem, clientes viram problema, etc. Se algo dessa lista (ou de qualquer outra) virou dor real, talvez faça sentido a gente conversar agora.\n\nSe sim, me avisa e marco 30 min de diagnóstico gratuito. Se não, sem problema — só queria deixar o canal aberto.\n\nAbraço,\n{{responsavel}}\nCONSEJ`,
         },
       ],
     },
     linkedin: {
       geral: [
-        { body: `Olá, {{nome}}! Quanto tempo! 😊\n\nSou {{responsavel}}, da CONSEJ Advocacia. Queria retomar nosso contato e saber como as coisas têm evoluído por aí.\n\nNosso escritório expandiu bastante — se surgir qualquer necessidade jurídica, adoraria conversar.\n\nComo está a {{empresa}}?` },
+        { body: `Oi, {{nome}}! Quanto tempo 👋\n\n{{responsavel}}, da CONSEJ. Tô passando só pra retomar o contato e saber como tá a {{empresa}} hoje. Se surgiu alguma demanda jurídica (ou mesmo se você só quer bater um papo sobre o momento), topo conversar.\n\nFica o contato aberto!\n{{responsavel}}` },
       ],
     },
   },
@@ -347,8 +379,14 @@ function getMessages(
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const PREFS_KEY = 'consej_mensagens_prefs'
+const VALID_SECTORS = new Set<Sector>(['geral', 'societario', 'contratual', 'digital_lgpd', 'trabalhista', 'marca_pi'])
 function loadPrefs(): Partial<{ stage: Stage; sector: Sector; channel: Channel; responsavel: string }> {
-  try { return JSON.parse(localStorage.getItem(PREFS_KEY) ?? '{}') } catch { return {} }
+  try {
+    const raw = JSON.parse(localStorage.getItem(PREFS_KEY) ?? '{}')
+    // Migra/ignora setores antigos (empresarial, familia, imobiliario, tributario, consumidor, previdenciario)
+    if (raw.sector && !VALID_SECTORS.has(raw.sector)) delete raw.sector
+    return raw
+  } catch { return {} }
 }
 
 export function MensagensPage() {
@@ -428,7 +466,7 @@ export function MensagensPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-foreground">Mensagens de Abordagem</h1>
-          <p className="text-sm text-muted-foreground">Gere mensagens personalizadas para cada etapa do funil e tipo de cliente</p>
+          <p className="text-sm text-muted-foreground">Templates no tom da CONSEJ — fale como pessoa, não como empresa. Adapte sempre com um detalhe real do lead.</p>
         </div>
       </div>
 
@@ -622,8 +660,9 @@ export function MensagensPage() {
           {/* Tip */}
           <div className="flex items-start gap-2.5 p-4 bg-[rgba(245,158,11,0.10)] border border-[rgba(245,158,11,0.20)] rounded-xl">
             <span className="text-lg leading-none">💡</span>
-            <div className="text-xs text-amber-800 leading-relaxed">
-              <strong>Dica:</strong> Personalize sempre com detalhes específicos do cliente — mencionar o nome da empresa, um dado recente ou uma dor real aumenta muito a taxa de resposta. As mensagens geradas são um ponto de partida, não um roteiro fixo!
+            <div className="text-xs text-amber-800 leading-relaxed space-y-1.5">
+              <p><strong>Regra de ouro CONSEJ:</strong> se essa mensagem funcionaria pra qualquer outra empresa, ela ainda não tá personalizada o suficiente.</p>
+              <p>Antes de enviar, adapte com ao menos <strong>1 detalhe real</strong>: um post recente, um produto, uma expansão, o nicho específico. Fale como pessoa — "eu" e "a gente", nunca "nós" ou "nossa equipe". E nada de "prezado/a" no WhatsApp.</p>
             </div>
           </div>
 
