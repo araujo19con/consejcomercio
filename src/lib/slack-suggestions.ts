@@ -56,25 +56,7 @@ const LINK_PATTERN = /https?:\/\/[^\s]+(?:zoom|meet\.google|teams|calendly)[^\s]
 
 const INDICACAO_KEYWORDS = /\b(indicou|foi indicado|veio por indicação|indicação de|indicou o|indicou a|recomendou|trouxe um contato|me mandou contato|indicou para nós|indicado pelo|indicada pela)\b/i
 
-const LEAD_KEYWORDS = /\b(
-  novo contato|novo lead|novo cliente|conheci|prospecção|prospectei|
-  interessado em|quer contratar|quer fazer (um|uma)|quer nossos serviços|
-  procurando advogado|precisa de (advogado|assessoria|consultoria)|
-  busca(ndo)? (advogado|assessoria|consultoria)|
-  potencial cliente|primeira consulta|diagnóstico gratuito|
-  me indicaram|ele quer contratar|ela quer contratar|
-  entrou em contato|entrou contato|fez contato|
-  assumir o contato|assumir o lead|assumir esse contato|
-  contato com o lead|quem (pode|vai|fica) (com|assumir)|
-  registro de marca|propriedade intelectual|
-  processo (trabalhista|civil|criminal|judicial)|
-  inventário|divórcio|contrato social|ltda|mei|
-  assessoria jurídica|consultoria jurídica|
-  me passou o contato|passou o contato|mandou contato|
-  para fazer (um|uma)|para contratar|para solicitar|
-  cliente em potencial|potencial negócio|
-  entrar em contato|pode atender|pode assumir
-)\b/xi
+const LEAD_KEYWORDS = /\b(novo contato|novo lead|novo cliente|conheci|prospecção|prospectei|interessado em|quer contratar|quer fazer (um|uma)|quer nossos serviços|procurando advogado|precisa de (advogado|assessoria|consultoria)|busca(ndo)? (advogado|assessoria|consultoria)|potencial cliente|primeira consulta|diagnóstico gratuito|me indicaram|ele quer contratar|ela quer contratar|entrou em contato|entrou contato|fez contato|assumir o contato|assumir o lead|assumir esse contato|contato com o lead|quem (pode|vai|fica) (com|assumir)|registro de marca|propriedade intelectual|processo (trabalhista|civil|criminal|judicial)|inventário|divórcio|contrato social|assessoria jurídica|consultoria jurídica|me passou o contato|passou o contato|mandou contato|para fazer (um|uma)|para contratar|para solicitar|cliente em potencial|potencial negócio|pode atender|pode assumir)\b/i
 const PHONE_PATTERN = /(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\s?)?\d{4}[-.\s]?\d{4}/
 const EMAIL_PATTERN = /\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b/
 
