@@ -1,10 +1,12 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Copy, Check, Smartphone, Mail, Linkedin, RefreshCw, Sparkles } from 'lucide-react'
+import { Copy, Check, Smartphone, Mail, Linkedin, RefreshCw, Sparkles, Search, Phone, X, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { useLeads } from '@/hooks/useLeads'
+import { useMeuPerfil } from '@/hooks/usePerfis'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -389,6 +391,27 @@ function loadPrefs(): Partial<{ stage: Stage; sector: Sector; channel: Channel; 
   } catch { return {} }
 }
 
+// Maps lead pipeline status → mensagens Stage
+const STATUS_TO_STAGE: Record<string, Stage> = {
+  classificacao:             'primeiro_contato',
+  levantamento_oportunidade: 'diagnostico',
+  educar_lead:               'followup',
+  proposta_comercial:        'proposta',
+  negociacao:                'negociacao',
+  ganho_assessoria:          'pos_fechamento',
+  ganho_consultoria:         'pos_fechamento',
+  stand_by:                  'reativacao',
+  perdido:                   'reativacao',
+  cancelado:                 'reativacao',
+}
+
+// Builds a wa.me deep link with the message pre-filled
+function buildWhatsAppUrl(phone: string, message: string): string {
+  const digits = phone.replace(/\D/g, '')
+  const intl = digits.startsWith('55') ? digits : '55' + digits
+  return 'https://wa.me/' + intl + '?text=' + encodeURIComponent(message)
+}
+
 export function MensagensPage() {
   const [searchParams] = useSearchParams()
   const prefs = loadPrefs()
@@ -398,14 +421,42 @@ export function MensagensPage() {
   const [channel, setChannel]       = useState<Channel>(prefs.channel || 'whatsapp')
   const [nome, setNome]             = useState(searchParams.get('nome') ?? '')
   const [empresa, setEmpresa]       = useState(searchParams.get('empresa') ?? '')
+  const [telefone, setTelefone]     = useState(searchParams.get('telefone') ?? '')
   const [responsavel, setResponsavel] = useState(prefs.responsavel ?? '')
   const [varIdx, setVarIdx]         = useState(0)
   const [copied, setCopied]         = useState(false)
+
+  // Lead picker state
+  const [leadSearch, setLeadSearch] = useState('')
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
+  const pickerRef = useRef<HTMLDivElement>(null)
+
+  const { data: leads = [] } = useLeads()
+  const { data: meuPerfil }  = useMeuPerfil()
 
   // Persist preferences whenever they change
   useEffect(() => {
     localStorage.setItem(PREFS_KEY, JSON.stringify({ stage, sector, channel, responsavel }))
   }, [stage, sector, channel, responsavel])
+
+  // Auto-fill responsavel from logged-in profile (only if not already set)
+  useEffect(() => {
+    if (meuPerfil?.nome && !prefs.responsavel) {
+      setResponsavel(meuPerfil.nome)
+    }
+  }, [meuPerfil]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Close picker when clicking outside
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setPickerOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   // If navigated from lead card, scroll to message area
   useEffect(() => {
@@ -413,6 +464,26 @@ export function MensagensPage() {
       setTimeout(() => document.getElementById('msg-output')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Select a lead and populate all fields
+  function selectLead(lead: typeof leads[0]) {
+    setSelectedLeadId(lead.id)
+    setNome(lead.nome)
+    setEmpresa(lead.empresa ?? '')
+    setTelefone(lead.telefone ?? '')
+    const mappedStage = STATUS_TO_STAGE[lead.status]
+    if (mappedStage) { setStage(mappedStage); setVarIdx(0) }
+    setLeadSearch(lead.nome)
+    setPickerOpen(false)
+  }
+
+  function clearLead() {
+    setSelectedLeadId(null)
+    setNome('')
+    setEmpresa('')
+    setTelefone('')
+    setLeadSearch('')
+  }
 
   const ctx = useMemo(
     () => ({
@@ -422,6 +493,14 @@ export function MensagensPage() {
     }),
     [nome, empresa, responsavel]
   )
+
+  const filteredLeads = useMemo(() => {
+    if (!leadSearch.trim()) return leads.slice(0, 8)
+    const q = leadSearch.toLowerCase()
+    return leads.filter(l =>
+      l.nome.toLowerCase().includes(q) || (l.empresa ?? '').toLowerCase().includes(q)
+    ).slice(0, 8)
+  }, [leads, leadSearch])
 
   const messages = useMemo(() => getMessages(stage, sector, channel, ctx), [stage, sector, channel, ctx])
   const currentMsg = messages[varIdx] ?? messages[0]
@@ -475,6 +554,60 @@ export function MensagensPage() {
         {/* ── Config Panel ── */}
         <div className="bg-card border rounded-2xl p-5 space-y-5 shadow-sm">
 
+          {/* Lead picker */}
+          <div>
+            <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-3">Lead do funil</h2>
+            <div ref={pickerRef} className="relative">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Buscar lead pelo nome ou empresa…"
+                  value={leadSearch}
+                  onChange={e => { setLeadSearch(e.target.value); setPickerOpen(true) }}
+                  onFocus={() => setPickerOpen(true)}
+                  className="form-control pl-8 pr-8 h-9 text-sm w-full"
+                />
+                {selectedLeadId && (
+                  <button
+                    onClick={clearLead}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {pickerOpen && filteredLeads.length > 0 && (
+                <div
+                  className="absolute z-50 mt-1 w-full rounded-xl overflow-hidden shadow-xl"
+                  style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                >
+                  {filteredLeads.map(lead => (
+                    <button
+                      key={lead.id}
+                      onMouseDown={e => { e.preventDefault(); selectLead(lead) }}
+                      className="w-full text-left px-3 py-2.5 flex items-center gap-2.5 hover:bg-secondary transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{lead.nome}</p>
+                        <p className="text-xs text-muted-foreground truncate">{lead.empresa}</p>
+                      </div>
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0"
+                        style={{ background: 'var(--alpha-bg-md)', color: 'var(--text-soft-a)' }}
+                      >
+                        {lead.status.replace(/_/g, ' ')}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <hr className="border-slate-100" />
+
           {/* Contact info */}
           <div>
             <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-3">Dados do contato</h2>
@@ -497,8 +630,20 @@ export function MensagensPage() {
                   className="h-9 text-sm"
                 />
               </div>
+              <div className="relative">
+                <Label className="text-muted-foreground text-xs mb-1 block">Telefone / WhatsApp</Label>
+                <div className="relative">
+                  <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="(11) 99999-9999"
+                    value={telefone}
+                    onChange={e => setTelefone(e.target.value)}
+                    className="h-9 text-sm pl-8"
+                  />
+                </div>
+              </div>
               <div>
-                <Label className="text-muted-foreground text-xs mb-1 block">Advogado(a) responsável</Label>
+                <Label className="text-muted-foreground text-xs mb-1 block">Consultor(a) responsável</Label>
                 <Input
                   placeholder="Ex: Ana Carolina"
                   value={responsavel}
@@ -632,7 +777,7 @@ export function MensagensPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap justify-end">
                 {messages.length > 1 && (
                   <Button
                     variant="outline"
@@ -643,6 +788,18 @@ export function MensagensPage() {
                     <RefreshCw className="w-3.5 h-3.5" />
                     Outra versão
                   </Button>
+                )}
+                {channel === 'whatsapp' && telefone && (
+                  <a
+                    href={buildWhatsAppUrl(telefone, currentMsg?.body ?? '')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-white transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: '#25D366' }}
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    Abrir no WhatsApp
+                  </a>
                 )}
                 <Button
                   size="sm"
