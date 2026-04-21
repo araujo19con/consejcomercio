@@ -241,6 +241,58 @@ export interface Configuracoes {
   updated_at: string
 }
 
+export type TarefaTipo =
+  | 'generica'
+  | 'followup'
+  | 'reuniao_prep'
+  | 'renovacao'
+  | 'upsell'
+  | 'diagnostico'
+  | 'proposta'
+  | 'cobranca'
+
+export type TarefaPrioridade = 'baixa' | 'media' | 'alta' | 'critica'
+
+export type TarefaStatus = 'aberta' | 'em_andamento' | 'concluida' | 'cancelada'
+
+export type TarefaEntidade = 'lead' | 'cliente' | 'contrato' | 'oportunidade' | 'reuniao' | 'indicacao'
+
+export interface Tarefa {
+  id: string
+  titulo: string
+  descricao?: string | null
+  tipo: TarefaTipo
+  entidade_tipo?: TarefaEntidade | null
+  entidade_id?: string | null
+  atribuido_a_id?: string | null
+  criado_por_id?: string | null
+  prioridade: TarefaPrioridade
+  status: TarefaStatus
+  data_vencimento?: string | null
+  data_conclusao?: string | null
+  notas?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface InteracaoLead {
+  id: string
+  lead_id: string
+  canal: 'whatsapp' | 'email' | 'linkedin'
+  stage_msg: string
+  setor: string
+  variacao_idx: number
+  assunto?: string | null
+  corpo: string
+  telefone_usado?: string | null
+  pipeline_antes?: string | null
+  pipeline_depois?: string | null
+  enviada_por_id?: string | null
+  enviada_por?: string | null
+  enviada_em: string
+  created_at: string
+}
+
 export interface AuditLog {
   id: string
   tabela: string

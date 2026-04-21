@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useContratos, useUpdateContrato, useDeleteContrato } from '@/hooks/useContratos'
+import { useMeuPerfil } from '@/hooks/usePerfis'
+import { ScopeToggle, type Scope } from '@/components/shared/ScopeToggle'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -320,6 +322,8 @@ const SORT_OPTIONS: { value: ContratoSort; label: string }[] = [
 
 export function ContratosPage() {
   const { data: contratos, isLoading } = useContratos()
+  const { data: meuPerfil } = useMeuPerfil()
+  const [scope, setScope]             = useState<Scope>('all')
   const [search, setSearch]           = useState('')
   const [tipoFilter, setTipoFilter]   = useState<TipoFilter>('todos')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todos')
@@ -327,8 +331,12 @@ export function ContratosPage() {
   const [sortBy, setSortBy]           = useState<ContratoSort>('padrao')
   const [selected, setSelected]       = useState<Contrato | null>(null)
 
+  const mineCount = meuPerfil?.id ? (contratos?.filter(c => c.responsavel_id === meuPerfil.id).length ?? 0) : 0
+
   const filtered = useMemo(() => {
     let list = contratos ?? []
+    if (scope === 'mine' && meuPerfil?.id)
+      list = list.filter(c => c.responsavel_id === meuPerfil.id)
     if (search)
       list = list.filter(c => c.cliente?.nome?.toLowerCase().includes(search.toLowerCase()) || c.cliente?.empresa?.toLowerCase().includes(search.toLowerCase()))
     if (tipoFilter !== 'todos')
@@ -360,12 +368,15 @@ export function ContratosPage() {
 
   return (
     <div>
-      <div className="flex items-start justify-between mb-5">
+      <div className="flex items-start justify-between mb-5 gap-4">
         <div>
           <h1 className="text-xl font-bold text-foreground">Contratos</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Acompanhe contratos, prazos e status de Registro de Marca</p>
         </div>
-        <Badge variant="secondary" className="shrink-0 mt-1">{filtered.length} contrato{filtered.length !== 1 ? 's' : ''}</Badge>
+        <div className="flex items-center gap-3 shrink-0 mt-1">
+          <ScopeToggle value={scope} onChange={setScope} mineCount={mineCount} allCount={contratos?.length ?? 0} />
+          <Badge variant="secondary">{filtered.length} contrato{filtered.length !== 1 ? 's' : ''}</Badge>
+        </div>
       </div>
 
       {expiringSoon.length > 0 && (

@@ -3,7 +3,7 @@ import {
   LayoutDashboard, KanbanSquare, Stethoscope, Users, FileText,
   Inbox, Share2, Handshake, TrendingUp, ClipboardList, Settings,
   LogOut, MessageSquare, CalendarDays, Sparkles, Search, BarChart2, Map, Upload, GraduationCap,
-  Sun, Moon, Target, HelpCircle, Trophy,
+  Sun, Moon, Target, HelpCircle, Trophy, Send,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useMeuPerfil } from '@/hooks/usePerfis'
@@ -25,9 +25,7 @@ const NAV_GROUPS: { label?: string; items: { to: string; label: string; icon: Re
     label: 'PIPELINE',
     items: [
       { to: '/leads',        label: 'Leads',        icon: KanbanSquare },
-      { to: '/prospeccao',   label: 'Prospecção',   icon: Target       },
       { to: '/diagnosticos', label: 'Diagnósticos', icon: Stethoscope  },
-      { to: '/ranking',      label: 'Ranking',      icon: Trophy       },
     ],
   },
   {
@@ -151,7 +149,7 @@ export function Sidebar() {
       {/* Profile + Theme + Logout */}
       <div className="p-2 space-y-1" style={{ borderTop: '1px solid #000d32' }}>
         <NavLink
-          to="/perfil"
+          to="/me"
           className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm w-full transition-colors"
           style={({ isActive }) => isActive ? { backgroundColor: ACTIVE_BG, color: '#fff' } : { color: '#6bd0e7' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = HOVER_BG }}
@@ -164,7 +162,7 @@ export function Sidebar() {
               {initials}
             </div>
           )}
-          <span className="truncate">{perfil?.nome || 'Meu perfil'}</span>
+          <span className="truncate">{perfil?.nome ? `${perfil.nome} — Meu Espaço` : 'Meu Espaço'}</span>
         </NavLink>
 
         {/* Theme toggle */}

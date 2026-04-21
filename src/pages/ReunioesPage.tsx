@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Plus, ChevronLeft, ChevronRight, Video, MapPin, Clock, CheckCircle, XCircle, Calendar, Pencil, Trash2 } from 'lucide-react'
 import { useReunioes, useUpdateReuniao, useDeleteReuniao, type Reuniao } from '@/hooks/useReunioes'
-import { usePerfis, type Perfil } from '@/hooks/usePerfis'
+import { usePerfis, useMeuPerfil, type Perfil } from '@/hooks/usePerfis'
+import { ScopeToggle, type Scope } from '@/components/shared/ScopeToggle'
 import { NovaReuniaoModal } from '@/components/reunioes/NovaReuniaoModal'
 import { toast } from 'sonner'
 
@@ -117,12 +118,19 @@ export function ReunioesPage() {
   const [weekRef, setWeekRef] = useState(new Date())
   const [showModal, setShowModal] = useState(false)
   const [editando, setEditando] = useState<Reuniao | undefined>()
-  const { data: reunioes = [], isLoading } = useReunioes()
+  const [scope, setScope] = useState<Scope>('all')
+  const { data: todasReunioes = [], isLoading } = useReunioes()
   const { data: perfis = [] } = usePerfis()
+  const { data: meuPerfil } = useMeuPerfil()
   const update = useUpdateReuniao()
   const deletar = useDeleteReuniao()
 
   const perfilByEmail = new Map(perfis.filter(p => p.email).map(p => [p.email!, p]))
+
+  const mineCount = meuPerfil?.id ? todasReunioes.filter(r => r.responsavel_id === meuPerfil.id).length : 0
+  const reunioes = scope === 'mine' && meuPerfil?.id
+    ? todasReunioes.filter(r => r.responsavel_id === meuPerfil.id)
+    : todasReunioes
 
   const weekDays = getWeekDays(weekRef)
   const today = new Date()
@@ -161,8 +169,8 @@ export function ReunioesPage() {
         </button>
       </div>
 
-      {/* Week nav */}
-      <div className="flex items-center gap-3">
+      {/* Week nav + scope */}
+      <div className="flex items-center gap-3 flex-wrap">
         <button onClick={prevWeek} className="p-1.5 rounded-lg border hover:bg-background">
           <ChevronLeft className="w-4 h-4 text-muted-foreground" />
         </button>
@@ -173,6 +181,9 @@ export function ReunioesPage() {
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </button>
         <span className="text-sm font-medium text-fg2">{weekRange}</span>
+        <div className="ml-auto">
+          <ScopeToggle value={scope} onChange={setScope} mineCount={mineCount} allCount={todasReunioes.length} />
+        </div>
       </div>
 
       {/* Week grid */}

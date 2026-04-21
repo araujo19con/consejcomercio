@@ -8,8 +8,10 @@ import type { Perfil } from '@/hooks/usePerfis'
 import { LEAD_SOURCE_LABELS } from '@/lib/constants'
 import { formatRelative } from '@/lib/utils'
 import { cn } from '@/lib/utils'
-import { Calendar, MessageCircle, Clock, UserRoundPlus, Check } from 'lucide-react'
+import { Calendar, MessageCircle, Clock, UserRoundPlus, Check, Send } from 'lucide-react'
 import { useUpdateLead } from '@/hooks/useLeads'
+import { useInteracoes } from '@/hooks/useInteracoes'
+import { getCadenciaDueToday } from '@/lib/cadencia'
 
 const SEGMENT_COLORS: Record<string, { bg: string; color: string }> = {
   empresa_junior:        { bg: 'rgba(139,92,246,0.15)',  color: '#c4b5fd' },
@@ -123,6 +125,7 @@ type Props = { lead: Lead; isDragging?: boolean; stageId?: string; perfis?: Perf
 export function LeadCard({ lead, isDragging = false, stageId, perfis = [] }: Props) {
   const navigate    = useNavigate()
   const updateLead  = useUpdateLead()
+  const { data: allInteracoes = [] } = useInteracoes()
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortDragging } =
     useSortable({ id: lead.id })
@@ -135,9 +138,13 @@ export function LeadCard({ lead, isDragging = false, stageId, perfis = [] }: Pro
   const isStagnant  = daysInStage >= threshold &&
     !(lead.status in { ganho_assessoria: 1, ganho_consultoria: 1, perdido: 1, cancelado: 1 })
 
-  // Message shortcut URL
-  const msgStage = STAGE_TO_MSG[lead.status] ?? 'primeiro_contato'
-  const msgUrl   = `/mensagens?nome=${encodeURIComponent(lead.nome)}&empresa=${encodeURIComponent(lead.empresa ?? '')}&stage=${msgStage}`
+  // Cadência check
+  const leadInteracoes = allInteracoes.filter(i => i.lead_id === lead.id)
+  const cadenciaPoint  = getCadenciaDueToday(lead, leadInteracoes)
+
+  // Message shortcut URL (if cadência is due, use its stage; else fall back to pipeline stage)
+  const msgStage = cadenciaPoint?.stage ?? STAGE_TO_MSG[lead.status] ?? 'primeiro_contato'
+  const msgUrl   = `/mensagens?nome=${encodeURIComponent(lead.nome)}&empresa=${encodeURIComponent(lead.empresa ?? '')}&stage=${msgStage}&leadId=${lead.id}`
 
   const accentColor = isStagnant
     ? 'rgba(249,115,22,0.90)'
@@ -307,6 +314,20 @@ export function LeadCard({ lead, isDragging = false, stageId, perfis = [] }: Pro
               <Clock className="w-2.5 h-2.5" />
               {daysInStage}d
             </div>
+          )}
+
+          {/* Cadência badge */}
+          {cadenciaPoint && !isStagnant && (
+            <button
+              title={`Cadência: ${cadenciaPoint.label} — ${cadenciaPoint.descricao}`}
+              onPointerDown={e => e.stopPropagation()}
+              onClick={e => { e.stopPropagation(); navigate(msgUrl) }}
+              className="flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-medium transition-opacity hover:opacity-80"
+              style={{ background: 'rgba(37,211,102,0.18)', color: '#4ade80' }}
+            >
+              <Send className="w-2.5 h-2.5" />
+              {cadenciaPoint.label}
+            </button>
           )}
         </div>
       </div>

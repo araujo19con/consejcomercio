@@ -1,14 +1,23 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Copy, Check, Smartphone, Mail, Linkedin, RefreshCw, Sparkles, Search, Phone, X, MessageSquare, BookOpen } from 'lucide-react'
+import { Copy, Check, Smartphone, Mail, Linkedin, RefreshCw, Sparkles, Search, Phone, X, MessageSquare, BookOpen, Pencil, Eye, RotateCcw, ChevronDown, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { useLeads } from '@/hooks/useLeads'
 import { useMeuPerfil } from '@/hooks/usePerfis'
 import { useConfiguracoes, DEFAULT_MENSAGENS_CONFIG } from '@/hooks/useConfiguracoes'
 import type { MensagensConfig } from '@/types'
+import { ConfirmSendModal } from '@/components/leads/ConfirmSendModal'
+import {
+  BLOCOS,
+  BLOCO_CATEGORIAS,
+  blocosPorCategoria,
+  montarMensagem,
+  type BlocoCategoria,
+} from '@/lib/blocos-mensagem'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -461,6 +470,22 @@ export function MensagensPage() {
   const [varIdx, setVarIdx]         = useState(0)
   const [copied, setCopied]         = useState(false)
 
+  // Variáveis extras (preenchem {{dor}}, {{gancho}}, {{tempo}}, {{cta_custom}})
+  const [varDor, setVarDor]         = useState('')
+  const [varGancho, setVarGancho]   = useState('')
+  const [varTempo, setVarTempo]     = useState('')
+
+  // Editor nativo
+  const [editMode, setEditMode]           = useState(false)
+  const [workingBody, setWorkingBody]     = useState('')
+  const [workingSubject, setWorkingSubject] = useState('')
+  const [composerOpen, setComposerOpen]   = useState(true)
+  const bodyRef = useRef<HTMLTextAreaElement>(null)
+
+  // Composer slot-based: uma seleção por categoria. Trocar um bloco da mesma
+  // categoria substitui o anterior, evitando repetição.
+  const [slots, setSlots] = useState<Record<string, string | null>>({})
+
   // Lead picker state
   const [leadSearch, setLeadSearch] = useState('')
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -503,6 +528,15 @@ export function MensagensPage() {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-select lead when navigated with leadId param
+  useEffect(() => {
+    const lid = searchParams.get('leadId')
+    if (lid && !selectedLeadId && leads.length > 0) {
+      const lead = leads.find(l => l.id === lid)
+      if (lead) selectLead(lead)
+    }
+  }, [searchParams, leads]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Select a lead and populate all fields
   function selectLead(lead: typeof leads[0]) {
     setSelectedLeadId(lead.id)
@@ -528,8 +562,12 @@ export function MensagensPage() {
       nome: nome || 'Nome',
       empresa: empresa || 'Empresa',
       responsavel: responsavel || 'Responsável',
+      dor: varDor || '[dor específica]',
+      gancho: varGancho || '[gancho]',
+      tempo: varTempo || '20 minutos',
+      prazo: config?.mensagens?.defaults?.prazo_entrega || '2–3 semanas',
     }),
-    [nome, empresa, responsavel]
+    [nome, empresa, responsavel, varDor, varGancho, varTempo, config]
   )
 
   const filteredLeads = useMemo(() => {
@@ -542,6 +580,17 @@ export function MensagensPage() {
 
   const messages = useMemo(() => getMessages(stage, sector, channel, ctx, mensagensConfig), [stage, sector, channel, ctx, mensagensConfig])
   const currentMsg = messages[varIdx] ?? messages[0]
+
+  // Sincroniza o workingBody/Subject com o template quando o usuário NÃO está editando.
+  useEffect(() => {
+    if (!editMode) {
+      setWorkingBody(currentMsg?.body ?? '')
+      setWorkingSubject(currentMsg?.subject ?? '')
+    }
+  }, [currentMsg, editMode])
+
+  // Se o corpo editado é idêntico ao template, considera "não editado"
+  const isEdited = editMode && (workingBody !== (currentMsg?.body ?? '') || workingSubject !== (currentMsg?.subject ?? ''))
 
   const stageInfo = STAGES.find(s => s.id === stage)!
   const sectorInfo = SECTORS.find(s => s.id === sector)!
@@ -563,16 +612,102 @@ export function MensagensPage() {
     setVarIdx(0)
   }
 
+  // Conteúdo efetivo a ser enviado/copiado (edição tem precedência sobre template).
+  const effectiveBody = editMode ? workingBody : (currentMsg?.body ?? '')
+  const effectiveSubject = editMode ? workingSubject : (currentMsg?.subject ?? '')
+
   async function copyMessage() {
-    const text = channel === 'email' && currentMsg.subject
-      ? `Assunto: ${currentMsg.subject}\n\n${currentMsg.body}`
-      : currentMsg.body
+    const text = channel === 'email' && effectiveSubject
+      ? `Assunto: ${effectiveSubject}\n\n${effectiveBody}`
+      : effectiveBody
     await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const charCount = currentMsg?.body.length ?? 0
+  // ── Composer slot-based ──────────────────────────────────────────────────
+  // Toggle selection: se o mesmo bloco já está no slot, desmarca.
+  // Se outro bloco da mesma categoria está selecionado, substitui.
+  function toggleSlot(categoria: BlocoCategoria, blocoId: string) {
+    setSlots(prev => ({
+      ...prev,
+      [categoria]: prev[categoria] === blocoId ? null : blocoId,
+    }))
+  }
+
+  function clearSlot(categoria: BlocoCategoria) {
+    setSlots(prev => ({ ...prev, [categoria]: null }))
+  }
+
+  function limparComposer() {
+    setSlots({})
+  }
+
+  // Mensagem composta em tempo real a partir dos slots, na ordem canônica.
+  const composedBody = useMemo(
+    () => montarMensagem(slots, tpl => fill(tpl, ctx)),
+    [slots, ctx]
+  )
+
+  const slotsPreenchidos = useMemo(
+    () => Object.values(slots).filter(Boolean).length,
+    [slots]
+  )
+
+  // Aplica a mensagem composta no editor (entra em modo editor).
+  function aplicarComposerNoEditor() {
+    if (!composedBody) return
+    setWorkingBody(composedBody)
+    setEditMode(true)
+    setTimeout(() => {
+      bodyRef.current?.focus()
+      bodyRef.current?.setSelectionRange(composedBody.length, composedBody.length)
+    }, 50)
+  }
+
+  // Pré-seleciona slots a partir de um template (inverso do composer).
+  // Simplificação: quando o usuário muda stage/sector/channel, zera os slots
+  // pra evitar incoerência.
+  useEffect(() => {
+    setSlots({})
+  }, [stage, sector, channel])
+
+  function resetToTemplate() {
+    setWorkingBody(currentMsg?.body ?? '')
+    setWorkingSubject(currentMsg?.subject ?? '')
+  }
+
+  const charCount = effectiveBody.length
+
+  const selectedLead = useMemo(
+    () => (selectedLeadId ? leads.find(l => l.id === selectedLeadId) ?? null : null),
+    [leads, selectedLeadId]
+  )
+
+  // Modal de confirmação de envio/cópia
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmMode, setConfirmMode] = useState<'send' | 'copy'>('send')
+
+  function openWhatsAppConfirm() {
+    if (!selectedLead) {
+      // Sem lead vinculado: segue o comportamento antigo (abre link sem registrar)
+      const url = buildWhatsAppUrl(telefone, currentMsg?.body ?? '')
+      window.open(url, '_blank', 'noopener,noreferrer')
+      return
+    }
+    setConfirmMode('send')
+    setConfirmOpen(true)
+  }
+
+  function openCopyConfirm() {
+    if (!selectedLead) {
+      // Sem lead vinculado: cópia simples, sem registrar
+      copyMessage()
+      return
+    }
+    setConfirmMode('copy')
+    setConfirmOpen(true)
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -694,6 +829,56 @@ export function MensagensPage() {
 
           <hr className="border-slate-100" />
 
+          {/* Variáveis extras */}
+          <div>
+            <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-2">Variáveis extras</h2>
+            <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
+              Preencha e use nos blocos/templates como <code className="text-[10px] px-1 py-0.5 rounded bg-[var(--alpha-bg-sm)]">{'{{dor}}'}</code>, <code className="text-[10px] px-1 py-0.5 rounded bg-[var(--alpha-bg-sm)]">{'{{gancho}}'}</code>, <code className="text-[10px] px-1 py-0.5 rounded bg-[var(--alpha-bg-sm)]">{'{{tempo}}'}</code>.
+            </p>
+            <div className="space-y-3">
+              <div>
+                <Label className="text-muted-foreground text-xs mb-1 block">Dor específica do lead</Label>
+                <Input
+                  placeholder="Ex: processo trabalhista em andamento"
+                  value={varDor}
+                  onChange={e => setVarDor(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-muted-foreground text-xs mb-1 block">Gancho personalizado</Label>
+                <Input
+                  placeholder="Ex: vi que vocês abriram 3 lojas esse ano"
+                  value={varGancho}
+                  onChange={e => setVarGancho(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-muted-foreground text-xs mb-1 block">Tempo da reunião</Label>
+                <div className="grid grid-cols-4 gap-1">
+                  {['15 min', '20 min', '30 min', '45 min'].map(t => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setVarTempo(t)}
+                      className={cn(
+                        'h-8 rounded-md border text-xs font-medium transition-all',
+                        varTempo === t
+                          ? 'border-cyan-500 bg-cyan-50 text-cyan-700'
+                          : 'text-muted-foreground hover:bg-background'
+                      )}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-slate-100" />
+
           {/* Channel */}
           <div>
             <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-3">Canal</h2>
@@ -786,19 +971,80 @@ export function MensagensPage() {
           {/* Message card */}
           <div className="bg-card border rounded-2xl shadow-sm overflow-hidden">
 
+            {/* Toolbar: edit toggle + reset */}
+            <div className="px-5 py-2 border-b flex items-center justify-between gap-2" style={{ borderColor: 'var(--alpha-border)', background: editMode ? 'rgba(0,137,172,0.05)' : 'var(--alpha-bg-xs)' }}>
+              <div className="flex items-center gap-2 text-xs">
+                {editMode
+                  ? <span className="flex items-center gap-1.5 font-medium" style={{ color: 'var(--cyan-hi)' }}>
+                      <Pencil className="w-3 h-3" /> Modo editor
+                      {isEdited && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>editado</span>}
+                    </span>
+                  : <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <Eye className="w-3 h-3" /> Pré-visualização do template
+                    </span>
+                }
+              </div>
+              <div className="flex items-center gap-1">
+                {editMode && isEdited && (
+                  <button
+                    type="button"
+                    onClick={resetToTemplate}
+                    title="Restaurar o template original"
+                    className="inline-flex items-center gap-1 h-7 px-2 rounded text-[11px] font-medium text-muted-foreground hover:text-fg2 hover:bg-[var(--alpha-bg-sm)] transition-colors"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    Restaurar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setEditMode(e => !e)}
+                  className="inline-flex items-center gap-1 h-7 px-2 rounded text-[11px] font-medium transition-colors"
+                  style={editMode
+                    ? { background: 'var(--alpha-bg-sm)', color: 'var(--text-soft-a)' }
+                    : { background: 'rgba(0,137,172,0.12)', color: 'var(--cyan-hi)' }}
+                >
+                  {editMode ? <><Eye className="w-3 h-3" /> Sair do editor</> : <><Pencil className="w-3 h-3" /> Editar mensagem</>}
+                </button>
+              </div>
+            </div>
+
             {/* Email subject */}
-            {channel === 'email' && currentMsg?.subject && (
-              <div className="px-5 py-3 border-b border-slate-100 bg-background">
-                <span className="text-xs font-semibold text-fg4 uppercase tracking-wider mr-2">Assunto:</span>
-                <span className="text-sm font-medium text-foreground">{currentMsg.subject}</span>
+            {channel === 'email' && (
+              <div className="px-5 py-3 border-b" style={{ borderColor: 'var(--alpha-border)', background: 'var(--alpha-bg-xs)' }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-fg4 uppercase tracking-wider shrink-0">Assunto:</span>
+                  {editMode
+                    ? <Input
+                        value={workingSubject}
+                        onChange={e => setWorkingSubject(e.target.value)}
+                        placeholder="Assunto do e-mail"
+                        className="h-7 text-sm border-0 bg-transparent px-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      />
+                    : effectiveSubject
+                      ? <span className="text-sm font-medium text-foreground">{effectiveSubject}</span>
+                      : <span className="text-sm italic text-muted-foreground">(sem assunto)</span>
+                  }
+                </div>
               </div>
             )}
 
             {/* Body */}
             <div className="p-5">
-              <pre className="whitespace-pre-wrap text-sm text-fg2 font-sans leading-relaxed">
-                {currentMsg?.body ?? '—'}
-              </pre>
+              {editMode ? (
+                <Textarea
+                  ref={bodyRef}
+                  value={workingBody}
+                  onChange={e => setWorkingBody(e.target.value)}
+                  placeholder="Escreva ou edite a mensagem aqui. Use os blocos abaixo pra inserir trechos prontos, ou digite livremente."
+                  className="min-h-[200px] text-sm leading-relaxed font-sans resize-y border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 shadow-none bg-transparent"
+                  style={{ lineHeight: '1.6' }}
+                />
+              ) : (
+                <pre className="whitespace-pre-wrap text-sm text-fg2 font-sans leading-relaxed">
+                  {effectiveBody || '—'}
+                </pre>
+              )}
             </div>
 
             {/* Footer */}
@@ -828,28 +1074,156 @@ export function MensagensPage() {
                   </Button>
                 )}
                 {channel === 'whatsapp' && telefone && (
-                  <a
-                    href={buildWhatsAppUrl(telefone, currentMsg?.body ?? '')}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={openWhatsAppConfirm}
                     className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium text-white transition-opacity hover:opacity-90"
                     style={{ backgroundColor: '#25D366' }}
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
-                    Abrir no WhatsApp
-                  </a>
+                    {selectedLead ? 'Abrir no WhatsApp + registrar' : 'Abrir no WhatsApp'}
+                  </button>
                 )}
                 <Button
                   size="sm"
-                  onClick={copyMessage}
+                  onClick={openCopyConfirm}
                   className="h-8 gap-1.5 text-xs"
                   style={copied ? { backgroundColor: '#16a34a' } : { backgroundColor: '#0089ac' }}
                 >
                   {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copied ? 'Copiado!' : 'Copiar mensagem'}
+                  {copied ? 'Copiado!' : selectedLead ? 'Copiar + registrar' : 'Copiar mensagem'}
                 </Button>
               </div>
             </div>
+          </div>
+
+          {/* Composer slot-based — uma seleção por categoria */}
+          <div className="rounded-2xl border overflow-hidden bg-card" style={{ borderColor: 'var(--alpha-border)' }}>
+            <button
+              type="button"
+              onClick={() => setComposerOpen(v => !v)}
+              className="w-full px-4 py-3 flex items-center justify-between gap-2 hover:bg-[var(--alpha-bg-xs)] transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4" style={{ color: 'var(--cyan-hi)' }} />
+                <span className="text-sm font-semibold text-foreground">Compositor por blocos</span>
+                <span className="text-[11px] text-muted-foreground hidden sm:inline">— escolha um bloco por categoria, a mensagem se monta sozinha</span>
+                {slotsPreenchidos > 0 && (
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                    style={{ background: 'rgba(0,137,172,0.15)', color: 'var(--cyan-hi)' }}
+                  >
+                    {slotsPreenchidos}/{BLOCO_CATEGORIAS.length}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                {slotsPreenchidos > 0 && (
+                  <button
+                    type="button"
+                    onClick={e => { e.stopPropagation(); limparComposer() }}
+                    className="inline-flex items-center gap-1 h-7 px-2 rounded text-[11px] font-medium text-muted-foreground hover:text-fg2 hover:bg-[var(--alpha-bg-sm)] transition-colors"
+                    title="Limpar todas as seleções"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    Limpar
+                  </button>
+                )}
+                {composerOpen ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+              </div>
+            </button>
+
+            {composerOpen && (
+              <div className="border-t divide-y" style={{ borderColor: 'var(--alpha-border)' }}>
+                {BLOCO_CATEGORIAS.map(categoria => {
+                  const disponiveis = blocosPorCategoria(categoria, sector)
+                  if (disponiveis.length === 0) return null
+                  const selecionadoId = slots[categoria] ?? null
+                  const selecionado = selecionadoId ? BLOCOS.find(b => b.id === selecionadoId) : null
+
+                  return (
+                    <div key={categoria} className="px-4 py-3">
+                      <div className="flex items-start gap-3">
+                        <div className="shrink-0 w-32 pt-1">
+                          <div className="text-xs font-semibold text-fg2">{categoria}</div>
+                          {selecionado && (
+                            <button
+                              type="button"
+                              onClick={() => clearSlot(categoria)}
+                              className="text-[10px] text-muted-foreground hover:text-fg2 inline-flex items-center gap-0.5 mt-0.5"
+                              title="Remover desta categoria"
+                            >
+                              <X className="w-2.5 h-2.5" /> remover
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex-1 flex flex-wrap gap-1.5">
+                          {disponiveis.map(b => {
+                            const ativo = selecionadoId === b.id
+                            return (
+                              <button
+                                key={b.id}
+                                type="button"
+                                onClick={() => toggleSlot(categoria, b.id)}
+                                title={fill(b.texto, ctx)}
+                                className={cn(
+                                  'text-left px-2.5 py-1.5 rounded-md border text-[11px] font-medium transition-all max-w-full',
+                                )}
+                                style={ativo
+                                  ? { background: 'rgba(0,137,172,0.15)', borderColor: 'rgba(0,137,172,0.55)', color: 'var(--cyan-hi)' }
+                                  : { background: 'var(--alpha-bg-xs)', borderColor: 'var(--alpha-border)', color: 'var(--text-soft-a)' }
+                                }
+                              >
+                                {ativo && <Check className="w-3 h-3 inline mr-1 -mt-0.5" />}
+                                {b.titulo}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                      {selecionado && (
+                        <div
+                          className="mt-2 ml-32 pl-2 p-2 rounded text-[11px] text-muted-foreground leading-snug whitespace-pre-wrap"
+                          style={{ background: 'var(--alpha-bg-xs)', borderLeft: '2px solid rgba(0,137,172,0.40)' }}
+                        >
+                          {fill(selecionado.texto, ctx)}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+
+                {/* Preview composta + apply */}
+                {slotsPreenchidos > 0 ? (
+                  <div className="p-4 bg-[var(--alpha-bg-xs)]">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--cyan-hi)' }}>
+                        Mensagem composta
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={aplicarComposerNoEditor}
+                        className="h-7 gap-1.5 text-xs"
+                        style={{ backgroundColor: '#0089ac' }}
+                      >
+                        <Pencil className="w-3 h-3" />
+                        Usar no editor
+                      </Button>
+                    </div>
+                    <pre className="whitespace-pre-wrap text-xs text-fg2 font-sans leading-relaxed">
+                      {composedBody}
+                    </pre>
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                      Depois de aplicar, você pode editar livremente no editor acima.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-xs text-muted-foreground">
+                    Selecione um bloco em qualquer categoria para começar a compor. Trocar de bloco na mesma categoria substitui automaticamente.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Voice rules card — shown only when configured */}
@@ -897,6 +1271,24 @@ export function MensagensPage() {
           )}
         </div>
       </div>
+
+      <ConfirmSendModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        lead={selectedLead
+          ? { id: selectedLead.id, nome: selectedLead.nome, status: selectedLead.status, telefone: selectedLead.telefone }
+          : null}
+        channel={channel}
+        stageMsg={stage}
+        setor={sector}
+        variacaoIdx={varIdx}
+        assunto={effectiveSubject}
+        corpo={effectiveBody}
+        mode={confirmMode}
+        externalUrl={confirmMode === 'send' && channel === 'whatsapp'
+          ? buildWhatsAppUrl(telefone, effectiveBody)
+          : undefined}
+      />
     </div>
   )
 }

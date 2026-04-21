@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useDemandas, useCreateDemanda, useUpdateDemanda, useDeleteDemanda } from '@/hooks/useDemandas'
+import { useMeuPerfil } from '@/hooks/usePerfis'
+import { ScopeToggle, type Scope } from '@/components/shared/ScopeToggle'
 import { useContratos } from '@/hooks/useContratos'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,13 +27,18 @@ const DEMANDA_STATUS = [
 export function DemandasPage() {
   const { data: demandas, isLoading } = useDemandas()
   const { data: contratos } = useContratos()
+  const { data: meuPerfil } = useMeuPerfil()
   const createDemanda = useCreateDemanda()
   const updateDemanda = useUpdateDemanda()
   const deleteDemanda = useDeleteDemanda()
+  const [scope, setScope] = useState<Scope>('all')
   const [search, setSearch] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState('todos')
   const [showNew, setShowNew] = useState(false)
+
+  const meuNome = meuPerfil?.nome?.toLowerCase()
+  const mineCount = meuNome ? (demandas?.filter(d => d.responsavel?.toLowerCase() === meuNome).length ?? 0) : 0
 
   // New demanda form state
   const [contratoId, setContratoId] = useState('')
@@ -43,9 +50,10 @@ export function DemandasPage() {
 
   const filtered = demandas?.filter(d => {
     const q = search.toLowerCase()
+    const matchScope  = scope === 'all' || (meuNome && d.responsavel?.toLowerCase() === meuNome)
     const matchSearch = !search || d.titulo.toLowerCase().includes(q) || d.cliente?.nome?.toLowerCase().includes(q)
     const matchStatus = statusFilter === 'todos' || d.status === statusFilter
-    return matchSearch && matchStatus
+    return matchScope && matchSearch && matchStatus
   }) || []
 
   function handleCreate() {
@@ -79,7 +87,8 @@ export function DemandasPage() {
         </Button>
       </div>
 
-      <div className="flex gap-3 mb-5">
+      <div className="flex gap-3 mb-5 items-center flex-wrap">
+        <ScopeToggle value={scope} onChange={setScope} mineCount={mineCount} allCount={demandas?.length ?? 0} />
         <SearchInput value={search} onChange={setSearch} placeholder="Buscar demanda…" className="max-w-xs flex-1" />
         <div className="flex gap-1.5">
           {['todos', ...DEMANDA_STATUS.map(s => s.value)].map(s => (

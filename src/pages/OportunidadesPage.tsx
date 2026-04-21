@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useOportunidades, useCreateOportunidade, useUpdateOportunidade, useDeleteOportunidade } from '@/hooks/useOportunidades'
+import { useMeuPerfil } from '@/hooks/usePerfis'
+import { ScopeToggle, type Scope } from '@/components/shared/ScopeToggle'
 import { useCreateContrato } from '@/hooks/useContratos'
 import { useClientes } from '@/hooks/useClientes'
 import { Card, CardContent } from '@/components/ui/card'
@@ -262,8 +264,10 @@ function NovaOportunidadeModal({ onClose }: { onClose: () => void }) {
 
 export function OportunidadesPage() {
   const { data: oportunidades, isLoading } = useOportunidades()
+  const { data: meuPerfil } = useMeuPerfil()
   const updateOportunidade = useUpdateOportunidade()
   const deleteOportunidade = useDeleteOportunidade()
+  const [scope, setScope] = useState<Scope>('all')
   const [convertendo, setConvertendo] = useState<Oportunidade | null>(null)
   const [showNova, setShowNova] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -276,20 +280,29 @@ export function OportunidadesPage() {
     updateOportunidade.mutate({ id: op.id, status: newStatus })
   }
 
+  const meuNome = meuPerfil?.nome?.toLowerCase()
+  const mineCount = meuNome ? (oportunidades?.filter(o => o.responsavel?.toLowerCase() === meuNome).length ?? 0) : 0
+  const escopadas = scope === 'mine' && meuNome
+    ? (oportunidades?.filter(o => o.responsavel?.toLowerCase() === meuNome) ?? [])
+    : oportunidades
+
   const byStatus = OPORTUNIDADE_STATUS.reduce((acc, s) => {
-    acc[s.value] = oportunidades?.filter(o => o.status === s.value) || []
+    acc[s.value] = escopadas?.filter(o => o.status === s.value) || []
     return acc
   }, {} as Record<string, typeof oportunidades extends undefined ? never[] : NonNullable<typeof oportunidades>>)
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-foreground">Oportunidades</h1>
-        <button onClick={() => setShowNova(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-white text-sm font-medium"
-          style={{ backgroundColor: '#0089ac' }}>
-          <Plus className="w-4 h-4" />Nova Oportunidade
-        </button>
+        <div className="flex items-center gap-3">
+          <ScopeToggle value={scope} onChange={setScope} mineCount={mineCount} allCount={oportunidades?.length ?? 0} />
+          <button onClick={() => setShowNova(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-white text-sm font-medium"
+            style={{ backgroundColor: '#0089ac' }}>
+            <Plus className="w-4 h-4" />Nova Oportunidade
+          </button>
+        </div>
       </div>
 
       {isLoading ? <OportunidadesSkeleton /> : (

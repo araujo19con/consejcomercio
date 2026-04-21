@@ -16,8 +16,9 @@ import { AuditoriaPage } from '@/pages/AuditoriaPage'
 import { ConfiguracoesPage } from '@/pages/ConfiguracoesPage'
 import { SlackPage } from '@/pages/SlackPage'
 import { ReunioesPage } from '@/pages/ReunioesPage'
-import { PerfilPage } from '@/pages/PerfilPage'
+import { MeEspacoPage } from '@/pages/MeEspacoPage'
 import { MensagensPage } from '@/pages/MensagensPage'
+import { CadenciaPage } from '@/pages/CadenciaPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { MapaPage } from '@/pages/MapaPage'
 import { ImportarPage } from '@/pages/ImportarPage'
@@ -51,12 +52,14 @@ export const router = createBrowserRouter([
       { path: 'oportunidades', element: <OportunidadesPage /> },
       { path: 'reunioes', element: <ReunioesPage /> },
       { path: 'mensagens', element: <MensagensPage /> },
+      { path: 'cadencia', element: <CadenciaPage /> },
       { path: 'slack', element: <SlackPage /> },
       { path: 'auditoria', element: <AuditoriaPage /> },
       { path: 'configuracoes', element: <ConfiguracoesPage /> },
       { path: 'importar', element: <ImportarPage /> },
       { path: 'pos-juniors', element: <PosJuniorsPage /> },
-      { path: 'perfil', element: <PerfilPage /> },
+      { path: 'me', element: <MeEspacoPage /> },
+      { path: 'perfil', element: <Navigate to="/me?tab=perfil" replace /> },
       { path: 'ajuda', element: <AjudaPage /> },
       { path: 'ranking', element: <RankingPage /> },
     ],

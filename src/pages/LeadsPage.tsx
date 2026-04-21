@@ -1,28 +1,35 @@
 import { useState, useMemo } from 'react'
 import { useLeads } from '@/hooks/useLeads'
+import { useMeuPerfil } from '@/hooks/usePerfis'
 import { KanbanBoard } from '@/components/leads/KanbanBoard'
 import { LEAD_SOURCES, SEGMENTS } from '@/lib/constants'
 import { X } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { SearchInput } from '@/components/ui/search-input'
+import { ScopeToggle, type Scope } from '@/components/shared/ScopeToggle'
 
 export function LeadsPage() {
   const { data: leads, isLoading } = useLeads()
+  const { data: meuPerfil } = useMeuPerfil()
+  const [scope, setScope]             = useState<Scope>('all')
   const [search, setSearch]           = useState('')
   const [origemFilter, setOrigemFilter]     = useState('todos')
   const [segmentoFilter, setSegmentoFilter] = useState('todos')
 
+  const mineCount = useMemo(() => (meuPerfil?.id ? leads?.filter(l => l.responsavel_id === meuPerfil.id).length ?? 0 : 0), [leads, meuPerfil])
+  const allCount  = leads?.length ?? 0
+
   const filteredLeads = useMemo(() => {
     if (!leads) return []
     return leads.filter(l => {
+      const matchScope     = scope === 'all' || (meuPerfil?.id && l.responsavel_id === meuPerfil.id)
       const matchSearch    = !search || l.nome.toLowerCase().includes(search.toLowerCase()) || (l.empresa ?? '').toLowerCase().includes(search.toLowerCase())
       const matchOrigem    = origemFilter === 'todos' || l.origem === origemFilter
       const matchSegmento  = segmentoFilter === 'todos' || l.segmento === segmentoFilter
-      return matchSearch && matchOrigem && matchSegmento
+      return matchScope && matchSearch && matchOrigem && matchSegmento
     })
-  }, [leads, search, origemFilter, segmentoFilter])
+  }, [leads, scope, meuPerfil, search, origemFilter, segmentoFilter])
 
-  const hasFilter = search || origemFilter !== 'todos' || segmentoFilter !== 'todos'
+  const hasFilter = search || origemFilter !== 'todos' || segmentoFilter !== 'todos' || scope !== 'all'
 
   const selectStyle = {
     background: 'var(--alpha-bg-xs)',
@@ -55,6 +62,9 @@ export function LeadsPage() {
 
         {/* Filter bar */}
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Scope: minhas/todas */}
+          <ScopeToggle value={scope} onChange={setScope} mineCount={mineCount} allCount={allCount} />
+
           {/* Search */}
           <SearchInput value={search} onChange={setSearch} placeholder="Buscar lead…" className="w-48" />
 
@@ -89,7 +99,7 @@ export function LeadsPage() {
           {/* Clear */}
           {hasFilter && (
             <button
-              onClick={() => { setSearch(''); setOrigemFilter('todos'); setSegmentoFilter('todos') }}
+              onClick={() => { setSearch(''); setOrigemFilter('todos'); setSegmentoFilter('todos'); setScope('all') }}
               className="h-8 px-2.5 flex items-center gap-1 text-xs rounded-lg border transition-colors text-muted-foreground hover:text-white hover:border-[var(--alpha-bg-lg)]"
               style={{ borderColor: 'var(--alpha-bg-md)' }}
             >
