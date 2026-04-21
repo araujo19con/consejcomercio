@@ -26,3 +26,6 @@ dist-ssr
 # Migration data — never commit client CSVs or secrets
 scripts/data/*.csv
 .env.migration
+
+# Claude Code local state
+.superpowers/

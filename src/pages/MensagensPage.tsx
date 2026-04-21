@@ -1,27 +1,29 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Copy, Check, Smartphone, Mail, Linkedin, RefreshCw, Sparkles, Search, Phone, X, MessageSquare } from 'lucide-react'
+import { Copy, Check, Smartphone, Mail, Linkedin, RefreshCw, Sparkles, Search, Phone, X, MessageSquare, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { useLeads } from '@/hooks/useLeads'
 import { useMeuPerfil } from '@/hooks/usePerfis'
+import { useConfiguracoes, DEFAULT_MENSAGENS_CONFIG } from '@/hooks/useConfiguracoes'
+import type { MensagensConfig } from '@/types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Stage = 'primeiro_contato' | 'followup' | 'diagnostico' | 'proposta' | 'negociacao' | 'pos_fechamento' | 'reativacao'
+export type Stage = 'primeiro_contato' | 'followup' | 'diagnostico' | 'proposta' | 'negociacao' | 'pos_fechamento' | 'reativacao'
 // Setores alinhados ao catálogo real da CONSEJ (useConfiguracoes.ts → ServicoCategoria)
-type Sector = 'geral' | 'societario' | 'contratual' | 'digital_lgpd' | 'trabalhista' | 'marca_pi'
-type Channel = 'whatsapp' | 'email' | 'linkedin'
+export type Sector = 'geral' | 'societario' | 'contratual' | 'digital_lgpd' | 'trabalhista' | 'marca_pi'
+export type Channel = 'whatsapp' | 'email' | 'linkedin'
 
-interface MsgTemplate { subject?: string; body: string }
+export interface MsgTemplate { subject?: string; body: string }
 type TemplateMap = Partial<Record<Sector, MsgTemplate[]>>
 type Templates = Record<Stage, Record<Channel, TemplateMap>>
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
-const STAGES: { id: Stage; label: string; colorVal: string; bgVal: string }[] = [
+export const STAGES: { id: Stage; label: string; colorVal: string; bgVal: string }[] = [
   { id: 'primeiro_contato', label: 'Primeiro Contato',   colorVal: '#93c5fd', bgVal: 'rgba(59,130,246,0.12)'   },
   { id: 'followup',         label: 'Follow-up',          colorVal: '#c4b5fd', bgVal: 'rgba(139,92,246,0.12)'  },
   { id: 'diagnostico',      label: 'Diagnóstico',        colorVal: '#67e8f9', bgVal: 'rgba(6,182,212,0.12)'   },
@@ -32,7 +34,7 @@ const STAGES: { id: Stage; label: string; colorVal: string; bgVal: string }[] = 
 ]
 
 // Setores espelham as categorias do catálogo de serviços (ServicoCategoria)
-const SECTORS: { id: Sector; label: string; emoji: string }[] = [
+export const SECTORS: { id: Sector; label: string; emoji: string }[] = [
   { id: 'geral',         label: 'Geral / Consultoria',         emoji: '⚖️'  },
   { id: 'societario',    label: 'Societário / Acordo Sócios',  emoji: '🤝'  },
   { id: 'contratual',    label: 'Contratos / Inadimplência',   emoji: '📝'  },
@@ -41,7 +43,7 @@ const SECTORS: { id: Sector; label: string; emoji: string }[] = [
   { id: 'marca_pi',      label: 'Marca / INPI',                emoji: '™️'  },
 ]
 
-const CHANNELS: { id: Channel; label: string; icon: React.FC<{ className?: string }> }[] = [
+export const CHANNELS: { id: Channel; label: string; icon: React.FC<{ className?: string }> }[] = [
   { id: 'whatsapp', label: 'WhatsApp', icon: Smartphone },
   { id: 'email',    label: 'E-mail',   icon: Mail        },
   { id: 'linkedin', label: 'LinkedIn', icon: Linkedin    },
@@ -53,9 +55,20 @@ function fill(tpl: string, ctx: Record<string, string>) {
   return tpl.replace(/\{\{(\w+)\}\}/g, (_, k) => ctx[k] ?? `[${k}]`)
 }
 
+// ─── Template helpers ─────────────────────────────────────────────────────────
+
+function fillBrackets(text: string, defaults: MensagensConfig['defaults']): string {
+  return text
+    .replace(/\[link_diagnostico\]/gi, defaults.link_diagnostico || '[link_diagnostico]')
+    .replace(/\[forma_pagamento\]/gi, defaults.forma_pagamento || '[forma_pagamento]')
+    .replace(/\[prazo_entrega\]/gi, defaults.prazo_entrega || '[prazo_entrega]')
+    .replace(/\[valor_hora\]/gi, defaults.valor_hora || '[valor_hora]')
+    .replace(/\[assinatura\]/gi, defaults.assinatura || '[assinatura]')
+}
+
 // ─── Templates ────────────────────────────────────────────────────────────────
 
-const TEMPLATES: Templates = {
+export const TEMPLATES: Templates = {
 
   /* ────────────────── PRIMEIRO CONTATO ────────────────── */
   primeiro_contato: {
@@ -364,18 +377,40 @@ const TEMPLATES: Templates = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+function resolveTemplate(
+  stage: Stage,
+  channel: Channel,
+  sector: Sector,
+  varIdx: number,
+  overrides: MensagensConfig['overrides']
+): MsgTemplate | undefined {
+  const key = `${stage}__${channel}__${sector}__${varIdx}`
+  if (overrides[key]) return overrides[key]
+  const byChannel = TEMPLATES[stage]?.[channel] ?? {}
+  return (byChannel[sector] ?? byChannel['geral'] ?? [])[varIdx]
+}
+
 function getMessages(
   stage: Stage,
   sector: Sector,
   channel: Channel,
-  ctx: Record<string, string>
+  ctx: Record<string, string>,
+  mensagensConfig: MensagensConfig
 ): { subject?: string; body: string }[] {
   const byChannel = TEMPLATES[stage]?.[channel] ?? {}
-  const templates = byChannel[sector] ?? byChannel['geral'] ?? []
-  return templates.map(t => ({
-    subject: t.subject ? fill(t.subject, ctx) : undefined,
-    body: fill(t.body, ctx),
-  }))
+  const staticTemplates = byChannel[sector] ?? byChannel['geral'] ?? []
+  const count = staticTemplates.length || 1
+  return Array.from({ length: count }, (_, i) => {
+    const tpl = resolveTemplate(stage, channel, sector, i, mensagensConfig.overrides)
+      ?? staticTemplates[i]
+      ?? { body: '' }
+    const rawBody = fillBrackets(tpl.body, mensagensConfig.defaults)
+    const rawSubject = tpl.subject ? fillBrackets(tpl.subject, mensagensConfig.defaults) : undefined
+    return {
+      subject: rawSubject ? fill(rawSubject, ctx) : undefined,
+      body: fill(rawBody, ctx),
+    }
+  })
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -432,8 +467,11 @@ export function MensagensPage() {
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
   const pickerRef = useRef<HTMLDivElement>(null)
 
-  const { data: leads = [] } = useLeads()
-  const { data: meuPerfil }  = useMeuPerfil()
+  const { data: leads = [] }  = useLeads()
+  const { data: meuPerfil }   = useMeuPerfil()
+  const { data: config }      = useConfiguracoes()
+  const mensagensConfig       = config?.mensagens ?? DEFAULT_MENSAGENS_CONFIG
+  const activeSectors         = SECTORS.filter(s => mensagensConfig.setores_ativos.includes(s.id))
 
   // Persist preferences whenever they change
   useEffect(() => {
@@ -502,7 +540,7 @@ export function MensagensPage() {
     ).slice(0, 8)
   }, [leads, leadSearch])
 
-  const messages = useMemo(() => getMessages(stage, sector, channel, ctx), [stage, sector, channel, ctx])
+  const messages = useMemo(() => getMessages(stage, sector, channel, ctx, mensagensConfig), [stage, sector, channel, ctx, mensagensConfig])
   const currentMsg = messages[varIdx] ?? messages[0]
 
   const stageInfo = STAGES.find(s => s.id === stage)!
@@ -705,7 +743,7 @@ export function MensagensPage() {
           <div>
             <h2 className="text-xs font-semibold text-fg4 uppercase tracking-wider mb-3">Setor / Área jurídica</h2>
             <div className="grid grid-cols-2 gap-1.5">
-              {SECTORS.map(sec => (
+              {activeSectors.map(sec => (
                 <button
                   key={sec.id}
                   onClick={() => handleSectorChange(sec.id)}
@@ -813,6 +851,17 @@ export function MensagensPage() {
               </div>
             </div>
           </div>
+
+          {/* Voice rules card — shown only when configured */}
+          {mensagensConfig.regras_voz && (
+            <div className="flex items-start gap-2.5 p-4 rounded-xl" style={{ background: 'rgba(107,208,231,0.07)', border: '1px solid rgba(107,208,231,0.20)' }}>
+              <BookOpen className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--cyan-hi)' }} />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold mb-1" style={{ color: 'var(--cyan-hi)' }}>Regras de voz</p>
+                <p className="text-xs leading-relaxed whitespace-pre-wrap text-muted-foreground">{mensagensConfig.regras_voz}</p>
+              </div>
+            </div>
+          )}
 
           {/* Tip */}
           <div className="flex items-start gap-2.5 p-4 bg-[rgba(245,158,11,0.10)] border border-[rgba(245,158,11,0.20)] rounded-xl">

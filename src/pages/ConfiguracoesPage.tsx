@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Settings, DollarSign, Plus, Trash2, Save, Trophy, Pencil, Tag, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Settings, DollarSign, Plus, Trash2, Save, Trophy, Pencil, Tag, ToggleLeft, ToggleRight, MessageSquare, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatCurrency } from '@/lib/utils'
 import { SEGMENTS, BUDGET_OPTIONS, SERVICE_AREAS } from '@/lib/constants'
-import type { ServicoConfig, MetasConfig, ServicoCategoria } from '@/types'
+import type { ServicoConfig, MetasConfig, ServicoCategoria, MensagensConfig } from '@/types'
+import { DEFAULT_MENSAGENS_CONFIG } from '@/hooks/useConfiguracoes'
+import { STAGES, SECTORS, CHANNELS, TEMPLATES } from '@/pages/MensagensPage'
 
 // ─── Category config ──────────────────────────────────────────────────────────
 
@@ -269,12 +271,20 @@ export function ConfiguracoesPage() {
   const [editingServico, setEditingServico] = useState<ServicoConfig | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
+  // Mensagens config state
+  const [mensagens, setMensagens] = useState<MensagensConfig>(DEFAULT_MENSAGENS_CONFIG)
+  // Template editor selectors
+  const [tplStage, setTplStage] = useState(STAGES[0].id)
+  const [tplChannel, setTplChannel] = useState(CHANNELS[0].id)
+  const [tplSector, setTplSector] = useState(SECTORS[0].id)
+
   // Sync local state when data loads from DB
   useEffect(() => {
     if (config) {
       setAlertaDias(String(config.alerta_renovacao_dias))
       setServicos(config.servicos)
       if (config.metas) setMetas({ ...DEFAULT_METAS, ...config.metas })
+      if (config.mensagens) setMensagens({ ...DEFAULT_MENSAGENS_CONFIG, ...config.mensagens, defaults: { ...DEFAULT_MENSAGENS_CONFIG.defaults, ...config.mensagens.defaults }, overrides: config.mensagens.overrides ?? {} })
     }
   }, [config])
 
@@ -305,6 +315,28 @@ export function ConfiguracoesPage() {
       servicos,
       metas,
     })
+  }
+
+  function saveMensagens() {
+    updateConfig.mutate({ mensagens })
+  }
+
+  function setOverride(key: string, value: { body: string; subject?: string } | null) {
+    setMensagens(prev => {
+      const next = { ...prev.overrides }
+      if (value === null) delete next[key]
+      else next[key] = value
+      return { ...prev, overrides: next }
+    })
+  }
+
+  function toggleSetor(id: string) {
+    setMensagens(prev => ({
+      ...prev,
+      setores_ativos: prev.setores_ativos.includes(id)
+        ? prev.setores_ativos.filter(s => s !== id)
+        : [...prev.setores_ativos, id],
+    }))
   }
 
   function resetToDefaults() {
@@ -488,6 +520,185 @@ export function ConfiguracoesPage() {
                 rows={2}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* ── Mensagens ──────────────────────────────────────────────────────── */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" /> Configurações de Mensagens
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <p className="text-xs text-muted-foreground -mt-1">
+              Controle os parâmetros das mensagens de abordagem: valores padrão, setores visíveis, tom de voz e edição de templates.
+            </p>
+
+            {/* Seção 1: Parâmetros Padrão */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-fg4 uppercase tracking-wider">Parâmetros Padrão</p>
+              <p className="text-xs text-muted-foreground">Substitui automaticamente os placeholders <code className="text-xs bg-muted px-1 rounded">[chave]</code> nas mensagens.</p>
+              <div className="grid grid-cols-1 gap-3">
+                {([
+                  ['link_diagnostico', 'Link do Diagnóstico', 'https://...'],
+                  ['forma_pagamento', 'Forma de Pagamento', 'Ex: PIX ou boleto em até 3x'],
+                  ['prazo_entrega', 'Prazo de Entrega', 'Ex: 7 a 14 dias úteis'],
+                  ['valor_hora', 'Valor / Hora', 'Ex: R$ 150'],
+                  ['assinatura', 'Assinatura', 'Ex: Equipe CONSEJ'],
+                ] as [keyof MensagensConfig['defaults'], string, string][]).map(([key, label, placeholder]) => (
+                  <div key={key} className="space-y-1">
+                    <Label className="text-xs">{label}</Label>
+                    <Input
+                      value={mensagens.defaults[key]}
+                      onChange={e => setMensagens(prev => ({ ...prev, defaults: { ...prev.defaults, [key]: e.target.value } }))}
+                      placeholder={placeholder}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Seção 2: Setores Ativos */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-fg4 uppercase tracking-wider">Setores Visíveis</p>
+              <p className="text-xs text-muted-foreground">Setores desativados ficam ocultos na página de mensagens.</p>
+              <div className="grid grid-cols-2 gap-2">
+                {SECTORS.map(sec => {
+                  const active = mensagens.setores_ativos.includes(sec.id)
+                  return (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      onClick={() => toggleSetor(sec.id)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all text-left"
+                      style={active
+                        ? { background: 'rgba(0,137,172,0.10)', borderColor: 'rgba(0,137,172,0.40)', color: 'var(--cyan-hi)' }
+                        : { borderColor: 'var(--alpha-border)', color: 'var(--text-soft-a)' }}
+                    >
+                      {active
+                        ? <ToggleRight className="w-4 h-4 shrink-0" />
+                        : <ToggleLeft className="w-4 h-4 shrink-0 opacity-40" />}
+                      <span>{sec.emoji} {sec.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Seção 3: Tom e Regras de Voz */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-fg4 uppercase tracking-wider">Tom e Regras de Voz</p>
+              <p className="text-xs text-muted-foreground">Referência de escrita para o time. Aparece na página de mensagens quando preenchida.</p>
+              <Textarea
+                value={mensagens.regras_voz}
+                onChange={e => setMensagens(prev => ({ ...prev, regras_voz: e.target.value }))}
+                placeholder={'Ex: Sempre tutear, nunca vossear. Nunca usar "prezado/a". Somos consultores, não advogados…'}
+                rows={3}
+              />
+            </div>
+
+            {/* Seção 4: Editor de Templates */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-fg4 uppercase tracking-wider">Editor de Templates</p>
+              <p className="text-xs text-muted-foreground">Sobrescreva o texto padrão de qualquer mensagem. Use <code className="text-xs bg-muted px-1 rounded">{'{{nome}}'}</code>, <code className="text-xs bg-muted px-1 rounded">{'{{empresa}}'}</code>, <code className="text-xs bg-muted px-1 rounded">{'{{responsavel}}'}</code> como variáveis.</p>
+
+              {/* Selectors */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Etapa</Label>
+                  <Select value={tplStage} onValueChange={v => setTplStage(v as typeof tplStage)}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STAGES.map(s => <SelectItem key={s.id} value={s.id} className="text-xs">{s.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Canal</Label>
+                  <Select value={tplChannel} onValueChange={v => setTplChannel(v as typeof tplChannel)}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CHANNELS.map(c => <SelectItem key={c.id} value={c.id} className="text-xs">{c.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Setor</Label>
+                  <Select value={tplSector} onValueChange={v => setTplSector(v as typeof tplSector)}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {SECTORS.map(s => <SelectItem key={s.id} value={s.id} className="text-xs">{s.emoji} {s.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Variation editors */}
+              {(() => {
+                const byChannel = TEMPLATES[tplStage as keyof typeof TEMPLATES]?.[tplChannel as 'whatsapp' | 'email' | 'linkedin'] ?? {}
+                const staticList = (byChannel as Record<string, { subject?: string; body: string }[]>)[tplSector]
+                  ?? (byChannel as Record<string, { subject?: string; body: string }[]>)['geral']
+                  ?? []
+                return staticList.map((_, idx) => {
+                  const key = `${tplStage}__${tplChannel}__${tplSector}__${idx}`
+                  const override = mensagens.overrides[key]
+                  const current = override ?? staticList[idx]
+                  return (
+                    <div key={key} className="space-y-2 p-3 rounded-lg" style={{ background: 'var(--alpha-bg-xs)', border: '1px solid var(--alpha-border)' }}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-fg4">Variação {idx + 1}</span>
+                        {override && (
+                          <button
+                            type="button"
+                            onClick={() => setOverride(key, null)}
+                            className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <RotateCcw className="w-3 h-3" /> Restaurar padrão
+                          </button>
+                        )}
+                      </div>
+                      {tplChannel === 'email' && (
+                        <div className="space-y-1">
+                          <Label className="text-xs">Assunto</Label>
+                          <Input
+                            value={current.subject ?? ''}
+                            onChange={e => setOverride(key, { body: current.body, subject: e.target.value || undefined })}
+                            className="h-7 text-xs"
+                            placeholder="Assunto do e-mail"
+                          />
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        <Label className="text-xs">Corpo</Label>
+                        <Textarea
+                          value={current.body}
+                          onChange={e => setOverride(key, { body: e.target.value, subject: current.subject })}
+                          rows={5}
+                          className="text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+                  )
+                })
+              })()}
+              {(() => {
+                const byChannel = TEMPLATES[tplStage as keyof typeof TEMPLATES]?.[tplChannel as 'whatsapp' | 'email' | 'linkedin'] ?? {}
+                const staticList = (byChannel as Record<string, { subject?: string; body: string }[]>)[tplSector]
+                  ?? (byChannel as Record<string, { subject?: string; body: string }[]>)['geral']
+                  ?? []
+                if (staticList.length === 0) return (
+                  <p className="text-xs text-muted-foreground text-center py-3">Nenhum template padrão para esta combinação.</p>
+                )
+                return null
+              })()}
+            </div>
+
+            <Button onClick={saveMensagens} disabled={updateConfig.isPending} size="sm" style={{ backgroundColor: '#0089ac' }} className="text-white">
+              <Save className="w-3.5 h-3.5 mr-1.5" />
+              {updateConfig.isPending ? 'Salvando...' : 'Salvar Mensagens'}
+            </Button>
           </CardContent>
         </Card>
 

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { QUERY_KEYS } from '@/lib/query-keys'
-import type { Configuracoes, MetasConfig, ServicoConfig } from '@/types'
+import type { Configuracoes, MetasConfig, MensagensConfig, ServicoConfig } from '@/types'
 import { toast } from 'sonner'
 
 export const DEFAULT_METAS: MetasConfig = {
@@ -138,6 +138,19 @@ export const DEFAULT_SERVICOS: ServicoConfig[] = [
   },
 ]
 
+export const DEFAULT_MENSAGENS_CONFIG: MensagensConfig = {
+  defaults: {
+    link_diagnostico: '',
+    forma_pagamento: '',
+    prazo_entrega: '',
+    valor_hora: '',
+    assinatura: '',
+  },
+  setores_ativos: ['geral', 'societario', 'contratual', 'digital_lgpd', 'trabalhista', 'marca_pi'],
+  regras_voz: '',
+  overrides: {},
+}
+
 const DEFAULT_CONFIGURACOES: Configuracoes = {
   id: 'default',
   alerta_renovacao_dias: 60,
@@ -165,7 +178,13 @@ export function useConfiguracoes() {
         rawServicos.every(s => s.id === 'simples' || s.id === 'complexa')
 
       if (isOldPlaceholders) {
-        return { ...data, servicos: DEFAULT_SERVICOS } as Configuracoes
+        const mensagensEarly: MensagensConfig = {
+          ...DEFAULT_MENSAGENS_CONFIG,
+          ...(data.mensagens ?? {}),
+          defaults: { ...DEFAULT_MENSAGENS_CONFIG.defaults, ...(data.mensagens?.defaults ?? {}) },
+          overrides: data.mensagens?.overrides ?? {},
+        }
+        return { ...data, servicos: DEFAULT_SERVICOS, mensagens: mensagensEarly } as Configuracoes
       }
 
       // Merge DB servicos with any new default fields (backward compat)
@@ -182,7 +201,15 @@ export function useConfiguracoes() {
         ...servicoDefaults,
         ...s,
       }))
-      return { ...data, servicos: dbServicos } as Configuracoes
+
+      const mensagens: MensagensConfig = {
+        ...DEFAULT_MENSAGENS_CONFIG,
+        ...(data.mensagens ?? {}),
+        defaults: { ...DEFAULT_MENSAGENS_CONFIG.defaults, ...(data.mensagens?.defaults ?? {}) },
+        overrides: data.mensagens?.overrides ?? {},
+      }
+
+      return { ...data, servicos: dbServicos, mensagens } as Configuracoes
     },
     staleTime: 1000 * 60 * 5,
   })

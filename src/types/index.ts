@@ -219,11 +219,25 @@ export interface MetasConfig {
   recompensa_descricao: string
 }
 
+export interface MensagensConfig {
+  defaults: {
+    link_diagnostico: string
+    forma_pagamento: string
+    prazo_entrega: string
+    valor_hora: string
+    assinatura: string
+  }
+  setores_ativos: string[]
+  regras_voz: string
+  overrides: Record<string, { body: string; subject?: string }>
+}
+
 export interface Configuracoes {
   id: string
   alerta_renovacao_dias: number
   servicos: ServicoConfig[]
   metas?: MetasConfig
+  mensagens?: MensagensConfig
   updated_at: string
 }
 
