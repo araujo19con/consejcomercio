@@ -7,7 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { ArrowLeft, Plus, AlertCircle, Trash2, Star, Shield, UserCheck, Pencil, X, Check } from 'lucide-react'
+import { ArrowLeft, Plus, AlertCircle, Trash2, Star, Shield, UserCheck, Pencil, X, Check, Mail } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import { toast } from 'sonner'
 import { useUpdateClienteNPS } from '@/hooks/useClientes'
 import { useUpdateContrato } from '@/hooks/useContratos'
 import {
@@ -162,6 +164,22 @@ export function ClienteDetailPage() {
   useEffect(() => { setEditingDados(false) }, [id])
 
   const indicacoes = todasIndicacoes?.filter(i => i.indicante_cliente_id === id) || []
+
+  async function handleConvidarPortal() {
+    if (!cliente.email) {
+      toast.error('Cliente sem e-mail cadastrado. Adicione um e-mail antes de convidar.')
+      return
+    }
+    const { error } = await supabase.auth.signInWithOtp({
+      email: cliente.email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/portal`,
+        data: { tipo: 'cliente', cliente_id: cliente.id },
+      },
+    })
+    if (error) toast.error('Erro ao enviar convite. Tente novamente.')
+    else toast.success(`Convite enviado para ${cliente.email}`)
+  }
   const oportunidades = todasOportunidades?.filter(o => o.cliente_id === id) || []
 
   if (!cliente) return <div className="text-muted-foreground">Cliente não encontrado.</div>
@@ -184,11 +202,23 @@ export function ClienteDetailPage() {
           <h1 className="text-xl font-bold text-foreground">{cliente.nome}</h1>
           <p className="text-sm text-muted-foreground">{cliente.empresa}</p>
         </div>
-        {statusInfo && (
-          <span className={cn('ml-auto text-xs font-medium px-2.5 py-1 rounded-full', statusInfo.color)}>
-            {statusInfo.label}
-          </span>
-        )}
+        <div className="ml-auto flex items-center gap-2">
+          {statusInfo && (
+            <span className={cn('text-xs font-medium px-2.5 py-1 rounded-full', statusInfo.color)}>
+              {statusInfo.label}
+            </span>
+          )}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleConvidarPortal}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            title="Convidar cliente para o Portal de Indicações"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            Convidar para Portal
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="contratos">

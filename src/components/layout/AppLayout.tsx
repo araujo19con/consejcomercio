@@ -14,8 +14,21 @@ export function AppLayout() {
   const [checking, setChecking] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) navigate('/login', { replace: true })
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) {
+        navigate('/login', { replace: true })
+        return
+      }
+      // Clientes pertencem ao portal, não ao CRM
+      const { data: perfil } = await supabase
+        .from('perfis')
+        .select('tipo')
+        .eq('id', session.user.id)
+        .single()
+      if (perfil?.tipo === 'cliente') {
+        navigate('/portal', { replace: true })
+        return
+      }
       setChecking(false)
     })
 

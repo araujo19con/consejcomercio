@@ -27,6 +27,11 @@ import { PosJuniorsPage } from '@/pages/PosJuniorsPage'
 import { ProspeccaoPage } from '@/pages/ProspeccaoPage'
 import { AjudaPage } from '@/pages/AjudaPage'
 import { RankingPage } from '@/pages/RankingPage'
+import { PortalLayout } from '@/pages/portal/PortalLayout'
+import { PortalWalletPage } from '@/pages/portal/PortalWalletPage'
+import { PortalIndicarPage } from '@/pages/portal/PortalIndicarPage'
+import { PortalCatalogoPage } from '@/pages/portal/PortalCatalogoPage'
+import { PortalHistoricoPage } from '@/pages/portal/PortalHistoricoPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -62,6 +67,16 @@ export const router = createBrowserRouter([
       { path: 'perfil', element: <Navigate to="/me?tab=perfil" replace /> },
       { path: 'ajuda', element: <AjudaPage /> },
       { path: 'ranking', element: <RankingPage /> },
+    ],
+  },
+  {
+    path: '/portal',
+    element: <PortalLayout />,
+    children: [
+      { index: true,             element: <PortalWalletPage />   },
+      { path: 'indicar',         element: <PortalIndicarPage />  },
+      { path: 'catalogo',        element: <PortalCatalogoPage /> },
+      { path: 'historico',       element: <PortalHistoricoPage />},
     ],
   },
   { path: '*', element: <Navigate to="/dashboard" replace /> },

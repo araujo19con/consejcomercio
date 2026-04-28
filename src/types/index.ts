@@ -304,3 +304,57 @@ export interface AuditLog {
   usuario?: string | null
   created_at: string
 }
+
+// ─── Portal de Indicações — Tokens ───────────────────────────────────────────
+
+export interface TokenTransacao {
+  id: string
+  perfil_id: string
+  tipo: 'credito' | 'debito'
+  motivo: string
+  valor: number
+  referencia_tipo?: string | null
+  referencia_id?: string | null
+  descricao?: string | null
+  created_at: string
+}
+
+export interface CatalogoRecompensa {
+  id: string
+  nome: string
+  descricao?: string | null
+  tier: 'cortesia' | 'desconto' | 'servico' | 'premium'
+  custo_tokens: number
+  aprovacao_dupla: boolean
+  ativo: boolean
+  created_at: string
+}
+
+export interface Resgate {
+  id: string
+  perfil_id: string
+  catalogo_id: string
+  tokens_debitados: number
+  status: 'pendente' | 'aprovado' | 'entregue' | 'cancelado'
+  aprovado_por_id?: string | null
+  notas?: string | null
+  created_at: string
+  updated_at: string
+  catalogo?: CatalogoRecompensa
+}
+
+export type NivelToken = 'bronze' | 'prata' | 'ouro' | 'diamante'
+
+export function calcularNivel(historicoTotal: number): NivelToken {
+  if (historicoTotal >= 15000) return 'diamante'
+  if (historicoTotal >= 5000)  return 'ouro'
+  if (historicoTotal >= 1000)  return 'prata'
+  return 'bronze'
+}
+
+export const NIVEL_CONFIG: Record<NivelToken, { label: string; cor: string; bonus: number; min: number; next: number }> = {
+  bronze:   { label: 'Bronze',   cor: '#cd7f32', bonus: 0,  min: 0,     next: 1000  },
+  prata:    { label: 'Prata',    cor: '#9ca3af', bonus: 10, min: 1000,  next: 5000  },
+  ouro:     { label: 'Ouro',     cor: '#f59e0b', bonus: 20, min: 5000,  next: 15000 },
+  diamante: { label: 'Diamante', cor: '#818cf8', bonus: 30, min: 15000, next: 15000 },
+}
