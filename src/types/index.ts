@@ -343,6 +343,32 @@ export interface Resgate {
   catalogo?: CatalogoRecompensa
 }
 
+export interface RegraToken {
+  id: string
+  motivo: string
+  label: string
+  descricao?: string | null
+  valor_tokens: number
+  ativo: boolean
+  ordem: number
+  created_at: string
+  updated_at: string
+}
+
+export interface Campanha {
+  id: string
+  titulo: string
+  descricao: string
+  cor: string
+  icone: string
+  data_inicio: string
+  data_fim: string
+  ativa: boolean
+  destaque: boolean
+  created_at: string
+  updated_at: string
+}
+
 export type NivelToken = 'bronze' | 'prata' | 'ouro' | 'diamante'
 
 export function calcularNivel(historicoTotal: number): NivelToken {

@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { usePortalPerfil, useTokenTransacoes } from '@/hooks/usePortal'
+import { usePortalPerfil, useTokenTransacoes, useCampanhasAtivas } from '@/hooks/usePortal'
 import { calcularNivel, NIVEL_CONFIG } from '@/types'
-import { Coins, UserPlus, TrendingUp, TrendingDown, Target, ChevronRight, X, Gift, Zap } from 'lucide-react'
+import { Coins, UserPlus, TrendingUp, TrendingDown, Target, ChevronRight, Gift, Zap, Sparkles, Trophy, Star, Megaphone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { format } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+
+const CAMPANHA_ICONS: Record<string, typeof Sparkles> = {
+  sparkles:  Sparkles,
+  gift:      Gift,
+  zap:       Zap,
+  trophy:    Trophy,
+  star:      Star,
+  megaphone: Megaphone,
+}
 
 const MOTIVO_LABEL: Record<string, string> = {
   cadastro:           'Boas-vindas ao programa',
@@ -89,6 +98,7 @@ export function PortalWalletPage() {
   const navigate = useNavigate()
   const { data: perfil, isLoading } = usePortalPerfil()
   const { data: transacoes = [] } = useTokenTransacoes()
+  const { data: campanhas = [] } = useCampanhasAtivas()
   const [showWelcome, setShowWelcome] = useState(false)
 
   useEffect(() => {
@@ -199,6 +209,39 @@ export function PortalWalletPage() {
           )}
         </div>
       </div>
+
+      {/* Campanhas em destaque */}
+      {campanhas.length > 0 && (
+        <div className="space-y-3">
+          {campanhas.map(c => {
+            const Icon = CAMPANHA_ICONS[c.icone] ?? Sparkles
+            const restante = formatDistanceToNow(new Date(c.data_fim), { locale: ptBR })
+            return (
+              <div key={c.id} className="rounded-xl p-4 flex gap-3 items-start"
+                style={{
+                  background: `linear-gradient(135deg, ${c.cor}1f 0%, rgba(0,8,29,0.4) 100%)`,
+                  border: `1px solid ${c.cor}55`,
+                  boxShadow: `0 0 0 1px ${c.cor}11, 0 8px 24px ${c.cor}22`,
+                }}>
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: `${c.cor}33`, border: `1px solid ${c.cor}66` }}>
+                  <Icon className="w-5 h-5" style={{ color: c.cor }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{c.titulo}</p>
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
+                      style={{ background: `${c.cor}33`, color: c.cor, border: `1px solid ${c.cor}55` }}>
+                      Termina em {restante}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 4, lineHeight: 1.5 }}>{c.descricao}</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* CTA indicar */}
       <div className="rounded-xl p-5 flex items-center justify-between gap-4"

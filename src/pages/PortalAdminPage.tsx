@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { format, formatDistanceToNow, differenceInDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Coins, Users, Package, TrendingUp, TrendingDown, ChevronDown, ChevronUp, X, Check, Truck, Ban, Clock } from 'lucide-react'
+import { Coins, Users, Package, TrendingUp, TrendingDown, ChevronDown, ChevronUp, X, Check, Truck, Ban, Clock, Sliders, Gift, Megaphone } from 'lucide-react'
+import { RegrasTab } from '@/components/portal-admin/RegrasTab'
+import { CatalogoTab } from '@/components/portal-admin/CatalogoTab'
+import { CampanhasTab } from '@/components/portal-admin/CampanhasTab'
 import { useMeuPerfil } from '@/hooks/usePerfis'
 import {
   usePortalClientes, useAllResgates, useTransacoesCliente,
-  useAtualizarResgate, useCreditarTokens, MOTIVOS_CREDITO,
+  useAtualizarResgate, useCreditarTokens, useRegrasTokens,
   type PortalCliente,
 } from '@/hooks/usePortalAdmin'
 import { calcularNivel, NIVEL_CONFIG } from '@/types'
@@ -56,9 +59,18 @@ function ModalCreditar({
   onClose: () => void
 }) {
   const creditar = useCreditarTokens()
-  const [motivo,    setMotivo]    = useState(MOTIVOS_CREDITO[0].value)
+  const { data: regras = [] } = useRegrasTokens()
+  const regrasAtivas = regras.filter(r => r.ativo && r.motivo !== 'resgate' && r.motivo !== 'indicacao')
+  const [motivo,    setMotivo]    = useState(regrasAtivas[0]?.motivo ?? 'bonus')
   const [valor,     setValor]     = useState('')
   const [descricao, setDescricao] = useState('')
+
+  // Auto-preencher valor com o sugerido pela regra
+  function handleMotivoChange(novo: string) {
+    setMotivo(novo)
+    const regra = regras.find(r => r.motivo === novo)
+    if (regra && !valor) setValor(String(regra.valor_tokens))
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -91,12 +103,14 @@ function ModalCreditar({
             </label>
             <select
               value={motivo}
-              onChange={e => setMotivo(e.target.value)}
+              onChange={e => handleMotivoChange(e.target.value)}
               className="w-full mt-1.5 px-3 py-2.5 rounded-lg text-sm"
               style={{ background: 'rgba(0,137,172,0.08)', border: '1px solid rgba(107,208,231,0.15)', color: '#fff', outline: 'none' }}
             >
-              {MOTIVOS_CREDITO.map(m => (
-                <option key={m.value} value={m.value} style={{ background: '#000d28' }}>{m.label}</option>
+              {regrasAtivas.map(r => (
+                <option key={r.id} value={r.motivo} style={{ background: '#000d28' }}>
+                  {r.label} (sugerido: +{r.valor_tokens})
+                </option>
               ))}
             </select>
           </div>
@@ -252,7 +266,7 @@ function ClienteRow({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-type Tab = 'clientes' | 'resgates'
+type Tab = 'clientes' | 'resgates' | 'regras' | 'catalogo' | 'campanhas'
 
 export function PortalAdminPage() {
   const [tab, setTab]           = useState<Tab>('clientes')
@@ -299,17 +313,24 @@ export function PortalAdminPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-4">
-        {(['clientes', 'resgates'] as Tab[]).map(t => (
-          <button key={t} onClick={() => setTab(t)}
-            className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+      <div className="flex gap-1 mb-4 flex-wrap">
+        {([
+          { id: 'clientes',  label: `Clientes (${totalClientes})`,                                                 Icon: Users },
+          { id: 'resgates',  label: `Resgates${totalPendentes > 0 ? ` · ${totalPendentes} pendentes` : ''}`,        Icon: Package },
+          { id: 'regras',    label: 'Regras de Tokens',                                                            Icon: Sliders },
+          { id: 'catalogo',  label: 'Catálogo',                                                                    Icon: Gift },
+          { id: 'campanhas', label: 'Campanhas',                                                                   Icon: Megaphone },
+        ] as { id: Tab; label: string; Icon: typeof Users }[]).map(({ id, label, Icon }) => (
+          <button key={id} onClick={() => setTab(id)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
             style={{
-              background: tab === t ? 'rgba(0,137,172,0.25)' : 'transparent',
-              border: tab === t ? '1px solid rgba(0,137,172,0.5)' : '1px solid rgba(107,208,231,0.1)',
-              color: tab === t ? '#6bd0e7' : 'rgba(107,208,231,0.4)',
+              background: tab === id ? 'rgba(0,137,172,0.25)' : 'transparent',
+              border: tab === id ? '1px solid rgba(0,137,172,0.5)' : '1px solid rgba(107,208,231,0.1)',
+              color: tab === id ? '#6bd0e7' : 'rgba(107,208,231,0.4)',
               cursor: 'pointer',
             }}>
-            {t === 'clientes' ? `Clientes (${totalClientes})` : `Resgates${totalPendentes > 0 ? ` · ${totalPendentes} pendentes` : ''}`}
+            <Icon className="w-3.5 h-3.5" />
+            {label}
           </button>
         ))}
       </div>
@@ -447,6 +468,15 @@ export function PortalAdminPage() {
           )}
         </div>
       )}
+
+      {/* Tab: Regras de tokens */}
+      {tab === 'regras' && <RegrasTab />}
+
+      {/* Tab: Catálogo */}
+      {tab === 'catalogo' && <CatalogoTab />}
+
+      {/* Tab: Campanhas */}
+      {tab === 'campanhas' && <CampanhasTab />}
 
       {/* Modal creditar */}
       {modalCliente && (

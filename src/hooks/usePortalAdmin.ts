@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
-import type { TokenTransacao, Resgate } from '@/types'
+import type { TokenTransacao, Resgate, RegraToken, Campanha, CatalogoRecompensa } from '@/types'
 
 // ─── Todos os clientes com acesso ao portal ───────────────────────────────────
 
@@ -156,5 +156,198 @@ export function useCreditarTokens() {
       toast.success(`+${valor} tokens creditados com sucesso!`)
     },
     onError: () => toast.error('Erro ao creditar tokens. Verifique as permissões RLS.'),
+  })
+}
+
+// ─── REGRAS DE TOKENS ─────────────────────────────────────────────────────────
+
+export function useRegrasTokens() {
+  return useQuery({
+    queryKey: ['regras-tokens'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('regras_tokens')
+        .select('*')
+        .order('ordem', { ascending: true })
+      if (error) throw error
+      return (data ?? []) as RegraToken[]
+    },
+  })
+}
+
+export function useSalvarRegra() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (regra: Partial<RegraToken> & { motivo: string; label: string; valor_tokens: number }) => {
+      if (regra.id) {
+        const { error } = await supabase
+          .from('regras_tokens')
+          .update({
+            label: regra.label,
+            descricao: regra.descricao ?? null,
+            valor_tokens: regra.valor_tokens,
+            ativo: regra.ativo ?? true,
+            ordem: regra.ordem ?? 0,
+          })
+          .eq('id', regra.id)
+        if (error) throw error
+      } else {
+        const { error } = await supabase
+          .from('regras_tokens')
+          .insert({
+            motivo: regra.motivo,
+            label: regra.label,
+            descricao: regra.descricao ?? null,
+            valor_tokens: regra.valor_tokens,
+            ativo: regra.ativo ?? true,
+            ordem: regra.ordem ?? 0,
+          })
+        if (error) throw error
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['regras-tokens'] })
+      toast.success('Regra salva')
+    },
+    onError: (e: Error) => toast.error(`Erro: ${e.message}`),
+  })
+}
+
+export function useExcluirRegra() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('regras_tokens').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['regras-tokens'] })
+      toast.success('Regra excluída')
+    },
+    onError: () => toast.error('Erro ao excluir'),
+  })
+}
+
+// ─── CATÁLOGO (CRUD admin) ────────────────────────────────────────────────────
+
+export function useCatalogoTodos() {
+  return useQuery({
+    queryKey: ['catalogo-admin'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('catalogo_recompensas')
+        .select('*')
+        .order('custo_tokens', { ascending: true })
+      if (error) throw error
+      return (data ?? []) as CatalogoRecompensa[]
+    },
+  })
+}
+
+export function useSalvarRecompensa() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (item: Partial<CatalogoRecompensa> & { nome: string; tier: CatalogoRecompensa['tier']; custo_tokens: number }) => {
+      const payload = {
+        nome: item.nome,
+        descricao: item.descricao ?? null,
+        tier: item.tier,
+        custo_tokens: item.custo_tokens,
+        aprovacao_dupla: item.aprovacao_dupla ?? false,
+        ativo: item.ativo ?? true,
+      }
+      if (item.id) {
+        const { error } = await supabase.from('catalogo_recompensas').update(payload).eq('id', item.id)
+        if (error) throw error
+      } else {
+        const { error } = await supabase.from('catalogo_recompensas').insert(payload)
+        if (error) throw error
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['catalogo-admin'] })
+      qc.invalidateQueries({ queryKey: ['catalogo-recompensas'] })
+      toast.success('Recompensa salva')
+    },
+    onError: (e: Error) => toast.error(`Erro: ${e.message}`),
+  })
+}
+
+export function useExcluirRecompensa() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('catalogo_recompensas').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['catalogo-admin'] })
+      qc.invalidateQueries({ queryKey: ['catalogo-recompensas'] })
+      toast.success('Recompensa excluída')
+    },
+    onError: () => toast.error('Erro ao excluir'),
+  })
+}
+
+// ─── CAMPANHAS ────────────────────────────────────────────────────────────────
+
+export function useCampanhasTodas() {
+  return useQuery({
+    queryKey: ['campanhas-admin'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('campanhas_promocionais')
+        .select('*')
+        .order('data_fim', { ascending: false })
+      if (error) throw error
+      return (data ?? []) as Campanha[]
+    },
+  })
+}
+
+export function useSalvarCampanha() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (c: Partial<Campanha> & { titulo: string; descricao: string; data_fim: string }) => {
+      const payload = {
+        titulo: c.titulo,
+        descricao: c.descricao,
+        cor: c.cor ?? '#f59e0b',
+        icone: c.icone ?? 'sparkles',
+        data_inicio: c.data_inicio ?? new Date().toISOString(),
+        data_fim: c.data_fim,
+        ativa: c.ativa ?? true,
+        destaque: c.destaque ?? true,
+      }
+      if (c.id) {
+        const { error } = await supabase.from('campanhas_promocionais').update(payload).eq('id', c.id)
+        if (error) throw error
+      } else {
+        const { error } = await supabase.from('campanhas_promocionais').insert(payload)
+        if (error) throw error
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['campanhas-admin'] })
+      qc.invalidateQueries({ queryKey: ['campanhas-ativas'] })
+      toast.success('Campanha salva')
+    },
+    onError: (e: Error) => toast.error(`Erro: ${e.message}`),
+  })
+}
+
+export function useExcluirCampanha() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('campanhas_promocionais').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['campanhas-admin'] })
+      qc.invalidateQueries({ queryKey: ['campanhas-ativas'] })
+      toast.success('Campanha excluída')
+    },
+    onError: () => toast.error('Erro ao excluir'),
   })
 }

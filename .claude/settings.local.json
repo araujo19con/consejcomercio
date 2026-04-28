@@ -8,7 +8,14 @@
       "Bash(git push *)",
       "Bash(vercel --version)",
       "Bash(gh auth *)",
-      "Bash(git fetch *)"
+      "Bash(git fetch *)",
+      "Read(//c/Users/Gabriel/Desktop/consejcomercio/**)",
+      "Bash(mv supabase/migrations/015_notificacoes_ddgd.sql supabase/migrations/016_notificacoes_ddgd.sql)",
+      "Bash(mv supabase/migrations/016_passagem_bastao.sql supabase/migrations/017_passagem_bastao.sql)",
+      "Bash(mv supabase/migrations/016_notificacoes_ddgd.sql.sql supabase/migrations/016_notificacoes_ddgd.sql)",
+      "Bash(mv supabase/migrations/017_passagem_bastao.sql.sql supabase/migrations/017_passagem_bastao.sql)",
+      "Bash(npm run *)",
+      "Bash(npx tsc *)"
     ]
   }
 }
