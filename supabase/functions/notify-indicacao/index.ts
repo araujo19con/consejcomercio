@@ -10,10 +10,24 @@
 //   SUPABASE_URL             — injetado automaticamente
 //   SUPABASE_SERVICE_ROLE_KEY — injetado automaticamente
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
+import { timingSafeEqual } from 'https://deno.land/std@0.224.0/crypto/timing_safe_equal.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import type { HydratedIndicacao, IndicacaoRow, WebhookPayload } from './types.ts'
 import { buildIndicacaoBlocks, buildIndicacaoFallbackText } from './slack.ts'
+
+function constantTimeAuthCheck(received: string, expectedSecret: string): boolean {
+  const enc = new TextEncoder()
+  const expected = enc.encode(`Bearer ${expectedSecret}`)
+  const got = enc.encode(received)
+  // Pad shorter input to constant length to avoid timing differences via length comparison.
+  if (got.length !== expected.length) {
+    // Still do a dummy comparison to keep timing constant when length differs.
+    timingSafeEqual(expected, expected)
+    return false
+  }
+  return timingSafeEqual(got, expected)
+}
 
 const SLACK_BOT_TOKEN          = Deno.env.get('SLACK_BOT_TOKEN')
 const SLACK_LEADS_CHANNEL_ID   = Deno.env.get('SLACK_LEADS_CHANNEL_ID') ?? Deno.env.get('SLACK_CHANNEL_ID')
@@ -151,7 +165,7 @@ serve(async (req) => {
 
   if (WEBHOOK_SECRET) {
     const auth = req.headers.get('Authorization') ?? ''
-    if (auth !== `Bearer ${WEBHOOK_SECRET}`) {
+    if (!constantTimeAuthCheck(auth, WEBHOOK_SECRET)) {
       return json({ ok: false, error: 'unauthorized' }, 401)
     }
   }
