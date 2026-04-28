@@ -166,7 +166,7 @@ export function ClienteDetailPage() {
   const indicacoes = todasIndicacoes?.filter(i => i.indicante_cliente_id === id) || []
 
   async function handleConvidarPortal() {
-    if (!cliente.email) {
+    if (!cliente?.email) {
       toast.error('Cliente sem e-mail cadastrado. Adicione um e-mail antes de convidar.')
       return
     }
