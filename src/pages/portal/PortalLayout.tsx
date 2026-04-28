@@ -8,10 +8,10 @@ import { Wallet, UserPlus, Gift, ClipboardList, LogOut, Coins } from 'lucide-rea
 import { cn } from '@/lib/utils'
 
 const NAV = [
-  { to: '/portal',          label: 'Minha Carteira', icon: Wallet,        end: true },
-  { to: '/portal/indicar',  label: 'Indicar',        icon: UserPlus       },
-  { to: '/portal/catalogo', label: 'Catálogo',       icon: Gift           },
-  { to: '/portal/historico',label: 'Histórico',      icon: ClipboardList  },
+  { to: '/portal',           label: 'Carteira',  icon: Wallet,        end: true },
+  { to: '/portal/indicar',   label: 'Indicar',   icon: UserPlus       },
+  { to: '/portal/catalogo',  label: 'Catálogo',  icon: Gift           },
+  { to: '/portal/historico', label: 'Histórico', icon: ClipboardList  },
 ]
 
 export function PortalLayout() {
@@ -76,10 +76,11 @@ export function PortalLayout() {
         position: 'sticky', top: 0, zIndex: 50,
       }}>
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          {/* Logo + badge */}
+          {/* Logo */}
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="CONSEJ" className="h-7 w-auto" />
-            <span style={{ fontSize: 10, color: 'rgba(107,208,231,0.5)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 10, color: 'rgba(107,208,231,0.5)', letterSpacing: '0.12em', textTransform: 'uppercase' }}
+              className="hidden sm:block">
               Portal de Indicações
             </span>
           </div>
@@ -113,11 +114,11 @@ export function PortalLayout() {
             </div>
             <button
               onClick={handleLogout}
+              aria-label="Sair"
               className="p-1.5 rounded-lg transition-colors"
               style={{ color: 'rgba(107,208,231,0.5)' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#6bd0e7')}
               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(107,208,231,0.5)')}
-              title="Sair"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -125,7 +126,7 @@ export function PortalLayout() {
         </div>
       </header>
 
-      {/* Bottom nav (mobile) + top sub-nav (desktop) */}
+      {/* Nav */}
       <nav style={{ borderBottom: '1px solid rgba(0,137,172,0.1)', backgroundColor: '#00081d' }}>
         <div className="max-w-5xl mx-auto px-4 flex">
           {NAV.map(({ to, label, icon: Icon, end }) => (
@@ -134,14 +135,14 @@ export function PortalLayout() {
               to={to}
               end={end}
               className={({ isActive }) => cn(
-                'flex items-center gap-2 px-4 py-3 text-sm border-b-2 transition-colors',
+                'flex items-center gap-1.5 px-3 sm:px-4 py-3 text-xs sm:text-sm border-b-2 transition-colors',
                 isActive
                   ? 'border-[#0089ac] text-white font-medium'
                   : 'border-transparent text-[rgba(107,208,231,0.55)] hover:text-[rgba(107,208,231,0.9)] hover:border-[rgba(0,137,172,0.3)]'
               )}
             >
-              <Icon className="w-4 h-4" />
-              <span className="hidden sm:inline">{label}</span>
+              <Icon className="w-4 h-4 shrink-0" />
+              <span>{label}</span>
             </NavLink>
           ))}
         </div>

@@ -138,6 +138,30 @@ export function useSolicitarResgate() {
   })
 }
 
+// ─── Indicações feitas pelo cliente (para rastreamento no portal) ────────────
+
+export function useMinhasIndicacoes(clienteId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['minhas-indicacoes', clienteId],
+    enabled: !!clienteId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('indicacoes')
+        .select('id, indicado_nome, indicado_empresa, status, created_at')
+        .eq('indicante_cliente_id', clienteId!)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return (data ?? []) as Array<{
+        id: string
+        indicado_nome: string
+        indicado_empresa: string | null
+        status: string
+        created_at: string
+      }>
+    },
+  })
+}
+
 // ─── Mutation: enviar indicação (cliente via portal) ─────────────────────────
 
 export function useEnviarIndicacaoPortal() {
