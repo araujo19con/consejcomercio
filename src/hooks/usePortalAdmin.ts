@@ -119,35 +119,24 @@ export function useCreditarTokens() {
       valor: number
       descricao?: string
     }) => {
-      // 1. Buscar saldo atual
-      const { data: perfil, error: errPerfil } = await supabase
-        .from('perfis')
-        .select('tokens_saldo, tokens_historico_total')
-        .eq('id', perfilId)
-        .single()
-      if (errPerfil) throw errPerfil
-
-      // 2. Registrar transação
-      const { error: errTx } = await supabase
-        .from('token_transacoes')
-        .insert({
-          perfil_id: perfilId,
-          tipo: 'credito',
-          motivo,
-          valor,
-          descricao: descricao || null,
-        })
-      if (errTx) throw errTx
-
-      // 3. Atualizar saldo e histórico no perfil
-      const { error: errUpdate } = await supabase
-        .from('perfis')
-        .update({
-          tokens_saldo: perfil.tokens_saldo + valor,
-          tokens_historico_total: perfil.tokens_historico_total + valor,
-        })
-        .eq('id', perfilId)
-      if (errUpdate) throw errUpdate
+      const { error } = await supabase.rpc('creditar_tokens_admin', {
+        p_perfil_id: perfilId,
+        p_motivo: motivo,
+        p_valor: valor,
+        p_descricao: descricao || null,
+      })
+      if (error) {
+        if (error.message.includes('apenas_interno_pode_creditar')) {
+          throw new Error('Apenas administradores podem creditar tokens.')
+        }
+        if (error.message.includes('valor_invalido')) {
+          throw new Error('Valor inválido (máximo: 100.000 tokens por crédito).')
+        }
+        if (error.message.includes('perfil_nao_encontrado')) {
+          throw new Error('Cliente não encontrado.')
+        }
+        throw new Error('Erro ao creditar tokens.')
+      }
     },
     onSuccess: (_, { valor }) => {
       queryClient.invalidateQueries({ queryKey: ['portal-admin-clientes'] })
@@ -155,7 +144,7 @@ export function useCreditarTokens() {
       queryClient.invalidateQueries({ queryKey: ['portal-admin-resgates'] })
       toast.success(`+${valor} tokens creditados com sucesso!`)
     },
-    onError: () => toast.error('Erro ao creditar tokens. Verifique as permissões RLS.'),
+    onError: (err: Error) => toast.error(err.message ?? 'Erro ao creditar tokens.'),
   })
 }
 
