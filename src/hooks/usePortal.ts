@@ -196,7 +196,26 @@ export function useEnviarIndicacaoPortal() {
       saldoAtual: number
       historicoTotal: number
     }) => {
-      // 1. Criar indicação no CRM
+      // 1. Criar lead no pipeline do CRM (entra como novo_lead no kanban)
+      const segmento = form.segmento?.trim() || 'A definir'
+      const { data: lead, error: errLead } = await supabase
+        .from('leads')
+        .insert({
+          nome: form.nome,
+          empresa: form.empresa,
+          segmento,
+          telefone: form.telefone,
+          email: form.email ?? null,
+          origem: 'indicacao_cliente',
+          status: 'novo_lead',
+          referido_por_cliente_id: clienteId,
+          notas: 'Recebido via Portal de Indicações',
+        })
+        .select()
+        .single()
+      if (errLead) throw errLead
+
+      // 2. Criar indicação vinculada ao lead recém-criado
       const { data: indicacao, error: errInd } = await supabase
         .from('indicacoes')
         .insert({
@@ -205,6 +224,7 @@ export function useEnviarIndicacaoPortal() {
           indicado_empresa: form.empresa,
           indicado_telefone: form.telefone,
           indicado_email: form.email ?? null,
+          lead_id: lead.id,
           status: 'pendente',
           notas: form.segmento ? `Segmento: ${form.segmento}` : null,
         })
