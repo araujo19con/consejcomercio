@@ -71,58 +71,33 @@ export function useResgates() {
   })
 }
 
-// ─── Mutation: solicitar resgate ─────────────────────────────────────────────
+// ─── Mutation: solicitar resgate (via RPC SECURITY DEFINER) ──────────────────
 
 export function useSolicitarResgate() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ catalogo, perfilId, saldoAtual }: {
+    mutationFn: async ({ catalogo }: {
       catalogo: CatalogoRecompensa
-      perfilId: string
-      saldoAtual: number
+      perfilId?: string
+      saldoAtual?: number
     }) => {
-      if (saldoAtual < catalogo.custo_tokens) {
-        throw new Error('Saldo insuficiente')
+      const { error } = await supabase.rpc('solicitar_resgate_portal', {
+        p_catalogo_id: catalogo.id,
+      })
+      if (error) {
+        // Mapear erros do PG para mensagens amigáveis
+        if (error.message.includes('saldo_insuficiente')) {
+          throw new Error('Saldo insuficiente')
+        }
+        if (error.message.includes('recompensa_indisponivel')) {
+          throw new Error('Recompensa indisponível no momento')
+        }
+        throw new Error('Erro ao solicitar resgate. Tente novamente.')
       }
-
-      // 1. Inserir o resgate
-      const { data: resgate, error: errResgate } = await supabase
-        .from('resgates')
-        .insert({
-          perfil_id: perfilId,
-          catalogo_id: catalogo.id,
-          tokens_debitados: catalogo.custo_tokens,
-          status: 'pendente',
-        })
-        .select()
-        .single()
-      if (errResgate) throw errResgate
-
-      // 2. Registrar débito em token_transacoes
-      const { error: errTx } = await supabase
-        .from('token_transacoes')
-        .insert({
-          perfil_id: perfilId,
-          tipo: 'debito',
-          motivo: 'resgate',
-          valor: catalogo.custo_tokens,
-          referencia_tipo: 'resgate',
-          referencia_id: resgate.id,
-          descricao: catalogo.nome,
-        })
-      if (errTx) throw errTx
-
-      // 3. Decrementar saldo no perfil
-      const { error: errPerfil } = await supabase
-        .from('perfis')
-        .update({ tokens_saldo: saldoAtual - catalogo.custo_tokens })
-        .eq('id', perfilId)
-      if (errPerfil) throw errPerfil
-
-      return resgate
+      return catalogo
     },
-    onSuccess: (_, { catalogo }) => {
+    onSuccess: (catalogo) => {
       queryClient.invalidateQueries({ queryKey: ['portal-perfil'] })
       queryClient.invalidateQueries({ queryKey: ['token-transacoes'] })
       queryClient.invalidateQueries({ queryKey: ['resgates'] })
@@ -183,97 +158,54 @@ export function useMinhasIndicacoes(clienteId: string | null | undefined) {
   })
 }
 
-// ─── Mutation: enviar indicação (cliente via portal) ─────────────────────────
+// ─── Mutation: enviar indicação (RPC SECURITY DEFINER) ───────────────────────
+// Usa enviar_indicacao_portal (migration 022) que cria lead + indicacao +
+// crédito de tokens + update do saldo atomicamente, sem expor INSERT direto
+// em token_transacoes ou UPDATE em perfis para o cliente.
 
 export function useEnviarIndicacaoPortal() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ form, perfilId, clienteId, saldoAtual, historicoTotal }: {
+    mutationFn: async ({ form }: {
       form: { nome: string; empresa: string; telefone: string; email?: string; segmento?: string }
-      perfilId: string
-      clienteId: string | null
-      saldoAtual: number
-      historicoTotal: number
+      perfilId?: string
+      clienteId?: string | null
+      saldoAtual?: number
+      historicoTotal?: number
     }) => {
-      // 1. Criar lead no pipeline do CRM (entra como novo_lead no kanban)
-      const segmento = form.segmento?.trim() || 'A definir'
-      const { data: lead, error: errLead } = await supabase
-        .from('leads')
-        .insert({
-          nome: form.nome,
-          empresa: form.empresa,
-          segmento,
-          telefone: form.telefone,
-          email: form.email ?? null,
-          origem: 'indicacao_cliente',
-          status: 'novo_lead',
-          referido_por_cliente_id: clienteId,
-          notas: 'Recebido via Portal de Indicações',
-        })
-        .select()
-        .single()
-      if (errLead) throw errLead
-
-      // 2. Criar indicação vinculada ao lead recém-criado
-      const { data: indicacao, error: errInd } = await supabase
-        .from('indicacoes')
-        .insert({
-          indicante_cliente_id: clienteId,
-          indicado_nome: form.nome,
-          indicado_empresa: form.empresa,
-          indicado_telefone: form.telefone,
-          indicado_email: form.email ?? null,
-          lead_id: lead.id,
-          status: 'pendente',
-          notas: form.segmento ? `Segmento: ${form.segmento}` : null,
-        })
-        .select()
-        .single()
-      if (errInd) throw errInd
-
-      // Lê valor da regra ativa "indicacao" (com fallback para 100)
-      const { data: regra } = await supabase
-        .from('regras_tokens')
-        .select('valor_tokens')
-        .eq('motivo', 'indicacao')
-        .eq('ativo', true)
-        .maybeSingle()
-      const TOKENS_INDICACAO = regra?.valor_tokens ?? 100
-
-      // 2. Registrar crédito
-      const { error: errTx } = await supabase
-        .from('token_transacoes')
-        .insert({
-          perfil_id: perfilId,
-          tipo: 'credito',
-          motivo: 'indicacao',
-          valor: TOKENS_INDICACAO,
-          referencia_tipo: 'indicacao',
-          referencia_id: indicacao.id,
-          descricao: `Indicação de ${form.nome} — ${form.empresa}`,
-        })
-      if (errTx) throw errTx
-
-      // 3. Atualizar saldo e histórico
-      const { error: errPerfil } = await supabase
-        .from('perfis')
-        .update({
-          tokens_saldo: saldoAtual + TOKENS_INDICACAO,
-          tokens_historico_total: historicoTotal + TOKENS_INDICACAO,
-        })
-        .eq('id', perfilId)
-      if (errPerfil) throw errPerfil
-
-      return { indicacao, tokens: TOKENS_INDICACAO }
+      const { data, error } = await supabase.rpc('enviar_indicacao_portal', {
+        p_nome: form.nome,
+        p_empresa: form.empresa,
+        p_telefone: form.telefone,
+        p_email: form.email ?? null,
+        p_segmento: form.segmento ?? null,
+      })
+      if (error) {
+        if (error.message.includes('limite_indicacoes_atingido')) {
+          throw new Error('Você atingiu o limite de 10 indicações ativas.')
+        }
+        if (error.message.includes('perfil_sem_cliente_vinculado')) {
+          throw new Error('Seu perfil não está vinculado a um cliente. Contate o suporte.')
+        }
+        if (error.message.includes('apenas_cliente_pode_indicar')) {
+          throw new Error('Apenas clientes do portal podem enviar indicações.')
+        }
+        throw new Error('Erro ao enviar indicação. Tente novamente.')
+      }
+      return {
+        indicacao: { id: (data as { indicacao_id: string }).indicacao_id },
+        tokens: (data as { tokens_creditados: number }).tokens_creditados,
+      }
     },
     onSuccess: ({ tokens }) => {
       queryClient.invalidateQueries({ queryKey: ['portal-perfil'] })
       queryClient.invalidateQueries({ queryKey: ['token-transacoes'] })
+      queryClient.invalidateQueries({ queryKey: ['minhas-indicacoes'] })
       toast.success(`Indicação enviada! +${tokens} tokens creditados na sua carteira.`)
     },
-    onError: () => {
-      toast.error('Erro ao enviar indicação. Tente novamente.')
+    onError: (err: Error) => {
+      toast.error(err.message ?? 'Erro ao enviar indicação.')
     },
   })
 }
