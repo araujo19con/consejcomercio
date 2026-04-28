@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { format } from 'date-fns'
+import { format, formatDistanceToNow, differenceInDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Coins, Users, Package, TrendingUp, TrendingDown, ChevronDown, ChevronUp, X, Check, Truck, Ban } from 'lucide-react'
+import { Coins, Users, Package, TrendingUp, TrendingDown, ChevronDown, ChevronUp, X, Check, Truck, Ban, Clock } from 'lucide-react'
 import { useMeuPerfil } from '@/hooks/usePerfis'
 import {
   usePortalClientes, useAllResgates, useTransacoesCliente,
@@ -359,8 +359,15 @@ export function PortalAdminPage() {
             resgates.map(r => {
               const scfg = STATUS_CFG[r.status]
               return (
-                <div key={r.id} className="rounded-xl px-4 py-3"
-                  style={{ background: 'var(--alpha-bg-xs)', border: '1px solid rgba(107,208,231,0.08)' }}>
+                <div key={r.id} className="rounded-xl px-4 py-3" style={(() => {
+                    const dias = differenceInDays(new Date(), new Date(r.created_at))
+                    const borderColor = r.status === 'pendente' && dias >= 7
+                      ? 'rgba(239,68,68,0.4)'
+                      : r.status === 'pendente' && dias >= 3
+                        ? 'rgba(245,158,11,0.4)'
+                        : 'rgba(107,208,231,0.08)'
+                    return { background: 'var(--alpha-bg-xs)', border: `1px solid ${borderColor}` }
+                  })()}>
                   <div className="flex items-start gap-3">
                     {/* Info */}
                     <div className="flex-1 min-w-0">
@@ -385,6 +392,19 @@ export function PortalAdminPage() {
                       <p style={{ fontSize: 11, color: 'rgba(107,208,231,0.3)', marginTop: 1 }}>
                         {format(new Date(r.created_at), "d 'de' MMM 'de' yyyy, HH:mm", { locale: ptBR })}
                       </p>
+                      {r.status === 'pendente' && (() => {
+                        const dias = differenceInDays(new Date(), new Date(r.created_at))
+                        const cor  = dias >= 7 ? '#f87171' : dias >= 3 ? '#f59e0b' : 'rgba(107,208,231,0.4)'
+                        return (
+                          <div className="flex items-center gap-1 mt-1">
+                            <Clock className="w-3 h-3" style={{ color: cor }} />
+                            <span style={{ fontSize: 11, color: cor }}>
+                              {formatDistanceToNow(new Date(r.created_at), { locale: ptBR, addSuffix: true })}
+                              {dias >= 3 && ' — requer atenção'}
+                            </span>
+                          </div>
+                        )
+                      })()}
                     </div>
 
                     {/* Tokens */}

@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { usePortalPerfil, useCatalogoRecompensas, useSolicitarResgate } from '@/hooks/usePortal'
 import { Button } from '@/components/ui/button'
 import { type CatalogoRecompensa } from '@/types'
-import { Gift, Coins, Lock, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react'
+import { Gift, Coins, Lock, ShieldCheck, ChevronDown, ChevronUp, UserPlus, ArrowRight } from 'lucide-react'
 
 const TIER_CONFIG = {
   cortesia: { label: 'Cortesias',  cor: '#6bd0e7', desc: '100–500 tokens' },
@@ -24,15 +25,18 @@ function RecompensaCard({
   onResgatar: (item: CatalogoRecompensa) => void
   isPending: boolean
 }) {
+  const navigate = useNavigate()
   const podeResgatar = saldo >= item.custo_tokens
   const cfg = TIER_CONFIG[item.tier]
+  const faltam = item.custo_tokens - saldo
+  const indicacoesNecessarias = Math.ceil(faltam / 100)
 
   return (
     <div className="rounded-xl p-4 flex flex-col gap-3"
       style={{
         background: 'rgba(0,8,29,0.5)',
         border: `1px solid ${podeResgatar ? `${cfg.cor}33` : 'rgba(107,208,231,0.08)'}`,
-        opacity: podeResgatar ? 1 : 0.65,
+        opacity: podeResgatar ? 1 : 0.75,
       }}>
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -42,7 +46,7 @@ function RecompensaCard({
           )}
         </div>
         {item.aprovacao_dupla && (
-          <div title="Sujeito a aprovação dupla">
+          <div title="Sujeito a aprovação dupla da equipe CONSEJ">
             <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#818cf8' }} />
           </div>
         )}
@@ -67,22 +71,45 @@ function RecompensaCard({
           }}
         >
           {!podeResgatar && <Lock className="w-3 h-3 mr-1" />}
-          {podeResgatar ? 'Resgatar' : `Faltam ${(item.custo_tokens - saldo).toLocaleString('pt-BR')}`}
+          {podeResgatar ? 'Resgatar' : `Faltam ${faltam.toLocaleString('pt-BR')}`}
         </Button>
       </div>
+
+      {/* Como ganhar — visível apenas quando bloqueado */}
+      {!podeResgatar && (
+        <button
+          onClick={() => navigate('/portal/indicar')}
+          className="flex items-center gap-1.5 text-left"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+        >
+          <UserPlus className="w-3 h-3 shrink-0" style={{ color: 'rgba(107,208,231,0.35)' }} />
+          <span style={{ fontSize: 11, color: 'rgba(107,208,231,0.45)', textDecoration: 'underline', textDecorationColor: 'rgba(107,208,231,0.2)' }}>
+            {indicacoesNecessarias <= 1
+              ? 'Uma indicação te desbloqueia este item'
+              : `~${indicacoesNecessarias} indicações te desbloqueia este item`}
+          </span>
+          <ArrowRight className="w-3 h-3 shrink-0" style={{ color: 'rgba(107,208,231,0.35)' }} />
+        </button>
+      )}
     </div>
   )
 }
 
 export function PortalCatalogoPage() {
-  const { data: perfil } = usePortalPerfil()
+  const navigate = useNavigate()
+  const { data: perfil }                  = usePortalPerfil()
   const { data: catalogo = [], isLoading } = useCatalogoRecompensas()
   const { mutate: solicitarResgate, isPending } = useSolicitarResgate()
 
   const [confirmando, setConfirmando] = useState<CatalogoRecompensa | null>(null)
-  const [expandidos, setExpandidos] = useState<Set<string>>(new Set(['cortesia', 'desconto']))
+  const [expandidos, setExpandidos]   = useState<Set<string>>(new Set(['cortesia', 'desconto']))
 
   const saldo = perfil?.tokens_saldo ?? 0
+
+  const menorCusto = catalogo.length > 0 ? Math.min(...catalogo.map(i => i.custo_tokens)) : null
+  const indicacoesParaPrimeiro = menorCusto != null && saldo < menorCusto
+    ? Math.ceil((menorCusto - saldo) / 100)
+    : 0
 
   function toggleTier(tier: string) {
     setExpandidos(prev => {
@@ -90,10 +117,6 @@ export function PortalCatalogoPage() {
       next.has(tier) ? next.delete(tier) : next.add(tier)
       return next
     })
-  }
-
-  function handleResgatar(item: CatalogoRecompensa) {
-    setConfirmando(item)
   }
 
   function confirmarResgate() {
@@ -130,11 +153,36 @@ export function PortalCatalogoPage() {
         </div>
       </div>
 
-      <p style={{ fontSize: 13, color: 'rgba(107,208,231,0.5)', marginBottom: 24, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 13, color: 'rgba(107,208,231,0.5)', marginBottom: 16, lineHeight: 1.6 }}>
         Resgate recompensas com seus tokens acumulados. Itens marcados com{' '}
         <ShieldCheck className="w-3.5 h-3.5 inline mb-0.5" style={{ color: '#818cf8' }} />{' '}
         exigem aprovação dupla da CONSEJ.
       </p>
+
+      {/* Banner: nenhum item disponível ainda */}
+      {indicacoesParaPrimeiro > 0 && (
+        <div className="rounded-xl px-4 py-3 mb-5 flex items-center justify-between gap-3"
+          style={{ background: 'rgba(0,137,172,0.08)', border: '1px solid rgba(0,137,172,0.2)' }}>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <UserPlus className="w-4 h-4 shrink-0" style={{ color: '#6bd0e7' }} />
+            <p style={{ fontSize: 13, color: 'rgba(107,208,231,0.8)' }}>
+              Você está a{' '}
+              <strong style={{ color: '#fff' }}>
+                {indicacoesParaPrimeiro === 1 ? '1 indicação' : `${indicacoesParaPrimeiro} indicações`}
+              </strong>{' '}
+              de desbloquear sua primeira recompensa
+            </p>
+          </div>
+          <Button
+            size="sm"
+            className="shrink-0 text-white"
+            style={{ background: 'linear-gradient(135deg, #0089ac, #006d88)', border: 'none', fontSize: 12 }}
+            onClick={() => navigate('/portal/indicar')}
+          >
+            Indicar agora
+          </Button>
+        </div>
+      )}
 
       {/* Tiers */}
       <div className="space-y-4">
@@ -178,7 +226,7 @@ export function PortalCatalogoPage() {
                       key={item.id}
                       item={item}
                       saldo={saldo}
-                      onResgatar={handleResgatar}
+                      onResgatar={setConfirmando}
                       isPending={isPending}
                     />
                   ))}
@@ -198,19 +246,11 @@ export function PortalCatalogoPage() {
         >
           <div
             className="w-full max-w-sm rounded-2xl p-6"
-            style={{
-              background: '#00081d',
-              border: '1px solid rgba(107,208,231,0.2)',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.7)',
-            }}
+            style={{ background: '#00081d', border: '1px solid rgba(107,208,231,0.2)', boxShadow: '0 24px 64px rgba(0,0,0,0.7)' }}
             onClick={e => e.stopPropagation()}
           >
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 8 }}>
-              Confirmar resgate
-            </h3>
-            <p style={{ fontSize: 14, color: 'rgba(107,208,231,0.7)', marginBottom: 4 }}>
-              {confirmando.nome}
-            </p>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 8 }}>Confirmar resgate</h3>
+            <p style={{ fontSize: 14, color: 'rgba(107,208,231,0.7)', marginBottom: 4 }}>{confirmando.nome}</p>
             <div className="flex items-center gap-2 mb-5">
               <Coins className="w-4 h-4" style={{ color: TIER_CONFIG[confirmando.tier].cor }} />
               <span style={{ fontSize: 16, fontWeight: 700, color: TIER_CONFIG[confirmando.tier].cor }}>
@@ -225,9 +265,14 @@ export function PortalCatalogoPage() {
                 style={{ background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.2)' }}>
                 <ShieldCheck className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
                 <p style={{ fontSize: 12, color: 'rgba(129,140,248,0.9)', lineHeight: 1.5 }}>
-                  Este item requer aprovação dupla pela equipe CONSEJ. Você receberá uma confirmação por e-mail.
+                  Este item requer aprovação dupla pela equipe CONSEJ. A confirmação será enviada por e-mail em até 5 dias úteis.
                 </p>
               </div>
+            )}
+            {!confirmando.aprovacao_dupla && (
+              <p style={{ fontSize: 12, color: 'rgba(107,208,231,0.45)', marginBottom: 16, lineHeight: 1.5 }}>
+                A equipe CONSEJ entrará em contato para combinar a entrega em até 2 dias úteis.
+              </p>
             )}
             <div className="flex gap-3">
               <Button variant="ghost" className="flex-1"
