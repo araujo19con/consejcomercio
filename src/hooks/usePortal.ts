@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
-import type { TokenTransacao, CatalogoRecompensa, Resgate } from '@/types'
+import type { TokenTransacao, CatalogoRecompensa, Resgate, Campanha } from '@/types'
 
 // ─── Perfil do portal (cliente) ──────────────────────────────────────────────
 
@@ -138,6 +138,27 @@ export function useSolicitarResgate() {
   })
 }
 
+// ─── Campanhas promocionais ativas ───────────────────────────────────────────
+
+export function useCampanhasAtivas() {
+  return useQuery({
+    queryKey: ['campanhas-ativas'],
+    queryFn: async () => {
+      const nowIso = new Date().toISOString()
+      const { data, error } = await supabase
+        .from('campanhas_promocionais')
+        .select('*')
+        .eq('ativa', true)
+        .eq('destaque', true)
+        .lte('data_inicio', nowIso)
+        .gte('data_fim', nowIso)
+        .order('data_fim', { ascending: true })
+      if (error) throw error
+      return (data ?? []) as Campanha[]
+    },
+  })
+}
+
 // ─── Indicações feitas pelo cliente (para rastreamento no portal) ────────────
 
 export function useMinhasIndicacoes(clienteId: string | null | undefined) {
@@ -191,7 +212,14 @@ export function useEnviarIndicacaoPortal() {
         .single()
       if (errInd) throw errInd
 
-      const TOKENS_INDICACAO = 100
+      // Lê valor da regra ativa "indicacao" (com fallback para 100)
+      const { data: regra } = await supabase
+        .from('regras_tokens')
+        .select('valor_tokens')
+        .eq('motivo', 'indicacao')
+        .eq('ativo', true)
+        .maybeSingle()
+      const TOKENS_INDICACAO = regra?.valor_tokens ?? 100
 
       // 2. Registrar crédito
       const { error: errTx } = await supabase
