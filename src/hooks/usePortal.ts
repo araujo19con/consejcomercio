@@ -134,18 +134,28 @@ export function useCampanhasAtivas() {
   })
 }
 
-// ─── Indicações feitas pelo cliente (para rastreamento no portal) ────────────
+// ─── Indicações feitas no portal (cliente OU consultor interno) ──────────────
 
-export function useMinhasIndicacoes(clienteId: string | null | undefined) {
+export function useMinhasIndicacoes(perfilId: string | null | undefined, clienteId?: string | null) {
   return useQuery({
-    queryKey: ['minhas-indicacoes', clienteId],
-    enabled: !!clienteId,
+    queryKey: ['minhas-indicacoes', perfilId, clienteId ?? null],
+    enabled: !!perfilId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Filtra por indicante_perfil_id (preenchido em todas indicações novas via
+      // migration 023). Para indicações legadas de clientes, faz fallback via
+      // indicante_cliente_id usando OR.
+      let query = supabase
         .from('indicacoes')
         .select('id, indicado_nome, indicado_empresa, status, created_at')
-        .eq('indicante_cliente_id', clienteId!)
         .order('created_at', { ascending: false })
+
+      if (clienteId) {
+        query = query.or(`indicante_perfil_id.eq.${perfilId},indicante_cliente_id.eq.${clienteId}`)
+      } else {
+        query = query.eq('indicante_perfil_id', perfilId!)
+      }
+
+      const { data, error } = await query
       if (error) throw error
       return (data ?? []) as Array<{
         id: string
@@ -188,8 +198,9 @@ export function useEnviarIndicacaoPortal() {
         if (error.message.includes('perfil_sem_cliente_vinculado')) {
           throw new Error('Seu perfil não está vinculado a um cliente. Contate o suporte.')
         }
-        if (error.message.includes('apenas_cliente_pode_indicar')) {
-          throw new Error('Apenas clientes do portal podem enviar indicações.')
+        if (error.message.includes('tipo_invalido_para_indicar') ||
+            error.message.includes('apenas_cliente_pode_indicar')) {
+          throw new Error('Seu perfil não tem permissão para enviar indicações.')
         }
         throw new Error('Erro ao enviar indicação. Tente novamente.')
       }
