@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
@@ -11,13 +11,35 @@ import { ArrowLeft, Users, Gift } from 'lucide-react'
 type Portal = 'crm' | 'cliente'
 type Mode   = 'login' | 'forgot' | 'sent'
 
+async function destinoParaPerfil(portal: Portal, userId: string): Promise<string> {
+  const { data: perfil } = await supabase
+    .from('perfis')
+    .select('tipo')
+    .eq('id', userId)
+    .single()
+  // Cliente nunca pode ver o CRM — sempre cai no portal.
+  if (perfil?.tipo === 'cliente') return '/portal'
+  // Interno respeita a escolha do seletor.
+  return portal === 'cliente' ? '/portal' : '/dashboard'
+}
+
 export function LoginPage() {
   const navigate = useNavigate()
-  const [portal,   setPortal]   = useState<Portal>('crm')
-  const [mode,     setMode]     = useState<Mode>('login')
-  const [email,    setEmail]    = useState('')
-  const [password, setPassword] = useState('')
-  const [loading,  setLoading]  = useState(false)
+  const [portal,        setPortal]        = useState<Portal>('crm')
+  const [mode,          setMode]          = useState<Mode>('login')
+  const [email,         setEmail]         = useState('')
+  const [password,      setPassword]      = useState('')
+  const [loading,       setLoading]       = useState(false)
+  const [activeEmail,   setActiveEmail]   = useState<string | null>(null)
+  const [switchingAcct, setSwitchingAcct] = useState(false)
+
+  // Detecta sessão residual sem redirecionar — usuário pode querer trocar de conta
+  // ou navegar pro outro portal manualmente.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user.email) setActiveEmail(session.user.email)
+    })
+  }, [])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -28,13 +50,27 @@ export function LoginPage() {
       toast.error('Email ou senha inválidos.')
       return
     }
-    // Redirecionar baseado no tipo de perfil
-    const { data: perfil } = await supabase
-      .from('perfis')
-      .select('tipo')
-      .eq('id', data.session.user.id)
-      .single()
-    navigate(perfil?.tipo === 'cliente' ? '/portal' : '/dashboard', { replace: true })
+    const destino = await destinoParaPerfil(portal, data.session.user.id)
+    navigate(destino, { replace: true })
+  }
+
+  async function handleIrParaPortalAtivo() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      setActiveEmail(null)
+      return
+    }
+    const destino = await destinoParaPerfil(portal, session.user.id)
+    navigate(destino, { replace: true })
+  }
+
+  async function handleTrocarConta() {
+    setSwitchingAcct(true)
+    await supabase.auth.signOut()
+    setActiveEmail(null)
+    setEmail('')
+    setPassword('')
+    setSwitchingAcct(false)
   }
 
   async function handleForgot(e: React.FormEvent) {
@@ -131,6 +167,40 @@ export function LoginPage() {
         >
           {mode === 'login' && (
             <>
+              {activeEmail && (
+                <div
+                  style={{
+                    background: 'rgba(0,137,172,0.10)',
+                    border: '1px solid rgba(0,137,172,0.25)',
+                    borderRadius: 10,
+                    padding: '10px 12px',
+                    marginBottom: 16,
+                    fontSize: 12,
+                    color: 'rgba(107,208,231,0.95)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Você já está conectado como <strong style={{ color: '#fff' }}>{activeEmail}</strong>.
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      type="button"
+                      onClick={handleIrParaPortalAtivo}
+                      style={{ fontSize: 11, fontWeight: 600, color: '#fff', background: 'rgba(0,137,172,0.4)', border: '1px solid rgba(0,137,172,0.6)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
+                    >
+                      Continuar como esta conta
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleTrocarConta}
+                      disabled={switchingAcct}
+                      style={{ fontSize: 11, color: 'rgba(107,208,231,0.85)', background: 'transparent', border: '1px solid rgba(107,208,231,0.3)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
+                    >
+                      {switchingAcct ? 'Saindo...' : 'Sair e usar outra conta'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Cabeçalho do card */}
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center"
@@ -203,7 +273,7 @@ export function LoginPage() {
 
               <p className="text-center mt-5" style={{ fontSize: 11, color: 'var(--text-dim-a)', lineHeight: 1.6 }}>
                 {isCliente
-                  ? <>Acesso exclusivo para clientes CONSEJ.<br />Receba seu convite por e-mail da equipe.</>
+                  ? <>Indique e ganhe tokens.<br />Convites enviados pela equipe CONSEJ.</>
                   : <>Acesso apenas para membros da equipe.<br />Contate o administrador para criar sua conta.</>}
               </p>
             </>

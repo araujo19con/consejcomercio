@@ -20,18 +20,9 @@ export function PortalLayout() {
   const { data: perfil } = usePortalPerfil()
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         navigate('/login', { replace: true })
-        return
-      }
-      const { data } = await supabase
-        .from('perfis')
-        .select('tipo')
-        .eq('id', session.user.id)
-        .single()
-      if (data?.tipo === 'interno') {
-        navigate('/dashboard', { replace: true })
         return
       }
       setChecking(false)

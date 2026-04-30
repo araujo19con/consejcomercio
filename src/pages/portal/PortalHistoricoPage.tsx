@@ -45,7 +45,7 @@ export function PortalHistoricoPage() {
   const { data: perfil }                        = usePortalPerfil()
   const { data: transacoes = [], isLoading: loadingTx } = useTokenTransacoes()
   const { data: resgates = [],   isLoading: loadingRs } = useResgates()
-  const { data: indicacoes = [], isLoading: loadingInd } = useMinhasIndicacoes(perfil?.cliente_id)
+  const { data: indicacoes = [], isLoading: loadingInd } = useMinhasIndicacoes(perfil?.id, perfil?.cliente_id)
 
   const [tab,    setTab]    = useState<TabPrincipal>('movimentacoes')
   const [filtro, setFiltro] = useState<FiltroTx>('todos')
