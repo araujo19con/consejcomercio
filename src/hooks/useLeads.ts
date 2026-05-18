@@ -119,12 +119,16 @@ export function useDeleteLead() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('leads').delete().eq('id', id)
+      const { error } = await supabase.rpc('excluir_lead', { p_id: id })
       if (error) throw error
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.leads.all })
-      toast.success('Lead removido.')
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.audit_logs.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.leads_lixeira.all })
+      toast.success('Lead removido e enviado para a lixeira.')
     },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : 'Erro ao remover lead'),
   })
 }
