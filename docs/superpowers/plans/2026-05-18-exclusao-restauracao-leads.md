@@ -236,8 +236,7 @@ GRANT EXECUTE ON FUNCTION restaurar_lead(UUID)        TO authenticated;
 
 - [ ] **Step 2: Aplicar a migração**
 
-Run: `npx supabase db push`
-(Alternativa: colar o conteúdo no SQL Editor do painel Supabase.)
+O Gabriel aplica migrações **colando o SQL no SQL Editor do painel Supabase** (não usa `supabase db push`). O agente NÃO executa este passo — deve pausar e pedir que o usuário cole o conteúdo de `032_lixeira_leads.sql` no SQL Editor e confirme a execução.
 Expected: aplica sem erro de SQL.
 
 - [ ] **Step 3: Verificar round-trip manualmente**
