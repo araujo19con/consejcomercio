@@ -39,6 +39,10 @@ export function TarefaModal({ open, onClose, mode, tarefa, entidadeTipo, entidad
   const criar = useCreateTarefa()
   const atualizar = useUpdateTarefa()
 
+  // Só gerente/diretor atribuem tarefa a outra pessoa; demais criam só para si.
+  const podeAtribuir = meuPerfil?.role === 'gerente' || meuPerfil?.role === 'diretor'
+  const internos = perfis.filter(p => p.tipo === 'interno')
+
   const { register, handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(tarefaSchema),
     defaultValues: {
@@ -74,6 +78,9 @@ export function TarefaModal({ open, onClose, mode, tarefa, entidadeTipo, entidad
     const vencimento = data.data_vencimento
       ? new Date(data.data_vencimento).toISOString()
       : null
+    // Consultor/coordenador sempre criam para si (defesa em profundidade — a RLS
+    // da migration 044 também rejeita atribuição a outros por quem não é gerente/diretor).
+    const assignee = podeAtribuir ? data.atribuido_a_id : (meuPerfil?.id ?? data.atribuido_a_id)
 
     if (mode === 'create') {
       await criar.mutateAsync({
@@ -82,7 +89,7 @@ export function TarefaModal({ open, onClose, mode, tarefa, entidadeTipo, entidad
         tipo:            data.tipo,
         prioridade:      data.prioridade,
         status:          'aberta',
-        atribuido_a_id:  data.atribuido_a_id,
+        atribuido_a_id:  assignee,
         criado_por_id:   meuPerfil?.id ?? data.atribuido_a_id,
         entidade_tipo:   entidadeTipo ?? null,
         entidade_id:     entidadeId ?? null,
@@ -98,7 +105,7 @@ export function TarefaModal({ open, onClose, mode, tarefa, entidadeTipo, entidad
         descricao:       data.descricao || null,
         tipo:            data.tipo,
         prioridade:      data.prioridade,
-        atribuido_a_id:  data.atribuido_a_id,
+        atribuido_a_id:  assignee,
         data_vencimento: vencimento,
         notas:           data.notas || null,
       })
@@ -174,20 +181,29 @@ export function TarefaModal({ open, onClose, mode, tarefa, entidadeTipo, entidad
             </div>
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-fg2 mb-1 block">Responsável *</label>
-            <Controller name="atribuido_a_id" control={control} render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Selecionar responsável" /></SelectTrigger>
-                <SelectContent>
-                  {perfis.map(p => (
-                    <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )} />
-            {errors.atribuido_a_id && <p className="text-xs text-red-500 mt-1">{errors.atribuido_a_id.message}</p>}
-          </div>
+          {podeAtribuir ? (
+            <div>
+              <label className="text-xs font-semibold text-fg2 mb-1 block">Responsável *</label>
+              <Controller name="atribuido_a_id" control={control} render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Selecionar responsável" /></SelectTrigger>
+                  <SelectContent>
+                    {internos.map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )} />
+              {errors.atribuido_a_id && <p className="text-xs text-red-500 mt-1">{errors.atribuido_a_id.message}</p>}
+            </div>
+          ) : (
+            <div>
+              <label className="text-xs font-semibold text-fg2 mb-1 block">Responsável</label>
+              <p className="text-sm text-muted-foreground h-9 flex items-center px-3 rounded-md border border-input bg-muted/20">
+                {meuPerfil?.nome ?? 'Você'} <span className="ml-1 text-fg4">(você)</span>
+              </p>
+            </div>
+          )}
 
           <div>
             <label className="text-xs font-semibold text-fg2 mb-1 block">Notas internas</label>
