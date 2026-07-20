@@ -15,6 +15,8 @@ export interface Perfil {
   role?: RoleConsej | null
   gestor_id?: string | null
   slack_user_id?: string | null
+  google_calendar_conectado?: boolean
+  google_calendar_email?: string | null
   created_at: string
 }
 
