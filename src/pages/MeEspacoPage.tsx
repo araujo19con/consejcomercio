@@ -61,7 +61,7 @@ export function MeEspacoPage() {
   const { data: interacoes = [] } = useInteracoes()
   const { data: reunioes = [] } = useReunioes()
 
-  const derivadas = deriveTarefas({ meuId: userId, leads, contratos, oportunidades, interacoes, reunioes })
+  const derivadas = deriveTarefas({ meuId: userId, leads, contratos, oportunidades, interacoes, reunioes, tarefas: minhasTarefas })
   const totalTarefas = minhasTarefas.length + derivadas.length
   const totalMeusLeads = leads.filter(l => l.responsavel_id === userId && !(TERMINAL_STAGES as readonly string[]).includes(l.status)).length
   const totalMinhaAgenda = reunioes.filter(r => r.responsavel_id === userId && r.status === 'agendada' && new Date(r.data_hora) >= new Date()).length

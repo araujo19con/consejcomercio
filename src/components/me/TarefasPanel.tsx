@@ -73,8 +73,8 @@ export function TarefasPanel({ userId }: Props) {
   const [filtroTipo, setFiltroTipo] = useState<'all' | TarefaTipo | 'derivada'>('all')
 
   const derivadas = useMemo(
-    () => deriveTarefas({ meuId: userId, leads, contratos, oportunidades, interacoes, reunioes }),
-    [userId, leads, contratos, oportunidades, interacoes, reunioes],
+    () => deriveTarefas({ meuId: userId, leads, contratos, oportunidades, interacoes, reunioes, tarefas: minhasTarefas }),
+    [userId, leads, contratos, oportunidades, interacoes, reunioes, minhasTarefas],
   )
 
   const unificadas: TarefaUnificada[] = useMemo(() => {

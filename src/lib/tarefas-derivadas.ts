@@ -7,7 +7,7 @@
 // e não têm `id` do banco — o `id` é sintético a partir da origem.
 
 import { differenceInDays, differenceInHours, isAfter, isBefore, startOfDay } from 'date-fns'
-import type { Lead, Contrato, Oportunidade, InteracaoLead, TarefaPrioridade } from '@/types'
+import type { Lead, Contrato, Oportunidade, InteracaoLead, TarefaPrioridade, Tarefa } from '@/types'
 import type { Reuniao } from '@/hooks/useReunioes'
 import { CADENCIA_DIAS } from './cadencia'
 import { TERMINAL_STAGES } from './constants'
@@ -35,6 +35,9 @@ interface DeriveArgs {
   oportunidades: Oportunidade[]
   interacoes: InteracaoLead[]
   reunioes: Reuniao[]
+  /** Tarefas persistidas do usuário — usadas pra deduplicar cadência derivada
+   *  vs. a tarefa real materializada pela cadência automática (migration 043). */
+  tarefas?: Tarefa[]
   hoje?: Date
 }
 
@@ -63,7 +66,7 @@ function priByVencimento(data: Date, hoje: Date): TarefaPrioridade {
 }
 
 export function deriveTarefas(args: DeriveArgs): TarefaDerivada[] {
-  const { meuId, leads, contratos, oportunidades, interacoes, reunioes } = args
+  const { meuId, leads, contratos, oportunidades, interacoes, reunioes, tarefas = [] } = args
   const hoje = args.hoje ?? new Date()
   const out: TarefaDerivada[] = []
   if (!meuId) return out
@@ -153,6 +156,9 @@ export function deriveTarefas(args: DeriveArgs): TarefaDerivada[] {
     if (!ponto) continue
     // evita duplicar com o estagnado (o estagnado já cobre leads parados)
     if (out.some(t => t.id === `derivada:lead_estagnado:${l.id}`)) continue
+    // dedup com a tarefa REAL de cadência (migration 043): se já existe um
+    // follow-up persistido aberto pro lead, a sugestão derivada é redundante
+    if (tarefas.some(t => t.entidade_tipo === 'lead' && t.entidade_id === l.id && t.tipo === 'followup' && (t.status === 'aberta' || t.status === 'em_andamento'))) continue
     out.push({
       id: `derivada:cadencia:${l.id}:${ponto.dia}`,
       derivada: true,
