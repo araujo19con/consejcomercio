@@ -44,6 +44,10 @@ export const QUERY_KEYS = {
     all: ['interacoes'] as const,
     byLead: (leadId: string) => ['interacoes', 'lead', leadId] as const,
   },
+  passagemBastao: {
+    byLead: (leadId: string) => ['passagem_bastao', 'lead', leadId] as const,
+    midias: (leadId: string) => ['passagem_bastao', 'midias', leadId] as const,
+  },
   tarefas: {
     all: ['tarefas'] as const,
     mine: (userId: string) => ['tarefas', 'mine', userId] as const,
