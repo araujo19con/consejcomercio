@@ -109,10 +109,12 @@ function buildReuniaoEvent(r: Row): CalendarEvent {
 
 serve(async (req) => {
   if (req.method !== 'POST') return json({ ok: false, error: 'method not allowed' }, 405)
-  if (WEBHOOK_SECRET) {
-    if (!constantTimeAuthCheck(req.headers.get('Authorization') ?? '', WEBHOOK_SECRET)) {
-      return json({ ok: false, error: 'unauthorized' }, 401)
-    }
+  // FAIL-CLOSED: esta function roda com --no-verify-jwt, então o Bearer secret é a
+  // ÚNICA barreira de auth. Sem o secret configurado, rejeita tudo — nunca fail-open
+  // (senão qualquer POST anônimo manipularia eventos/DB via service_role).
+  if (!WEBHOOK_SECRET) return json({ ok: false, error: 'server misconfigured (WEBHOOK_CALENDAR_SECRET)' }, 500)
+  if (!constantTimeAuthCheck(req.headers.get('Authorization') ?? '', WEBHOOK_SECRET)) {
+    return json({ ok: false, error: 'unauthorized' }, 401)
   }
 
   let payload: Payload
