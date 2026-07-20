@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils'
 import { DiagnosticForm } from '@/components/diagnostico/DiagnosticForm'
 import { DiagnosticPreview } from '@/components/diagnostico/DiagnosticPreview'
 import { ActivityTimeline } from '@/components/shared/ActivityTimeline'
+import { PassagemBastaoForm } from '@/components/passagem-bastao/PassagemBastaoForm'
 import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog'
 
 export function LeadDetailPage() {
@@ -137,6 +138,7 @@ export function LeadDetailPage() {
           <TabsTrigger value="info">Informações</TabsTrigger>
           <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
           <TabsTrigger value="proposta">Proposta</TabsTrigger>
+          <TabsTrigger value="handoff">Passagem de Bastão</TabsTrigger>
           <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
@@ -302,6 +304,10 @@ export function LeadDetailPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="handoff">
+          <PassagemBastaoForm leadId={id!} />
         </TabsContent>
 
         <TabsContent value="historico">

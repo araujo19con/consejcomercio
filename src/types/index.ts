@@ -51,6 +51,37 @@ export interface Diagnostico extends DiagnosticAnswers {
   updated_at: string
 }
 
+export interface PassagemBastao {
+  id: string
+  lead_id: string
+  dores_expectativas?: string | null
+  perfil_comunicacao?: string | null
+  info_financeira?: string | null
+  prazos_marcos?: string | null
+  criado_por_id?: string | null
+  atualizado_por_id?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface PassagemBastaoMidia {
+  id: string
+  passagem_id: string
+  lead_id: string
+  tipo: 'audio' | 'video'
+  nome_arquivo: string
+  storage_path: string
+  mime_type?: string | null
+  tamanho_bytes?: number | null
+  slack_file_id?: string | null
+  slack_permalink?: string | null
+  enviado_slack_em?: string | null
+  erro_slack?: string | null
+  enviado_por_id?: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Cliente {
   id: string
   lead_id?: string | null
