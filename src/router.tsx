@@ -17,6 +17,7 @@ import { ConfiguracoesPage } from '@/pages/ConfiguracoesPage'
 import { SlackPage } from '@/pages/SlackPage'
 import { ReunioesPage } from '@/pages/ReunioesPage'
 import { MeEspacoPage } from '@/pages/MeEspacoPage'
+import { GoogleCallbackPage } from '@/pages/GoogleCallbackPage'
 import { MeDesempenhoPage } from '@/pages/MeDesempenhoPage'
 import { NotificacoesHistoricoPage } from '@/pages/NotificacoesHistoricoPage'
 import { MensagensPage } from '@/pages/MensagensPage'
@@ -79,6 +80,7 @@ export const router = createBrowserRouter([
       { path: 'importar', element: <ImportarPage /> },
       { path: 'pos-juniors', element: <PosJuniorsPage /> },
       { path: 'me', element: <MeEspacoPage /> },
+      { path: 'me/google-callback', element: <GoogleCallbackPage /> },
       { path: 'me/desempenho', element: <MeDesempenhoPage /> },
       { path: 'me/desempenho/:perfilId', element: <MeDesempenhoPage /> },
       { path: 'me/notificacoes-historico', element: <NotificacoesHistoricoPage /> },
